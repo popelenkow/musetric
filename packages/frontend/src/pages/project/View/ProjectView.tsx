@@ -9,6 +9,7 @@ import { ProjectLayout } from '../components/ProjectPageLayout.js';
 import { ThemeViewColors } from '../components/ThemeViewColors.js';
 import { ProjectSettings } from '../Settings/ProjectSettings.js';
 import { usePlayerStore } from '../store/player.js';
+import { useWaveformStore } from '../store/waveform.js';
 import { Player } from './Player.js';
 import { Spectrogram } from './Spectrogram.js';
 import { Subtitle } from './Subtitle.js';
@@ -21,11 +22,13 @@ export const ProjectView: FC<ProjectViewProps> = (props) => {
   const { project } = props;
 
   const audio = useQuery(endpoints.audioDelivery.get(project.id, 'lead'));
+  const wave = useQuery(endpoints.wave.get(project.id, 'lead'));
   const subtitle = useQuery(endpoints.subtitle.get(project.id));
 
   const mount = usePlayerStore((s) => s.mount);
   const load = usePlayerStore((s) => s.load);
   const initialized = usePlayerStore((s) => s.initialized);
+  const setSegments = useWaveformStore((s) => s.setSegments);
 
   useEffect(() => mount(), [mount]);
 
@@ -34,7 +37,12 @@ export const ProjectView: FC<ProjectViewProps> = (props) => {
     void load(audio.data);
   }, [audio.data, load, initialized]);
 
-  if (!initialized || !audio.data || !subtitle.data) {
+  useEffect(() => {
+    if (!wave.data) return;
+    setSegments(wave.data);
+  }, [wave.data, setSegments]);
+
+  if (!initialized || !audio.data || !subtitle.data || !wave.data) {
     return <QueryPending />;
   }
 

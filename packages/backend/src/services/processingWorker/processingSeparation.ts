@@ -1,6 +1,6 @@
 import { EventEmitter } from '@musetric/resource-utils/eventEmitter';
 import { Logger } from '@musetric/resource-utils/logger';
-import { convertToFmp4, separateAudio } from '@musetric/toolkit';
+import { convertToFmp4, generateWave, separateAudio } from '@musetric/toolkit';
 import { FastifyInstance } from 'fastify';
 import { envs } from '../../common/envs.js';
 import {
@@ -97,6 +97,30 @@ export const createSeparationWorker = (
           }),
         ]);
 
+        const waveLead = app.blobStorage.createPath();
+        const waveBacking = app.blobStorage.createPath();
+        const waveInstrumental = app.blobStorage.createPath();
+        await Promise.all([
+          generateWave({
+            fromPath: masterLead.blobPath,
+            toPath: waveLead.blobPath,
+            sampleRate: envs.audioSampleRate,
+            logger,
+          }),
+          generateWave({
+            fromPath: masterBacking.blobPath,
+            toPath: waveBacking.blobPath,
+            sampleRate: envs.audioSampleRate,
+            logger,
+          }),
+          generateWave({
+            fromPath: masterInstrumental.blobPath,
+            toPath: waveInstrumental.blobPath,
+            sampleRate: envs.audioSampleRate,
+            logger,
+          }),
+        ]);
+
         await app.db.processing.applySeparationResult({
           projectId: task.projectId,
           master: {
@@ -108,6 +132,11 @@ export const createSeparationWorker = (
             leadId: deliveryLead.blobId,
             backingId: deliveryBacking.blobId,
             instrumentalId: deliveryInstrumental.blobId,
+          },
+          wave: {
+            leadId: waveLead.blobId,
+            backingId: waveBacking.blobId,
+            instrumentalId: waveInstrumental.blobId,
           },
         });
 

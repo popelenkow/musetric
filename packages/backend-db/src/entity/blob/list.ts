@@ -9,6 +9,7 @@ export const list = (database: DatabaseSync) => {
   const statement = database.prepare(
     `SELECT blobId FROM AudioMaster
      UNION ALL SELECT blobId FROM AudioDelivery
+     UNION ALL SELECT blobId FROM Wave
      UNION ALL SELECT blobId FROM Preview
      UNION ALL SELECT blobId FROM Subtitle`,
   );
