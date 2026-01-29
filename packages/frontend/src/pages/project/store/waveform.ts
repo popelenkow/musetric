@@ -4,8 +4,13 @@ import { create } from 'zustand';
 import { usePlayerStore } from './player.js';
 import { useSettingsStore } from './settings.js';
 
+type WaveformPipeline = {
+  render: (progress: number) => void;
+};
+
 export type WaveformState = {
-  pipeline?: waveform.Pipeline;
+  pipeline?: WaveformPipeline;
+  segments?: waveform.WaveSegment[];
 };
 
 export const initialState: WaveformState = {};
@@ -13,20 +18,40 @@ export const initialState: WaveformState = {};
 export type WaveformActions = {
   mount: (canvas: HTMLCanvasElement) => void;
   unmount: () => void;
+  setSegments: (data?: Uint8Array) => void;
 };
 
 type State = WaveformState & WaveformActions;
 export const useWaveformStore = create<State>((set, get) => {
   let canvas: HTMLCanvasElement | undefined = undefined;
   let unsubscribeResizeObserver: (() => void) | undefined = undefined;
+  const barStep = 3;
 
   const createPipeline = () => {
     unsubscribeResizeObserver?.();
     unsubscribeResizeObserver = undefined;
     set({ pipeline: undefined });
     if (!canvas) return undefined;
-    const { colors } = useSettingsStore.getState();
-    return waveform.createPipeline(canvas, colors);
+    const draw = waveform.createDraw(canvas);
+    return {
+      render: (progress: number) => {
+        const { segments } = get();
+        const { buffer } = usePlayerStore.getState();
+        const { colors } = useSettingsStore.getState();
+        if (segments) {
+          draw.run(segments, progress, colors);
+          return;
+        }
+        if (!buffer) return;
+        const data = buffer.getChannelData(0);
+        const segmentCount = Math.max(
+          1,
+          Math.floor(canvas.clientWidth / barStep),
+        );
+        const generated = waveform.generateSegments(data, segmentCount);
+        draw.run(generated, progress, colors);
+      },
+    };
   };
 
   const mount = createCallLatest(async () => {
@@ -37,10 +62,9 @@ export const useWaveformStore = create<State>((set, get) => {
 
   const render = () => {
     const { pipeline } = get();
-    const { buffer, progress } = usePlayerStore.getState();
-    if (!pipeline || !buffer) return;
-    const data = buffer.getChannelData(0);
-    pipeline.render(data, progress);
+    const { progress } = usePlayerStore.getState();
+    if (!pipeline) return;
+    pipeline.render(progress);
   };
 
   useSettingsStore.subscribe(
@@ -77,6 +101,24 @@ export const useWaveformStore = create<State>((set, get) => {
     unmount: async () => {
       canvas = undefined;
       await mount();
+    },
+    setSegments: (data) => {
+      if (!data) {
+        set({ segments: undefined });
+        render();
+        return;
+      }
+      const floatView = new Float32Array(
+        data.buffer,
+        data.byteOffset,
+        Math.floor(data.byteLength / 4),
+      );
+      const segments: waveform.WaveSegment[] = [];
+      for (let i = 0; i + 1 < floatView.length; i += 2) {
+        segments.push({ min: floatView[i], max: floatView[i + 1] });
+      }
+      set({ segments });
+      render();
     },
   };
   return ref;

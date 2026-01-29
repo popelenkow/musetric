@@ -8,6 +8,7 @@ import {
   project,
   audioMaster,
   audioDelivery,
+  wave,
   subtitle,
 } from './entity/index.js';
 
@@ -32,6 +33,7 @@ export const createInstance = async (databasePath: string) => {
     preview: preview.createInstance(database),
     audioMaster: audioMaster.createInstance(database),
     audioDelivery: audioDelivery.createInstance(database),
+    wave: wave.createInstance(database),
     processing: processing.createInstance(database),
     subtitle: subtitle.createInstance(database),
     blob: blob.createInstance(database),

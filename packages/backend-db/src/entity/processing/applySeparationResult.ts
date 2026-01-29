@@ -13,6 +13,11 @@ export type ApplySeparationResultArg = {
     backingId: string;
     instrumentalId: string;
   };
+  wave: {
+    leadId: string;
+    backingId: string;
+    instrumentalId: string;
+  };
 };
 
 export const applySeparationResult = (database: DatabaseSync) => {
@@ -21,6 +26,9 @@ export const applySeparationResult = (database: DatabaseSync) => {
   );
   const insertDeliveryStatement = database.prepare(
     `INSERT INTO AudioDelivery (projectId, type, blobId) VALUES (?, ?, ?)`,
+  );
+  const insertWaveStatement = database.prepare(
+    `INSERT INTO Wave (projectId, type, blobId) VALUES (?, ?, ?)`,
   );
 
   return async (arg: ApplySeparationResultArg): Promise<void> => {
@@ -63,6 +71,22 @@ export const applySeparationResult = (database: DatabaseSync) => {
           'backing',
           arg.delivery.backingId,
         ),
+      );
+
+      await Promise.resolve(
+        insertWaveStatement.run(arg.projectId, 'lead', arg.wave.leadId),
+      );
+
+      await Promise.resolve(
+        insertWaveStatement.run(
+          arg.projectId,
+          'instrumental',
+          arg.wave.instrumentalId,
+        ),
+      );
+
+      await Promise.resolve(
+        insertWaveStatement.run(arg.projectId, 'backing', arg.wave.backingId),
       );
     });
   };
