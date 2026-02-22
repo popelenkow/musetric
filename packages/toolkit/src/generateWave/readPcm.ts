@@ -12,7 +12,7 @@ export const readPcm = async (options: ReadPcmOptions): Promise<void> => {
   const { fromPath, sampleRate, logger, onSample } = options;
   const floatsPerSample = 2;
   const bytesPerSample = Float32Array.BYTES_PER_ELEMENT * floatsPerSample;
-  let carry: Buffer<ArrayBufferLike> = Buffer.alloc(0);
+  let carry: Buffer = Buffer.alloc(0);
   let sampleIndex = 0;
 
   await spawnScript({

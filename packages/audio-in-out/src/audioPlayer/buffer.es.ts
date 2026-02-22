@@ -1,4 +1,6 @@
-export type ChannelBuffers = [ArrayBuffer] | [ArrayBuffer, ArrayBuffer];
+export type ChannelBuffers =
+  | [ArrayBufferLike]
+  | [ArrayBufferLike, ArrayBufferLike];
 export type ChannelArrays = [Float32Array] | [Float32Array, Float32Array];
 
 export const toBuffers = (arrays: ChannelArrays): ChannelBuffers =>

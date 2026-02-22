@@ -47,23 +47,21 @@ export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
     draw.configure(config);
   });
 
-  const render = markers.total(
-    (wave: Float32Array<ArrayBuffer>, progress: number) => {
-      if (isConfigureRequested) {
-        isConfigureRequested = false;
-        configure();
-      }
-      const { signal, view } = state;
-      sliceWave.run(wave, signal.real, progress);
-      state.zerofyImag();
-      windowing.run(signal.real);
-      fourier.forward(signal);
-      magnitudify.run(signal);
-      decibelify.run(signal.real);
-      remap.run(signal.real, view);
-      draw.run(view);
-    },
-  );
+  const render = markers.total((wave: Float32Array, progress: number) => {
+    if (isConfigureRequested) {
+      isConfigureRequested = false;
+      configure();
+    }
+    const { signal, view } = state;
+    sliceWave.run(wave, signal.real, progress);
+    state.zerofyImag();
+    windowing.run(signal.real);
+    fourier.forward(signal);
+    magnitudify.run(signal);
+    decibelify.run(signal.real);
+    remap.run(signal.real, view);
+    draw.run(view);
+  });
 
   return {
     render: createCallLatest(async (wave, progress) => {

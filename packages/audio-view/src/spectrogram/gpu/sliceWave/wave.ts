@@ -4,11 +4,7 @@ export type StateWave = {
   buffer: GPUBuffer;
   array: Float32Array<ArrayBuffer>;
   resize: (visibleSamples: number) => void;
-  write: (
-    wave: Float32Array<ArrayBuffer>,
-    progress: number,
-    config: Config,
-  ) => void;
+  write: (wave: Float32Array, progress: number, config: Config) => void;
   destroy: () => void;
 };
 

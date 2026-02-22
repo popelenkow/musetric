@@ -2,6 +2,11 @@ import { fastifyStatic } from '@fastify/static';
 import { type FastifyInstance, type FastifyRequest } from 'fastify';
 import { envs } from '../common/envs.js';
 
+const crossOriginIsolationHeaders = {
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'require-corp',
+};
+
 const isApiPath = (path: string) =>
   path.startsWith('/api') ||
   path.startsWith('/docs') ||
@@ -21,9 +26,16 @@ export const registerFrontend = (app: FastifyInstance) => {
     root: envs.publicPath,
     prefix: '/',
     index: ['index.html'],
+    setHeaders: (response) => {
+      Object.entries(crossOriginIsolationHeaders).forEach((header) => {
+        const [name, value] = header;
+        response.setHeader(name, value);
+      });
+    },
   });
   app.setNotFoundHandler((request, reply) => {
     if (isFrontendRequest(request)) {
+      reply.headers(crossOriginIsolationHeaders);
       return reply.sendFile('index.html');
     }
     return reply.callNotFound();

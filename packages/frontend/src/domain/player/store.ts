@@ -2,10 +2,13 @@ import { type AudioPlayer, createAudioPlayer } from '@musetric/audio-in-out';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { type ChannelBuffers, toChannelBuffers } from './helper.js';
 
 export type PlayerState = {
   player?: AudioPlayer;
-  buffer?: AudioBuffer;
+  channelBuffers?: ChannelBuffers;
+  bufferLength?: number;
+  duration: number;
   sampleRate?: number;
   playing: boolean;
   progress: number;
@@ -16,7 +19,9 @@ export type PlayerState = {
 
 export const initialState: PlayerState = {
   player: undefined,
-  buffer: undefined,
+  channelBuffers: undefined,
+  bufferLength: undefined,
+  duration: 0,
   playing: false,
   progress: 0,
   offset: 0,
@@ -50,9 +55,12 @@ export const usePlayerStore = create<State>()(
           const buffer = await player.context.decodeAudioData(
             encodedBuffer.buffer,
           );
+          const channelBuffers = toChannelBuffers(buffer);
           set({
             player,
-            buffer,
+            channelBuffers,
+            bufferLength: buffer.length,
+            duration: buffer.duration,
             sampleRate: buffer.sampleRate,
             playing: false,
             progress: 0,
@@ -82,9 +90,9 @@ export const usePlayerStore = create<State>()(
         };
       },
       play: async () => {
-        const { player, buffer, offset } = get();
-        if (!player || !buffer) return;
-        await player.play(buffer, offset);
+        const { player, bufferLength, channelBuffers, offset } = get();
+        if (!player || !bufferLength || !channelBuffers) return;
+        await player.play(channelBuffers, bufferLength, offset);
         set({ playing: true, startTime: player.context.currentTime });
       },
       pause: () => {
@@ -98,13 +106,13 @@ export const usePlayerStore = create<State>()(
         set({ playing: false, offset: newOffset });
       },
       seek: async (fraction) => {
-        const { buffer, player, playing } = get();
-        if (!buffer || !player) return;
+        const { bufferLength, player, channelBuffers, playing } = get();
+        if (!bufferLength || !player || !channelBuffers) return;
         const context = player.context;
-        const newOffset = Math.floor(buffer.length * fraction);
+        const newOffset = Math.floor(bufferLength * fraction);
         set({ offset: newOffset, progress: fraction });
         if (playing) {
-          await player.play(buffer, newOffset);
+          await player.play(channelBuffers, bufferLength, newOffset);
           set({ startTime: context.currentTime });
         }
       },

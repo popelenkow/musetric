@@ -41,7 +41,7 @@ export const defaultConfig: PipelineConfig = {
   },
 };
 export type Pipeline = {
-  render: (wave: Float32Array<ArrayBuffer>, progress: number) => Promise<void>;
+  render: (wave: Float32Array, progress: number) => Promise<void>;
   configure: (config: PipelineConfig) => void;
   destroy: () => void;
 };

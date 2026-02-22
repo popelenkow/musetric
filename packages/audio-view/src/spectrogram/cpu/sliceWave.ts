@@ -12,7 +12,7 @@ type Config = Pick<
 >;
 
 export const sliceWave = (
-  wave: Float32Array<ArrayBuffer>,
+  wave: Float32Array,
   signal: Float32Array<ArrayBuffer>,
   progress: number,
   config: Config,
@@ -55,7 +55,7 @@ export const sliceWave = (
 
 export type SliceWave = {
   run: (
-    wave: Float32Array<ArrayBuffer>,
+    wave: Float32Array,
     waves: Float32Array<ArrayBuffer>,
     progress: number,
   ) => void;

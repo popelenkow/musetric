@@ -6,14 +6,14 @@ import { usePlayerStore } from './store.js';
 
 export const Player: FC = () => {
   const playing = usePlayerStore((s) => s.playing);
-  const buffer = usePlayerStore((s) => s.buffer);
+  const bufferLength = usePlayerStore((s) => s.bufferLength);
   const play = usePlayerStore((s) => s.play);
   const pause = usePlayerStore((s) => s.pause);
 
   return (
     <IconButton
       onClick={playing ? pause : play}
-      disabled={!buffer}
+      disabled={!bufferLength}
       sx={{ alignSelf: 'center' }}
     >
       {playing ? <PauseIcon /> : <PlayArrowIcon />}

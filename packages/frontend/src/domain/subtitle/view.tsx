@@ -25,7 +25,7 @@ const getSegmentEnd = (segment: api.subtitle.Segment) => {
 
 const getSubtitleLines = (
   subtitle: api.subtitle.Segment[],
-  buffer: { duration: number } | undefined,
+  duration: number,
   progress: number,
 ): SubtitleLines => {
   if (subtitle.length === 0) {
@@ -36,7 +36,7 @@ const getSubtitleLines = (
     };
   }
 
-  const currentTime = buffer ? buffer.duration * progress : 0;
+  const currentTime = duration * progress;
   const currentIndex = subtitle.findIndex(
     (segment) => currentTime < getSegmentEnd(segment),
   );
@@ -54,12 +54,12 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
   const { t } = useTranslation();
   const subtitleQuery = useQuery(endpoints.subtitle.get(projectId));
 
-  const buffer = usePlayerStore((s) => s.buffer);
+  const duration = usePlayerStore((s) => s.duration);
   const progress = usePlayerStore((s) => s.progress);
 
   const { current, next, currentTime } = getSubtitleLines(
     subtitleQuery.data ?? [],
-    buffer,
+    duration,
     progress,
   );
 
