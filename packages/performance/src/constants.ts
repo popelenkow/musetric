@@ -2,7 +2,7 @@ import {
   type FourierMode,
   isGpuFourierMode,
   spectrogram,
-} from '@musetric/audio-view';
+} from '@musetric/audio';
 
 export const runs = 10;
 export const skipRuns = 10;

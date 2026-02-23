@@ -3,7 +3,7 @@ import {
   isGpuFourierMode,
   spectrogram,
   type ViewSize,
-} from '@musetric/audio-view';
+} from '@musetric/audio';
 import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
 

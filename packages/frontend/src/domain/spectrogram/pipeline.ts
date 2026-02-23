@@ -2,7 +2,7 @@ import {
   type FourierMode,
   isGpuFourierMode,
   spectrogram,
-} from '@musetric/audio-view';
+} from '@musetric/audio';
 import { envs } from '../../common/envs.js';
 import { getGpuDevice } from '../../common/gpu.js';
 

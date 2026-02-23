@@ -4,7 +4,7 @@ import {
   type spectrogram,
   subscribeResizeObserver,
   type ViewSize,
-} from '@musetric/audio-view';
+} from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { usePlayerStore } from '../player/store.js';

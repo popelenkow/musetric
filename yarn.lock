@@ -1289,25 +1289,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@musetric/audio-in-out@workspace:*, @musetric/audio-in-out@workspace:packages/audio-in-out":
+"@musetric/audio@workspace:*, @musetric/audio@workspace:packages/audio":
   version: 0.0.0-use.local
-  resolution: "@musetric/audio-in-out@workspace:packages/audio-in-out"
+  resolution: "@musetric/audio@workspace:packages/audio"
   dependencies:
     "@musetric/eslint-config": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@types/audioworklet": "catalog:"
-    "@types/node": "catalog:"
-    eslint: "catalog:"
-    typescript: "catalog:"
-  languageName: unknown
-  linkType: soft
-
-"@musetric/audio-view@workspace:*, @musetric/audio-view@workspace:packages/audio-view":
-  version: 0.0.0-use.local
-  resolution: "@musetric/audio-view@workspace:packages/audio-view"
-  dependencies:
-    "@musetric/eslint-config": "workspace:*"
-    "@musetric/resource-utils": "workspace:*"
     "@types/node": "catalog:"
     "@vitest/browser": "catalog:"
     "@vitest/browser-playwright": "catalog:"
@@ -1398,8 +1386,7 @@ __metadata:
     "@mui/icons-material": "catalog:"
     "@mui/material": "catalog:"
     "@musetric/api": "workspace:*"
-    "@musetric/audio-in-out": "workspace:*"
-    "@musetric/audio-view": "workspace:*"
+    "@musetric/audio": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
     "@musetric/kill-process": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
@@ -1460,7 +1447,7 @@ __metadata:
     "@emotion/react": "catalog:"
     "@emotion/styled": "catalog:"
     "@mui/material": "catalog:"
-    "@musetric/audio-view": "workspace:*"
+    "@musetric/audio": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
     "@musetric/kill-process": "workspace:*"
     "@types/node": "catalog:"

@@ -8,7 +8,7 @@ import {
   TableRow,
   useTheme,
 } from '@mui/material';
-import { type FourierMode } from '@musetric/audio-view';
+import { type FourierMode } from '@musetric/audio';
 import { type FC } from 'react';
 import { getTimerLabels, windowSizes } from '../constants.js';
 import { getMetric } from '../getMetric.js';

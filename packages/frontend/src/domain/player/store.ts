@@ -1,8 +1,12 @@
-import { type AudioPlayer, createAudioPlayer } from '@musetric/audio-in-out';
+import {
+  type AudioPlayer,
+  type ChannelBuffers,
+  createAudioPlayer,
+  toChannelBuffers,
+} from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { type ChannelBuffers, toChannelBuffers } from './helper.js';
 
 export type PlayerState = {
   player?: AudioPlayer;

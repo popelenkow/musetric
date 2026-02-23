@@ -7,7 +7,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { allFourierModes, type FourierMode } from '@musetric/audio-view';
+import { allFourierModes, type FourierMode } from '@musetric/audio';
 import { type FC, useMemo, useState } from 'react';
 import { windowSizes } from '../constants.js';
 import type { BenchmarkData } from '../runBenchmarks.js';

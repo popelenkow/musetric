@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { type FourierMode } from '@musetric/audio-view';
+import { type FourierMode } from '@musetric/audio';
 import { type FC, useEffect, useRef } from 'react';
 import { canvasHeight, canvasWidth } from '../constants.js';
 import { type MetricsData, runBenchmark } from '../runBenchmarks.js';
