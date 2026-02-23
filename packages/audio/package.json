@@ -1,11 +1,17 @@
 {
-  "name": "@musetric/audio-view",
+  "name": "@musetric/audio",
   "version": "0.1.0",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "exports": {
     "./package.json": "./package.json",
+    "./es": {
+      "monorepo": "./src/index.es.ts",
+      "types": "./dist/index.es.d.ts",
+      "import": "./dist/index.es.js",
+      "default": "./dist/index.es.js"
+    },
     ".": {
       "monorepo": "./src/index.ts",
       "types": "./dist/index.d.ts",
@@ -24,6 +30,7 @@
   "devDependencies": {
     "@musetric/eslint-config": "workspace:*",
     "@musetric/resource-utils": "workspace:*",
+    "@types/audioworklet": "catalog:",
     "@types/node": "catalog:",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",

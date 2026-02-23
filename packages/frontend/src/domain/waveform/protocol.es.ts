@@ -1,5 +1,5 @@
 import { type api } from '@musetric/api';
-import { type ViewColors, type ViewSize } from '@musetric/audio-view';
+import { type ViewColors, type ViewSize } from '@musetric/audio';
 
 export type ToWaveformWorkerMessage =
   | {

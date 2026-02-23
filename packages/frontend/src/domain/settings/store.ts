@@ -2,7 +2,7 @@ import {
   type FourierMode,
   spectrogram,
   type ViewColors,
-} from '@musetric/audio-view';
+} from '@musetric/audio';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 

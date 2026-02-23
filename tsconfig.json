@@ -2,8 +2,7 @@
   "files": [],
   "references": [
     { "path": "packages/api" },
-    { "path": "packages/audio-in-out" },
-    { "path": "packages/audio-view" },
+    { "path": "packages/audio" },
     { "path": "packages/backend" },
     { "path": "packages/backend-db" },
     { "path": "packages/eslint-config" },

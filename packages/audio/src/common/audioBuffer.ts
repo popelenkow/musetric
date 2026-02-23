@@ -1,6 +1,4 @@
-export type ChannelBuffers =
-  | [ArrayBufferLike]
-  | [ArrayBufferLike, ArrayBufferLike];
+import { type ChannelBuffers } from './channelBuffers.es.js';
 
 const toSharedArrayBuffer = (data: Float32Array<ArrayBuffer>): Float32Array => {
   const buffer = new SharedArrayBuffer(data.byteLength);

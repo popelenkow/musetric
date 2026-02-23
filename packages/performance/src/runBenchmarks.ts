@@ -1,4 +1,4 @@
-import { createGpuContext, type FourierMode } from '@musetric/audio-view';
+import { createGpuContext, type FourierMode } from '@musetric/audio';
 import { runPipeline } from './runPipeline.js';
 import { waitNextFrame } from './waitNextFrame.js';
 

@@ -1,4 +1,4 @@
-import { createGpuContext, type GpuContext } from '@musetric/audio-view';
+import { createGpuContext, type GpuContext } from '@musetric/audio';
 import { useEffect, useState } from 'react';
 
 let gpuContext: GpuContext | undefined = undefined;

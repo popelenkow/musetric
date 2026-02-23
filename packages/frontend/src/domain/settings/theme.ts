@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { type ViewColors } from '@musetric/audio-view';
+import { type ViewColors } from '@musetric/audio';
 import { useLayoutEffect } from 'react';
 import { useSettingsStore } from './store.js';
 

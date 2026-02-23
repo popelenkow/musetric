@@ -15,7 +15,7 @@
     "@emotion/react": "catalog:",
     "@emotion/styled": "catalog:",
     "@mui/material": "catalog:",
-    "@musetric/audio-view": "workspace:*",
+    "@musetric/audio": "workspace:*",
     "@musetric/eslint-config": "workspace:*",
     "@musetric/kill-process": "workspace:*",
     "@types/node": "catalog:",

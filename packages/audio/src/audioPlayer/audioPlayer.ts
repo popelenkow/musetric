@@ -1,5 +1,5 @@
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
-import { type ChannelBuffers } from './buffer.es.js';
+import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 import { createPlayerNode, getPlayerPort } from './port.js';
 
 export type AudioPlayer = {
