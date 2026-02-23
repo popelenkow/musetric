@@ -5,6 +5,11 @@ import { spawnScript } from '@musetric/resource-utils/node';
 
 const fragmentDurationSeconds = 2;
 
+export const fmp4AudioOutput = {
+  format: 'mp4',
+  contentType: 'audio/mp4',
+} as const;
+
 export type ConvertToFmp4Options = {
   fromPath: string;
   toPath: string;

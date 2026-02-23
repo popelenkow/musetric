@@ -1,9 +1,9 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
+import { fmp4AudioOutput } from '@musetric/toolkit';
 import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
-import { envs } from '../common/envs.js';
 
 export const audioDeliveryRouter: FastifyPluginAsyncZod = async (app) => {
   app.addHook('onRoute', (opts) => {
@@ -28,8 +28,8 @@ export const audioDeliveryRouter: FastifyPluginAsyncZod = async (app) => {
 
       const suffix = `_${type}`;
       const isNotModified = handleCachedFile(request, reply, {
-        filename: `${project.name}${suffix}.${envs.audioDeliveryFormat}`,
-        contentType: envs.audioDeliveryContentType,
+        filename: `${project.name}${suffix}.${fmp4AudioOutput.format}`,
+        contentType: fmp4AudioOutput.contentType,
         size: stat.size,
         mtimeMs: stat.mtimeMs,
       });

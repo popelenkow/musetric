@@ -3,6 +3,11 @@ import { dirname } from 'node:path';
 import { type Logger } from '@musetric/resource-utils';
 import { spawnScript } from '@musetric/resource-utils/node';
 
+export const flacAudioOutput = {
+  format: 'flac',
+  contentType: 'audio/flac',
+} as const;
+
 export type ConvertToFlacOptions = {
   fromPath: string;
   toPath: string;
