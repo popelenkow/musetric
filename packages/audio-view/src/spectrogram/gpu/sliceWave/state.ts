@@ -20,7 +20,7 @@ export type State = {
   wave: StateWave;
   bindGroup: GPUBindGroup;
   configure: (waves: GPUBuffer, config: Config) => void;
-  write: (waveArray: Float32Array<ArrayBuffer>, progress: number) => void;
+  write: (waveArray: Float32Array, progress: number) => void;
   destroy: () => void;
 };
 
