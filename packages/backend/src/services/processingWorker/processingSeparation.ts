@@ -1,4 +1,8 @@
-import { type EventEmitter, type Logger } from '@musetric/resource-utils';
+import {
+  defaultSampleRate,
+  type EventEmitter,
+  type Logger,
+} from '@musetric/resource-utils';
 import { convertToFmp4, generateWave, separateAudio } from '@musetric/toolkit';
 import { type FastifyInstance } from 'fastify';
 import { envs } from '../../common/envs.js';
@@ -45,7 +49,7 @@ export const createSeparationWorker = (
           leadPath: masterLead.blobPath,
           backingPath: masterBacking.blobPath,
           instrumentalPath: masterInstrumental.blobPath,
-          sampleRate: envs.audioSampleRate,
+          sampleRate: defaultSampleRate,
           handlers: {
             progress: (message) => {
               if (!state) {
@@ -79,19 +83,19 @@ export const createSeparationWorker = (
           convertToFmp4({
             fromPath: masterLead.blobPath,
             toPath: deliveryLead.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
           convertToFmp4({
             fromPath: masterBacking.blobPath,
             toPath: deliveryBacking.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
           convertToFmp4({
             fromPath: masterInstrumental.blobPath,
             toPath: deliveryInstrumental.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
         ]);
@@ -103,19 +107,19 @@ export const createSeparationWorker = (
           generateWave({
             fromPath: masterLead.blobPath,
             toPath: waveLead.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
           generateWave({
             fromPath: masterBacking.blobPath,
             toPath: waveBacking.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
           generateWave({
             fromPath: masterInstrumental.blobPath,
             toPath: waveInstrumental.blobPath,
-            sampleRate: envs.audioSampleRate,
+            sampleRate: defaultSampleRate,
             logger,
           }),
         ]);

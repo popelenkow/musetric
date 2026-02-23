@@ -1,3 +1,4 @@
+import { defaultSampleRate } from '@musetric/resource-utils';
 import { type ViewColors } from '../common/colors.js';
 import { type ViewSize } from '../common/viewSize.js';
 import { type WindowName } from './windowFunction.js';
@@ -22,7 +23,7 @@ export type ExtPipelineConfig = PipelineConfig & {
 };
 export const defaultConfig: PipelineConfig = {
   windowSize: 1024 * 4,
-  sampleRate: 44100,
+  sampleRate: defaultSampleRate,
   visibleTimeBefore: 2.0,
   visibleTimeAfter: 2.0,
   zeroPaddingFactor: 2,
