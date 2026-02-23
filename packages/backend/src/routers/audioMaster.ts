@@ -1,9 +1,9 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
+import { flacAudioOutput } from '@musetric/toolkit';
 import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
-import { envs } from '../common/envs.js';
 
 export const audioMasterRouter: FastifyPluginAsyncZod = async (app) => {
   app.addHook('onRoute', (opts) => {
@@ -28,8 +28,8 @@ export const audioMasterRouter: FastifyPluginAsyncZod = async (app) => {
 
       const suffix = type === 'source' ? '' : `_${type}`;
       const isNotModified = handleCachedFile(request, reply, {
-        filename: `${project.name}${suffix}.${envs.audioFormat}`,
-        contentType: envs.audioContentType,
+        filename: `${project.name}${suffix}.${flacAudioOutput.format}`,
+        contentType: flacAudioOutput.contentType,
         size: stat.size,
         mtimeMs: stat.mtimeMs,
       });
