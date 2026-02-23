@@ -1,7 +1,10 @@
-import { type EventEmitter, type Logger } from '@musetric/resource-utils';
+import {
+  defaultSampleRate,
+  type EventEmitter,
+  type Logger,
+} from '@musetric/resource-utils';
 import { convertToFlac } from '@musetric/toolkit';
 import { type FastifyInstance } from 'fastify';
-import { envs } from '../../common/envs.js';
 import {
   type ProcessingWorkerEvent,
   type ProcessingWorkerProgressEvent,
@@ -40,7 +43,7 @@ export const createValidationWorker = (
         await convertToFlac({
           fromPath: rawSourcePath,
           toPath: source.blobPath,
-          sampleRate: envs.audioSampleRate,
+          sampleRate: defaultSampleRate,
           logger,
         });
 

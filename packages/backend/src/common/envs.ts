@@ -22,7 +22,6 @@ export const envs = {
   gcIntervalMs: 5 * 60 * 1000,
   blobRetentionMs: 5 * 60 * 1000,
   processingIntervalMs: 10 * 1000,
-  audioSampleRate: 44100,
   audioFormat: 'flac',
   audioContentType: 'audio/flac',
   audioDeliveryFormat: 'mp4',

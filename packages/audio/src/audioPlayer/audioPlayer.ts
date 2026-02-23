@@ -1,3 +1,4 @@
+import { defaultSampleRate } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 import { createPlayerNode, getPlayerPort } from './port.js';
@@ -21,7 +22,7 @@ export type AudioPlayerOptions = {
 export const createAudioPlayer = async (
   options: AudioPlayerOptions = {},
 ): Promise<AudioPlayer> => {
-  const context = new AudioContext();
+  const context = new AudioContext({ sampleRate: defaultSampleRate });
   const node = await createPlayerNode(context);
   const port = getPlayerPort(node);
 
