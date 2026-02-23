@@ -30,6 +30,7 @@ export const jsConfig: Linter.Config = {
     ],
     'func-names': ['error'],
     'func-style': ['error'],
+    eqeqeq: ['error', 'always'],
     'no-restricted-exports': [
       'error',
       {

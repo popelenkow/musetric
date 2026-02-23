@@ -10,7 +10,7 @@ const toSharedArrayBuffer = (data: Float32Array<ArrayBuffer>): Float32Array => {
 export const toChannelBuffers = (buffer: AudioBuffer): ChannelBuffers => {
   const first = toSharedArrayBuffer(buffer.getChannelData(0));
 
-  if (buffer.numberOfChannels == 1) {
+  if (buffer.numberOfChannels === 1) {
     return [first.buffer];
   }
 
