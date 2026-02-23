@@ -22,6 +22,7 @@
     "@types/react": "catalog:",
     "@webgpu/types": "catalog:",
     "eslint": "catalog:",
+    "mediabunny": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:",

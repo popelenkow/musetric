@@ -2,7 +2,7 @@ import {
   type AudioPlayer,
   type ChannelArrays,
   createAudioPlayer,
-  readAudioBuffer,
+  decodeMp4,
 } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
@@ -18,7 +18,7 @@ export type PlayerState = {
   progress: number;
   startFrame: number;
   startTime: number;
-  status: 'pending' | 'success';
+  status: 'pending' | 'success' | 'error';
 };
 
 export const initialState: PlayerState = {
@@ -56,23 +56,25 @@ export const usePlayerStore = create<State>()(
           },
         });
         try {
-          const buffer = await player.context.decodeAudioData(
-            encodedBuffer.buffer,
-          );
-          const channels = readAudioBuffer(buffer);
+          const { sampleRate } = player.context;
+          const decoded = await decodeMp4(encodedBuffer.buffer, sampleRate);
           set({
             player,
-            channels,
-            frameCount: buffer.length,
-            duration: buffer.duration,
-            sampleRate: buffer.sampleRate,
+            channels: decoded.channels,
+            frameCount: decoded.frameCount,
+            duration: decoded.frameCount / sampleRate,
+            sampleRate,
             playing: false,
             progress: 0,
             startFrame: 0,
             startTime: 0,
             status: 'success',
           });
-        } catch {
+        } catch (error) {
+          console.error('Failed to decode project audio track', error);
+          set({
+            status: 'error',
+          });
           return player;
         }
 

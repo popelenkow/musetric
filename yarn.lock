@@ -1302,9 +1302,12 @@ __metadata:
     "@webgpu/types": "catalog:"
     cpx2: "catalog:"
     eslint: "catalog:"
+    mediabunny: "catalog:"
     playwright: "catalog:"
     typescript: "catalog:"
     vitest: "catalog:"
+  peerDependencies:
+    mediabunny: 1.35.1
   languageName: unknown
   linkType: soft
 
@@ -1405,6 +1408,7 @@ __metadata:
     globals: "catalog:"
     i18next: "catalog:"
     i18next-parser: "catalog:"
+    mediabunny: "catalog:"
     react: "catalog:"
     react-dom: "catalog:"
     react-hook-form: "catalog:"
@@ -1454,6 +1458,7 @@ __metadata:
     "@types/react": "catalog:"
     "@webgpu/types": "catalog:"
     eslint: "catalog:"
+    mediabunny: "catalog:"
     react: "catalog:"
     react-dom: "catalog:"
     typescript: "catalog:"
@@ -2003,6 +2008,29 @@ __metadata:
   version: 4.0.2
   resolution: "@types/deep-eql@npm:4.0.2"
   checksum: 10c0/bf3f811843117900d7084b9d0c852da9a044d12eb40e6de73b552598a6843c21291a8a381b0532644574beecd5e3491c5ff3a0365ab86b15d59862c025384844
+  languageName: node
+  linkType: hard
+
+"@types/dom-mediacapture-transform@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@types/dom-mediacapture-transform@npm:0.1.11"
+  dependencies:
+    "@types/dom-webcodecs": "npm:*"
+  checksum: 10c0/19c76d54cf31aa2a925011fc5f973dff9a10bdecfdf2285e5e568e61850a0fa2b8c9f1807a1462cbefd57ec26d32eeaa9c359117aca9d9fe7f0d6f2fff33f51e
+  languageName: node
+  linkType: hard
+
+"@types/dom-webcodecs@npm:*":
+  version: 0.1.18
+  resolution: "@types/dom-webcodecs@npm:0.1.18"
+  checksum: 10c0/dcf0a36869bddb6ec1534039911bd5517985c03503da6d6cfea4ef26480c763f91b2ef4f03dcc7b3c8a68740efc1ed93b0f63a865823877eb8675f98a772f67d
+  languageName: node
+  linkType: hard
+
+"@types/dom-webcodecs@npm:0.1.13":
+  version: 0.1.13
+  resolution: "@types/dom-webcodecs@npm:0.1.13"
+  checksum: 10c0/16683fd0330fdfbb867affec1c18fd493d88433a4ec66257579adc5d07b07e9492268b4401e9017b7388b13750722365b0392b375e39c84e74f564d5b4f634a4
   languageName: node
   linkType: hard
 
@@ -5841,6 +5869,16 @@ __metadata:
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
   checksum: 10c0/7579ff94e899e2f76ab64491d76cf606274c874d8f2af4a442c016bd85688927fcfca157ba6bf74b08e9439dc010b248ce05b96cc7c126a354c3bae7fcb48b7f
+  languageName: node
+  linkType: hard
+
+"mediabunny@npm:1.35.1":
+  version: 1.35.1
+  resolution: "mediabunny@npm:1.35.1"
+  dependencies:
+    "@types/dom-mediacapture-transform": "npm:^0.1.11"
+    "@types/dom-webcodecs": "npm:0.1.13"
+  checksum: 10c0/9764aff5fc4e163bfc5a7e4e75ed47583d06393ac122860b48a63ba7a1dbbe105f667c0efa0e5965e6e92dc4261cf99df6cc98ea37eb7df766366a170ef26abd
   languageName: node
   linkType: hard
 

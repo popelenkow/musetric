@@ -23,7 +23,7 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
     return mount(canvas);
   }, [mount, canvas]);
 
-  if (status === 'error') {
+  if (status === 'error' || playerStatus === 'error') {
     return <ViewError message={t('pages.project.progress.error.audioTrack')} />;
   }
 
