@@ -39,8 +39,7 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
       onClick={async (event) => {
         const { visibleTimeBefore, visibleTimeAfter } =
           useSettingsStore.getState();
-        const { progress, frameCount, sampleRate } =
-          usePlayerStore.getState();
+        const { progress, frameCount, sampleRate } = usePlayerStore.getState();
 
         if (!frameCount || !sampleRate) {
           return;
