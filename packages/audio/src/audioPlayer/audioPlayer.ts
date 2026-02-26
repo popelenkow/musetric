@@ -1,14 +1,17 @@
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
-import { type ChannelBuffers } from '../common/channelBuffers.es.js';
+import {
+  type ChannelArrays,
+  toChannelBuffers,
+} from '../common/channelBuffers.es.js';
 import { createPlayerNode, getPlayerPort } from './port.js';
 
 export type AudioPlayer = {
   context: AudioContext;
   play: (
-    buffers: ChannelBuffers,
-    length: number,
-    offset: number,
+    channels: ChannelArrays,
+    frameCount: number,
+    startFrame: number,
   ) => Promise<void>;
   pause: () => void;
   destroy: () => Promise<void>;
@@ -30,30 +33,31 @@ export const createAudioPlayer = async (
     ended: () => options.end?.(),
   });
 
-  let bufferLength: number | undefined = undefined;
-  let offset = 0;
+  let totalFrameCount: number | undefined = undefined;
+  let playStartFrame = 0;
   let startTime = 0;
   let raf = 0;
 
   const tick = () => {
-    if (!bufferLength) return;
+    if (!totalFrameCount) return;
     const frame =
-      offset +
+      playStartFrame +
       Math.floor((context.currentTime - startTime) * context.sampleRate);
-    const progress = Math.min(frame / bufferLength, 1);
+    const progress = Math.min(frame / totalFrameCount, 1);
     options.progress?.(progress);
     raf = requestAnimationFrame(tick);
   };
 
   return {
     context,
-    play: async (buffers, length, startOffset) => {
-      bufferLength = length;
-      offset = startOffset;
+    play: async (channels, frameCount, startFrame) => {
+      totalFrameCount = frameCount;
+      playStartFrame = startFrame;
       if (context.state === 'suspended') {
         await context.resume();
       }
-      port.postMessage({ type: 'play', buffers, offset: startOffset });
+      const buffers = toChannelBuffers(channels);
+      port.postMessage({ type: 'play', buffers, startFrame });
       startTime = context.currentTime;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
@@ -63,7 +67,7 @@ export const createAudioPlayer = async (
       cancelAnimationFrame(raf);
     },
     destroy: async () => {
-      bufferLength = undefined;
+      totalFrameCount = undefined;
       cancelAnimationFrame(raf);
       port.postMessage({ type: 'pause' });
       port.onmessage = () => undefined;

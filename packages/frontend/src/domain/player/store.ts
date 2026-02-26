@@ -1,8 +1,8 @@
 import {
   type AudioPlayer,
-  type ChannelBuffers,
+  type ChannelArrays,
   createAudioPlayer,
-  toChannelBuffers,
+  readAudioBuffer,
 } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
@@ -10,25 +10,25 @@ import { subscribeWithSelector } from 'zustand/middleware';
 
 export type PlayerState = {
   player?: AudioPlayer;
-  channelBuffers?: ChannelBuffers;
-  bufferLength?: number;
+  channels?: ChannelArrays;
+  frameCount?: number;
   duration: number;
   sampleRate?: number;
   playing: boolean;
   progress: number;
-  offset: number;
+  startFrame: number;
   startTime: number;
   status: 'pending' | 'success';
 };
 
 export const initialState: PlayerState = {
   player: undefined,
-  channelBuffers: undefined,
-  bufferLength: undefined,
+  channels: undefined,
+  frameCount: undefined,
   duration: 0,
   playing: false,
   progress: 0,
-  offset: 0,
+  startFrame: 0,
   startTime: 0,
   status: 'pending',
 };
@@ -52,23 +52,23 @@ export const usePlayerStore = create<State>()(
             set({ progress });
           },
           end: () => {
-            set({ playing: false, progress: 0, offset: 0, startTime: 0 });
+            set({ playing: false, progress: 0, startFrame: 0, startTime: 0 });
           },
         });
         try {
           const buffer = await player.context.decodeAudioData(
             encodedBuffer.buffer,
           );
-          const channelBuffers = toChannelBuffers(buffer);
+          const channels = readAudioBuffer(buffer);
           set({
             player,
-            channelBuffers,
-            bufferLength: buffer.length,
+            channels,
+            frameCount: buffer.length,
             duration: buffer.duration,
             sampleRate: buffer.sampleRate,
             playing: false,
             progress: 0,
-            offset: 0,
+            startFrame: 0,
             startTime: 0,
             status: 'success',
           });
@@ -94,29 +94,29 @@ export const usePlayerStore = create<State>()(
         };
       },
       play: async () => {
-        const { player, bufferLength, channelBuffers, offset } = get();
-        if (!player || !bufferLength || !channelBuffers) return;
-        await player.play(channelBuffers, bufferLength, offset);
+        const { player, frameCount, channels, startFrame } = get();
+        if (!player || !frameCount || !channels) return;
+        await player.play(channels, frameCount, startFrame);
         set({ playing: true, startTime: player.context.currentTime });
       },
       pause: () => {
-        const { player, startTime, offset } = get();
+        const { player, startTime, startFrame } = get();
         if (!player) return;
         player.pause();
         const context = player.context;
-        const newOffset =
-          offset +
+        const newStartFrame =
+          startFrame +
           Math.floor((context.currentTime - startTime) * context.sampleRate);
-        set({ playing: false, offset: newOffset });
+        set({ playing: false, startFrame: newStartFrame });
       },
       seek: async (fraction) => {
-        const { bufferLength, player, channelBuffers, playing } = get();
-        if (!bufferLength || !player || !channelBuffers) return;
+        const { frameCount, player, channels, playing } = get();
+        if (!frameCount || !player || !channels) return;
         const context = player.context;
-        const newOffset = Math.floor(bufferLength * fraction);
-        set({ offset: newOffset, progress: fraction });
+        const newStartFrame = Math.floor(frameCount * fraction);
+        set({ startFrame: newStartFrame, progress: fraction });
         if (playing) {
-          await player.play(channelBuffers, bufferLength, newOffset);
+          await player.play(channels, frameCount, newStartFrame);
           set({ startTime: context.currentTime });
         }
       },

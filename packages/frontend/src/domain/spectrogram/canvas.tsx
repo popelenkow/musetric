@@ -39,10 +39,10 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
       onClick={async (event) => {
         const { visibleTimeBefore, visibleTimeAfter } =
           useSettingsStore.getState();
-        const { progress, bufferLength, sampleRate } =
+        const { progress, frameCount, sampleRate } =
           usePlayerStore.getState();
 
-        if (!bufferLength || !sampleRate) {
+        if (!frameCount || !sampleRate) {
           return;
         }
 
@@ -55,7 +55,7 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
         const timelineRatio = visibleTimeBefore / totalVisibleTime;
         const clickOffsetRatio = clickRatio - timelineRatio;
         const timeOffset = totalVisibleTime * sampleRate * clickOffsetRatio;
-        const progressOffset = timeOffset / bufferLength;
+        const progressOffset = timeOffset / frameCount;
 
         const newProgress = Math.min(1, Math.max(0, progress + progressOffset));
 

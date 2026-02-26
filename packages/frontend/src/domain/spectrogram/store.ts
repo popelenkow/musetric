@@ -41,10 +41,9 @@ export const useSpectrogramStore = create<State>((set, get) => {
 
   const render = async () => {
     const { pipeline, isConfigured } = get();
-    const { channelBuffers, progress } = usePlayerStore.getState();
-    if (!pipeline || !channelBuffers || !isConfigured) return;
-    const buffer = new Float32Array(channelBuffers[0]);
-    await pipeline.render(buffer, progress);
+    const { channels, progress } = usePlayerStore.getState();
+    if (!pipeline || !channels || !isConfigured) return;
+    await pipeline.render(channels[0], progress);
   };
 
   const singletonManager = createSingletonManager(
@@ -88,7 +87,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
     },
     {
       equalityFn: (a, b) =>
-        a.channelBuffers === b.channelBuffers && a.progress === b.progress,
+        a.channels === b.channels && a.progress === b.progress,
     },
   );
 

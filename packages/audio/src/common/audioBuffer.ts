@@ -1,19 +1,23 @@
-import { type ChannelBuffers } from './channelBuffers.es.js';
+import type { ChannelArrays } from './channelBuffers.es.js';
 
-const toSharedArrayBuffer = (data: Float32Array<ArrayBuffer>): Float32Array => {
-  const buffer = new SharedArrayBuffer(data.byteLength);
-  const array = new Float32Array(buffer);
-  array.set(data);
-  return array;
-};
-
-export const toChannelBuffers = (buffer: AudioBuffer): ChannelBuffers => {
-  const first = toSharedArrayBuffer(buffer.getChannelData(0));
-
-  if (buffer.numberOfChannels === 1) {
-    return [first.buffer];
+export const readAudioBuffer = (
+  audioBuffer: AudioBuffer,
+): ChannelArrays<ArrayBuffer> => {
+  if (audioBuffer.numberOfChannels === 1) {
+    return [audioBuffer.getChannelData(0)];
   }
 
-  const second = toSharedArrayBuffer(buffer.getChannelData(1));
-  return [first.buffer, second.buffer];
+  return [audioBuffer.getChannelData(0), audioBuffer.getChannelData(1)];
+};
+
+export const writeAudioBuffer = (
+  audioBuffer: AudioBuffer,
+  channels: ChannelArrays<ArrayBuffer>,
+): void => {
+  if (channels.length === 1) {
+    audioBuffer.copyToChannel(channels[0], 0);
+  } else {
+    audioBuffer.copyToChannel(channels[0], 0);
+    audioBuffer.copyToChannel(channels[1], 1);
+  }
 };
