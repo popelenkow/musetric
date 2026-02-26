@@ -1,8 +1,8 @@
 import { type ViewSize } from './viewSize.js';
 
 export const getCanvasSize = (canvas: HTMLCanvasElement): ViewSize => ({
-  width: canvas.width,
-  height: canvas.height,
+  width: canvas.clientWidth,
+  height: canvas.clientHeight,
 });
 
 export const resizeCanvas = (canvas: HTMLCanvasElement): ViewSize => {
