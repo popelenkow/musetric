@@ -54,7 +54,8 @@ const loadWave = async (projectId: number, waveType: api.wave.Type) => {
       status: 'success',
     });
     render();
-  } catch {
+  } catch (error) {
+    console.error('Failed to load project wave', error);
     port.postMessage({
       type: 'state',
       status: 'error',

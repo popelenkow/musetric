@@ -39,6 +39,7 @@
     "globals": "catalog:",
     "i18next": "catalog:",
     "i18next-parser": "catalog:",
+    "mediabunny": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
