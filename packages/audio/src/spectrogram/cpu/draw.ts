@@ -29,7 +29,7 @@ export type Draw = {
 };
 
 export const createDraw = (
-  canvas: HTMLCanvasElement,
+  canvas: OffscreenCanvas,
   marker?: CpuMarker,
 ): Draw => {
   const context = canvas.getContext('2d');

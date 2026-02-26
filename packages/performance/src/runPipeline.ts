@@ -2,7 +2,6 @@ import {
   type FourierMode,
   isGpuFourierMode,
   spectrogram,
-  type ViewSize,
 } from '@musetric/audio';
 import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
@@ -11,21 +10,20 @@ export const runPipeline = async (
   fourierMode: FourierMode,
   windowSize: number,
   device: GPUDevice,
-  canvas: HTMLCanvasElement,
+  canvas: OffscreenCanvas,
 ): Promise<{
   first: Record<string, number>;
   average: Record<string, number>;
   maxDeviation: Record<string, { positive: number; negative: number }>;
 }> => {
   const metricsArray: Record<string, number>[] = [];
-  const viewSize: ViewSize = {
-    width: canvas.clientWidth,
-    height: canvas.clientHeight,
-  };
   const config: spectrogram.PipelineConfig = {
     ...spectrogram.defaultConfig,
     windowSize,
-    viewSize,
+    viewSize: {
+      width: canvas.width,
+      height: canvas.height,
+    },
     zeroPaddingFactor: 1,
   };
   const pipeline = isGpuFourierMode(fourierMode)

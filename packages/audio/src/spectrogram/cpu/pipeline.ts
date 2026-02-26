@@ -11,7 +11,7 @@ import { createSliceWave } from './sliceWave.js';
 import { createWindowing } from './windowing.js';
 
 export type CreatePipelineOptions = {
-  canvas: HTMLCanvasElement;
+  canvas: OffscreenCanvas;
   fourierMode: CpuFourierMode;
   onMetrics?: (metrics: PipelineMetrics) => void;
 };

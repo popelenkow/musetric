@@ -11,7 +11,7 @@ export type MetricsData = {
 export type BenchmarkData = Record<FourierMode, Record<number, MetricsData>>;
 
 export const runBenchmark = async (
-  canvas: HTMLCanvasElement,
+  canvas: OffscreenCanvas,
   mode: FourierMode,
   windowSize: number,
 ) => {

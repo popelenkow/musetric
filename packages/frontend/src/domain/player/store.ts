@@ -10,7 +10,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 
 export type PlayerState = {
   player?: AudioPlayer;
-  channels?: ChannelArrays;
+  channels?: ChannelArrays<SharedArrayBuffer>;
   frameCount?: number;
   duration: number;
   sampleRate?: number;

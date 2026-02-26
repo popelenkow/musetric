@@ -7,7 +7,7 @@ import { envs } from '../../common/envs.js';
 import { getGpuDevice } from '../../common/gpu.js';
 
 export const createSpectrogramPipeline = async (
-  canvas: HTMLCanvasElement,
+  canvas: OffscreenCanvas,
   fourierMode: FourierMode,
 ): Promise<spectrogram.Pipeline> => {
   const profiling = envs.spectrogramProfiling;

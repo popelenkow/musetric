@@ -24,7 +24,12 @@ export const BenchmarkRunner: FC<BenchmarkRunnerProps> = (props) => {
     }
 
     const run = async () => {
-      const metrics = await runBenchmark(canvas, fourierMode, windowSize);
+      const offscreenCanvas = canvas.transferControlToOffscreen();
+      const metrics = await runBenchmark(
+        offscreenCanvas,
+        fourierMode,
+        windowSize,
+      );
       onUpdate(metrics);
       isRendering.current = false;
     };
