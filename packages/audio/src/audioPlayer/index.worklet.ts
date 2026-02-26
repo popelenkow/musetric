@@ -2,7 +2,10 @@ import {
   createPortMessageHandler,
   wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
-import { type ChannelArrays, toArrays } from '../common/channelBuffers.es.js';
+import {
+  type ChannelArrays,
+  toChannelArrays,
+} from '../common/channelBuffers.es.js';
 import type { FromWorkletMessage, ToWorkletMessage } from './message.es.js';
 
 type Process = (output: Float32Array<ArrayBuffer>[]) => boolean;
@@ -11,8 +14,8 @@ type Processor = {
   process: Process;
 };
 const createProcessor = (messagePort: MessagePort): Processor => {
-  let buffers: ChannelArrays | undefined = undefined;
-  let offset = 0;
+  let channels: ChannelArrays | undefined = undefined;
+  let frameOffset = 0;
   let playing = false;
 
   const port = wrapMessagePort(messagePort).typed<
@@ -22,8 +25,8 @@ const createProcessor = (messagePort: MessagePort): Processor => {
 
   port.onmessage = createPortMessageHandler({
     play: (message) => {
-      buffers = toArrays(message.buffers);
-      offset = message.offset;
+      channels = toChannelArrays(message.buffers);
+      frameOffset = message.startFrame;
       playing = true;
     },
     pause: () => {
@@ -33,7 +36,7 @@ const createProcessor = (messagePort: MessagePort): Processor => {
 
   return {
     process: (output) => {
-      if (!buffers || !playing) {
+      if (!channels || !playing) {
         for (const out of output) {
           out.fill(0);
         }
@@ -42,16 +45,16 @@ const createProcessor = (messagePort: MessagePort): Processor => {
 
       for (let channel = 0; channel < output.length; channel++) {
         const out = output[channel];
-        const data = buffers[channel] ?? new Float32Array(0);
+        const data = channels[channel] ?? new Float32Array(0);
         for (let i = 0; i < out.length; i++) {
-          const index = offset + i;
+          const index = frameOffset + i;
           out[i] = index < data.length ? data[index] : 0;
         }
       }
 
-      const length = buffers[0].length;
-      offset += output[0].length;
-      if (offset >= length) {
+      const frameCount = channels[0].length;
+      frameOffset += output[0].length;
+      if (frameOffset >= frameCount) {
         playing = false;
         port.postMessage({ type: 'ended' });
       }
