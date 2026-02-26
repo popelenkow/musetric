@@ -1,5 +1,9 @@
 import { type api } from '@musetric/api';
-import { resizeCanvas, subscribeResizeObserver } from '@musetric/audio';
+import {
+  getCanvasSize,
+  resizeCanvas,
+  subscribeResizeObserver,
+} from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import {
   createPortMessageHandler,
@@ -121,7 +125,7 @@ export const useWaveformStore = create<State>((set, get) => {
       );
 
       unsubscribeResizeObserver = subscribeResizeObserver(canvas, async () => {
-        const viewSize = resizeCanvas(canvas);
+        const viewSize = getCanvasSize(canvas);
         worker.postMessage({
           type: 'resize',
           viewSize,
