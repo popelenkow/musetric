@@ -1,4 +1,4 @@
-import { windowFunctions } from '../../windowFunction.js';
+import { windowFunctions } from '../windowFunction.js';
 import { type Config } from './state.js';
 
 export type StateWindowFunction = {

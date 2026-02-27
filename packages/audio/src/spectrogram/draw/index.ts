@@ -1,4 +1,4 @@
-import { type ExtPipelineConfig } from '../../pipeline.js';
+import { type ExtPipelineConfig } from '../config.js';
 import { createColors } from './colors.js';
 import { createPipeline } from './pipeline.js';
 import { createStateProgress } from './progress.js';

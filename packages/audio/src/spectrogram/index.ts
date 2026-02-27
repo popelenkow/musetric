@@ -1,3 +1,11 @@
-export * as gpu from './gpu/index.js';
+export * from './config.js';
+export * from './decibelify/index.js';
+export * from './draw/index.js';
+export * from './magnitudify/index.js';
 export * from './pipeline.js';
+export * from './pipelineState/index.js';
+export * from './pipelineTimer.js';
+export * from './remap/index.js';
+export * from './sliceWave/index.js';
 export * from './windowFunction.js';
+export * from './windowing/index.js';

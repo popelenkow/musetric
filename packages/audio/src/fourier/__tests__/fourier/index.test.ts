@@ -2,8 +2,8 @@ import { afterAll, describe, it } from 'vitest';
 import { complexArrayFrom } from '../../../common/complexArray.js';
 import { createComplexGpuBufferReader } from '../../../common/gpuBufferReader/index.js';
 import { createGpuContext } from '../../../common/gpuContext.js';
-import { allFourierModes, gpuFouriers } from '../../fouriers.js';
-import { assertArrayClose, createGpuBuffers, windowCount } from './common.js';
+import { allFourierModes, fouriers } from '../../fouriers.js';
+import { assertArrayClose, createBuffers, windowCount } from './common.js';
 import { fourierFixtures } from './fixture.js';
 
 describe('fourier', async () => {
@@ -13,8 +13,8 @@ describe('fourier', async () => {
     describe(mode, () => {
       for (const fixture of fourierFixtures) {
         describe(fixture.name, () => {
-          const buffers = createGpuBuffers(device, fixture.windowSize);
-          const createFourier = gpuFouriers[mode];
+          const buffers = createBuffers(device, fixture.windowSize);
+          const createFourier = fouriers[mode];
           const fourier = createFourier(device);
           fourier.configure(buffers.signal, {
             windowSize: fixture.windowSize,

@@ -1,20 +1,20 @@
 import { type FourierConfig } from '../config.js';
 import { utilsRadix4 } from '../utilsRadix4.js';
 
-export type GpuFftRadix4Params = {
+export type FftRadix4Params = {
   windowSize: number;
   windowCount: number;
   reverseWidth: number;
 };
 
-const toParams = (config: FourierConfig): GpuFftRadix4Params => ({
+const toParams = (config: FourierConfig): FftRadix4Params => ({
   windowSize: config.windowSize,
   windowCount: config.windowCount,
   reverseWidth: utilsRadix4.getReverseWidth(config.windowSize),
 });
 
 export type StateParams = {
-  value: GpuFftRadix4Params;
+  value: FftRadix4Params;
   buffer: GPUBuffer;
   write: (config: FourierConfig) => void;
   destroy: () => void;

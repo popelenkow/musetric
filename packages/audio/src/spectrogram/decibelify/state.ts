@@ -1,28 +1,27 @@
-import { type ExtPipelineConfig } from '../../pipeline.js';
+import { type ExtPipelineConfig } from '../config.js';
 import { createParams, type StateParams } from './params.js';
-import { createPipeline } from './pipeline.js';
-import { createWindowFunction } from './windowFunction.js';
+import { createPipelines, type Pipelines } from './pipeline.js';
 
 export type Config = Pick<
   ExtPipelineConfig,
-  'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'windowName'
+  'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'minDecibel'
 >;
 
 export type State = {
-  pipeline: GPUComputePipeline;
+  pipelines: Pipelines;
   config: Config;
   params: StateParams;
   bindGroup: GPUBindGroup;
   configure: (signal: GPUBuffer, config: Config) => void;
   destroy: () => void;
 };
-export const createState = (device: GPUDevice): State => {
-  const pipeline = createPipeline(device);
+
+export const createState = (device: GPUDevice) => {
+  const pipelines = createPipelines(device);
   const params = createParams(device);
-  const windowFunction = createWindowFunction(device);
 
   const ref: State = {
-    pipeline,
+    pipelines,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     config: undefined!,
     params,
@@ -31,20 +30,17 @@ export const createState = (device: GPUDevice): State => {
     configure: (signal, config) => {
       ref.config = config;
       params.write(config);
-      windowFunction.configure(config);
       ref.bindGroup = device.createBindGroup({
-        label: 'windowing-bind-group',
-        layout: pipeline.getBindGroupLayout(0),
+        label: 'decibelify-bind-group',
+        layout: pipelines.layout,
         entries: [
           { binding: 0, resource: { buffer: signal } },
           { binding: 1, resource: { buffer: params.buffer } },
-          { binding: 2, resource: { buffer: windowFunction.buffer } },
         ],
       });
     },
     destroy: () => {
       params.destroy();
-      windowFunction.destroy();
     },
   };
   return ref;

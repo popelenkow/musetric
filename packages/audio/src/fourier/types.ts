@@ -1,7 +1,7 @@
 import { type ComplexGpuBuffer } from '../common/complexArray.js';
 import { type FourierConfig } from './config.js';
 
-export type GpuFourier = {
+export type Fourier = {
   forward: (encoder: GPUCommandEncoder) => void;
   configure: (signal: ComplexGpuBuffer, config: FourierConfig) => void;
   destroy: () => void;
@@ -12,7 +12,7 @@ export type FourierTimestampWrites = {
   transform?: GPUComputePassTimestampWrites;
 };
 
-export type CreateGpuFourier = (
+export type CreateFourier = (
   device: GPUDevice,
   markers?: FourierTimestampWrites,
-) => GpuFourier;
+) => Fourier;

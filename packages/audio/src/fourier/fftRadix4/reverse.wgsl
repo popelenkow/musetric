@@ -1,4 +1,4 @@
-struct GpuFftRadix4ShaderParams {
+struct FftRadix4ShaderParams {
   windowSize : u32,
   windowCount : u32,
   reverseWidth : u32,
@@ -6,7 +6,7 @@ struct GpuFftRadix4ShaderParams {
 
 @group(0) @binding(0) var<storage, read_write> dataReal  : array<f32>;
 @group(0) @binding(1) var<storage, read>  reverseTable : array<u32>;
-@group(0) @binding(2) var<uniform> params : GpuFftRadix4ShaderParams;
+@group(0) @binding(2) var<uniform> params : FftRadix4ShaderParams;
 
 fn mapToReversedIndex(originalIndex : u32, stepSize : u32, blockLength : u32) -> u32 {
   let blockIndex = originalIndex / stepSize;

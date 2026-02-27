@@ -1,7 +1,7 @@
-import { type CreateGpuFourier, type GpuFourier } from '../gpuFourier.js';
+import { type CreateFourier, type Fourier } from '../types.js';
 import { createState } from './state.js';
 
-export const createGpuFftRadix4: CreateGpuFourier = (device, markers) => {
+export const createFftRadix4: CreateFourier = (device, markers) => {
   const state = createState(device);
 
   const reverse = (encoder: GPUCommandEncoder) => {
@@ -29,7 +29,7 @@ export const createGpuFftRadix4: CreateGpuFourier = (device, markers) => {
     pass.end();
   };
 
-  const ref: GpuFourier = {
+  const ref: Fourier = {
     forward: (encoder) => {
       reverse(encoder);
       transform(encoder);

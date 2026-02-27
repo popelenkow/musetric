@@ -1,15 +1,11 @@
-import { createGpuFftRadix2 } from './gpuFftRadix2/index.js';
-import { createGpuFftRadix4 } from './gpuFftRadix4/index.js';
-
-export const gpuFouriers = {
-  gpuFftRadix2: createGpuFftRadix2,
-  gpuFftRadix4: createGpuFftRadix4,
-} as const;
+import { createFftRadix2 } from './fftRadix2/index.js';
+import { createFftRadix4 } from './fftRadix4/index.js';
 
 export const fouriers = {
-  ...gpuFouriers,
-};
+  fftRadix2: createFftRadix2,
+  fftRadix4: createFftRadix4,
+} as const;
 
-export type FourierMode = keyof typeof gpuFouriers;
+export type FourierMode = keyof typeof fouriers;
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-export const allFourierModes = Object.keys(gpuFouriers) as FourierMode[];
+export const allFourierModes = Object.keys(fouriers) as FourierMode[];

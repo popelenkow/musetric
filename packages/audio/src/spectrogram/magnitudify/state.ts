@@ -1,10 +1,11 @@
-import { type ExtPipelineConfig } from '../../pipeline.js';
+import { type ComplexGpuBuffer } from '../../common/complexArray.js';
+import { type ExtPipelineConfig } from '../config.js';
 import { createParams, type StateParams } from './params.js';
 import { createPipelines, type Pipelines } from './pipeline.js';
 
 export type Config = Pick<
   ExtPipelineConfig,
-  'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'minDecibel'
+  'windowSize' | 'windowCount' | 'zeroPaddingFactor'
 >;
 
 export type State = {
@@ -12,7 +13,7 @@ export type State = {
   config: Config;
   params: StateParams;
   bindGroup: GPUBindGroup;
-  configure: (signal: GPUBuffer, config: Config) => void;
+  configure: (signal: ComplexGpuBuffer, config: Config) => void;
   destroy: () => void;
 };
 
@@ -29,13 +30,14 @@ export const createState = (device: GPUDevice) => {
     bindGroup: undefined!,
     configure: (signal, config) => {
       ref.config = config;
-      params.write(config);
+      ref.params.write(config);
       ref.bindGroup = device.createBindGroup({
-        label: 'decibelify-bind-group',
+        label: 'magnitudify-bind-group',
         layout: pipelines.layout,
         entries: [
-          { binding: 0, resource: { buffer: signal } },
-          { binding: 1, resource: { buffer: params.buffer } },
+          { binding: 0, resource: { buffer: signal.real } },
+          { binding: 1, resource: { buffer: signal.imag } },
+          { binding: 2, resource: { buffer: params.buffer } },
         ],
       });
     },
