@@ -5,9 +5,16 @@ export const getCanvasSize = (canvas: HTMLCanvasElement): ViewSize => ({
   height: canvas.clientHeight,
 });
 
-export const resizeCanvas = (canvas: HTMLCanvasElement): ViewSize => {
-  const viewSize = getCanvasSize(canvas);
+export const setCanvasSize = (
+  canvas: HTMLCanvasElement | OffscreenCanvas,
+  viewSize: ViewSize,
+) => {
   canvas.width = viewSize.width;
   canvas.height = viewSize.height;
+};
+
+export const resizeCanvas = (canvas: HTMLCanvasElement): ViewSize => {
+  const viewSize = getCanvasSize(canvas);
+  setCanvasSize(canvas, viewSize);
   return viewSize;
 };

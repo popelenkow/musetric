@@ -1,6 +1,8 @@
 import {
   type FourierMode,
+  getCanvasSize,
   resizeCanvas,
+  setCanvasSize,
   type spectrogram,
   subscribeResizeObserver,
   type ViewSize,
@@ -47,9 +49,13 @@ export const useSpectrogramStore = create<State>((set, get) => {
   };
 
   const singletonManager = createSingletonManager(
-    async (canvas: HTMLCanvasElement, fourierMode: FourierMode) => {
+    async (
+      canvas: OffscreenCanvas,
+      fourierMode: FourierMode,
+      viewSize: ViewSize,
+    ) => {
       const pipeline = await createSpectrogramPipeline(canvas, fourierMode);
-      set({ pipeline, viewSize: resizeCanvas(canvas) });
+      set({ pipeline, viewSize });
       configure();
       await render();
       return pipeline;
@@ -66,9 +72,6 @@ export const useSpectrogramStore = create<State>((set, get) => {
     () => {
       configure();
       void render();
-    },
-    {
-      equalityFn: (a, b) => a.fourierMode !== b.fourierMode,
     },
   );
 
@@ -94,12 +97,16 @@ export const useSpectrogramStore = create<State>((set, get) => {
   const ref: State = {
     mount: (canvas) => {
       const { fourierMode } = useSettingsStore.getState();
+      const initViewSize = resizeCanvas(canvas);
+      const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      void singletonManager.create(canvas, fourierMode);
+      void singletonManager.create(offscreenCanvas, fourierMode, initViewSize);
       const unsubscribeResizeObserver = subscribeResizeObserver(
         canvas,
         async () => {
-          set({ viewSize: resizeCanvas(canvas) });
+          const viewSize = getCanvasSize(canvas);
+          setCanvasSize(offscreenCanvas, viewSize);
+          set({ viewSize });
           configure();
           await render();
         },

@@ -13,7 +13,7 @@ import { createWindowing } from './windowing/index.js';
 export type CreatePipelineOptions = {
   device: GPUDevice;
   fourierMode: GpuFourierMode;
-  canvas: HTMLCanvasElement;
+  canvas: OffscreenCanvas;
   onMetrics?: (metrics: PipelineMetrics) => void;
 };
 export const createPipeline = (options: CreatePipelineOptions): Pipeline => {

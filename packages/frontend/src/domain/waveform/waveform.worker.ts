@@ -1,6 +1,6 @@
 import { api } from '@musetric/api';
 import { requestWithAxios } from '@musetric/api/dom';
-import { type ViewColors, waveform } from '@musetric/audio';
+import { setCanvasSize, type ViewColors, waveform } from '@musetric/audio';
 import {
   createPortMessageHandler,
   wrapMessagePort,
@@ -89,8 +89,7 @@ port.onmessage = createPortMessageHandler<ToWaveformWorkerMessage>({
   },
   resize: (message) => {
     if (!state.canvas) return;
-    state.canvas.width = message.viewSize.width;
-    state.canvas.height = message.viewSize.height;
+    setCanvasSize(state.canvas, message.viewSize);
     render();
   },
 });
