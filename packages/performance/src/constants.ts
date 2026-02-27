@@ -1,8 +1,4 @@
-import {
-  type FourierMode,
-  isGpuFourierMode,
-  spectrogram,
-} from '@musetric/audio';
+import { spectrogram } from '@musetric/audio';
 
 export const runs = 10;
 export const skipRuns = 10;
@@ -29,8 +25,3 @@ const createWave = () => {
   return result;
 };
 export const wave = createWave();
-
-export const getTimerLabels = (mode: FourierMode): readonly string[] =>
-  isGpuFourierMode(mode)
-    ? spectrogram.gpu.timerLabels
-    : spectrogram.cpu.timerLabels;

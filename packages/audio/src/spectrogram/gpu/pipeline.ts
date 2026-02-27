@@ -1,5 +1,5 @@
 import { createCallLatest } from '@musetric/resource-utils';
-import { type GpuFourierMode, gpuFouriers } from '../../fourier/index.js';
+import { type FourierMode, gpuFouriers } from '../../fourier/index.js';
 import { type Pipeline } from '../pipeline.js';
 import { createDecibelify } from './decibelify/index.js';
 import { createDraw } from './draw/index.js';
@@ -12,7 +12,7 @@ import { createWindowing } from './windowing/index.js';
 
 export type CreatePipelineOptions = {
   device: GPUDevice;
-  fourierMode: GpuFourierMode;
+  fourierMode: FourierMode;
   canvas: OffscreenCanvas;
   onMetrics?: (metrics: PipelineMetrics) => void;
 };

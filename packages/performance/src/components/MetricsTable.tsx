@@ -8,23 +8,21 @@ import {
   TableRow,
   useTheme,
 } from '@mui/material';
-import { type FourierMode } from '@musetric/audio';
+import { spectrogram } from '@musetric/audio';
 import { type FC } from 'react';
-import { getTimerLabels, windowSizes } from '../constants.js';
+import { windowSizes } from '../constants.js';
 import { getMetric } from '../getMetric.js';
 import type { MetricsData } from '../runBenchmarks.js';
 
 export type MetricsTableProps = {
-  mode: FourierMode;
   results: Record<number, MetricsData>;
   showFirst: boolean;
   showPercent: boolean;
   showDeviations: boolean;
 };
 export const MetricsTable: FC<MetricsTableProps> = (props) => {
-  const { mode, results, showFirst, showPercent, showDeviations } = props;
+  const { results, showFirst, showPercent, showDeviations } = props;
 
-  const metrics = getTimerLabels(mode);
   const theme = useTheme();
   const divider = `1px solid ${theme.palette.divider}`;
   const stickyBorder = {
@@ -89,7 +87,7 @@ export const MetricsTable: FC<MetricsTableProps> = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {metrics.map((metric, metricIdx) => (
+          {spectrogram.gpu.timerLabels.map((metric, metricIdx) => (
             <TableRow
               key={metric}
               sx={{

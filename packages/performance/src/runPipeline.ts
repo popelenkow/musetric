@@ -1,8 +1,4 @@
-import {
-  type FourierMode,
-  isGpuFourierMode,
-  spectrogram,
-} from '@musetric/audio';
+import { type FourierMode, spectrogram } from '@musetric/audio';
 import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
 
@@ -26,18 +22,12 @@ export const runPipeline = async (
     },
     zeroPaddingFactor: 1,
   };
-  const pipeline = isGpuFourierMode(fourierMode)
-    ? spectrogram.gpu.createPipeline({
-        device,
-        canvas,
-        fourierMode,
-        onMetrics: (metrics) => metricsArray.push(metrics),
-      })
-    : spectrogram.cpu.createPipeline({
-        canvas,
-        fourierMode,
-        onMetrics: (metrics) => metricsArray.push(metrics),
-      });
+  const pipeline = spectrogram.gpu.createPipeline({
+    device,
+    canvas,
+    fourierMode,
+    onMetrics: (metrics) => metricsArray.push(metrics),
+  });
   pipeline.configure(config);
 
   for (let i = 0; i < skipRuns + runs; i++) {
