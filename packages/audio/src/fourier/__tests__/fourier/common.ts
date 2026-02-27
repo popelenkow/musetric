@@ -2,7 +2,7 @@ import { expect } from 'vitest';
 
 export const windowCount = 1;
 
-export const createGpuBuffers = (device: GPUDevice, windowSize: number) => {
+export const createBuffers = (device: GPUDevice, windowSize: number) => {
   const createSignalBuffer = () => ({
     real: device.createBuffer({
       label: 'test-signal-real-buffer',

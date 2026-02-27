@@ -22,7 +22,7 @@ export const runPipeline = async (
     },
     zeroPaddingFactor: 1,
   };
-  const pipeline = spectrogram.gpu.createPipeline({
+  const pipeline = spectrogram.createPipeline({
     device,
     canvas,
     fourierMode,

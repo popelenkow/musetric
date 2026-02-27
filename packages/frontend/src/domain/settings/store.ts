@@ -13,7 +13,7 @@ export type SettingsState = {
 
 const initialState: SettingsState = {
   ...spectrogram.defaultConfig,
-  fourierMode: 'gpuFftRadix4',
+  fourierMode: 'fftRadix4',
   open: false,
 };
 

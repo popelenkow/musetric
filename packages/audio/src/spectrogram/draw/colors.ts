@@ -1,4 +1,4 @@
-import { parseHexColor } from '../../../common/colors.js';
+import { parseHexColor } from '../../common/colors.js';
 import { type Config } from './index.js';
 
 const toVec4 = (hex: string): [number, number, number, number] => {

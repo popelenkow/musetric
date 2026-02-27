@@ -9,7 +9,7 @@ export const createSpectrogramPipeline = async (
   const profiling = envs.spectrogramProfiling;
 
   const device = await getGpuDevice(profiling);
-  return spectrogram.gpu.createPipeline({
+  return spectrogram.createPipeline({
     device,
     fourierMode,
     canvas,

@@ -1,11 +1,11 @@
-struct GpuFourierParams {
+struct FourierParams {
   windowSize: u32,
   windowCount: u32,
 };
 
 @group(0) @binding(0) var<storage, read_write> dataReal: array<f32>;
 @group(0) @binding(1) var<storage, read> reverseTable: array<u32>;
-@group(0) @binding(2) var<uniform> params: GpuFourierParams;
+@group(0) @binding(2) var<uniform> params: FourierParams;
 
 @compute @workgroup_size(64)
 fn main(

@@ -87,7 +87,7 @@ export const MetricsTable: FC<MetricsTableProps> = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {spectrogram.gpu.timerLabels.map((metric, metricIdx) => (
+          {spectrogram.timerLabels.map((metric, metricIdx) => (
             <TableRow
               key={metric}
               sx={{
