@@ -1,6 +1,4 @@
 export * from './config.js';
-export * from './cpuFftRadix4/index.js';
-export * from './cpuFourier.js';
 export * from './fouriers.js';
 export * from './gpuFftRadix2/index.js';
 export * from './gpuFftRadix4/index.js';

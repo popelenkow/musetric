@@ -115,7 +115,6 @@ export const App: FC = () => {
       </Box>
 
       <MetricsTable
-        mode={mode}
         results={data[mode]}
         showFirst={showFirst}
         showPercent={showPercent}

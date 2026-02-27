@@ -1,60 +1,15 @@
 import { afterAll, describe, it } from 'vitest';
-import {
-  type ComplexArray,
-  complexArrayFrom,
-} from '../../../common/complexArray.js';
+import { complexArrayFrom } from '../../../common/complexArray.js';
 import { createComplexGpuBufferReader } from '../../../common/gpuBufferReader/index.js';
 import { createGpuContext } from '../../../common/gpuContext.js';
-import {
-  allCpuFourierModes,
-  allGpuFourierModes,
-  cpuFouriers,
-  gpuFouriers,
-} from '../../fouriers.js';
+import { allFourierModes, gpuFouriers } from '../../fouriers.js';
 import { assertArrayClose, createGpuBuffers, windowCount } from './common.js';
 import { fourierFixtures } from './fixture.js';
 
 describe('fourier', async () => {
   const { device } = await createGpuContext();
 
-  for (const mode of allCpuFourierModes) {
-    describe(mode, () => {
-      for (const fixture of fourierFixtures) {
-        describe(fixture.name, () => {
-          const createFourier = cpuFouriers[mode];
-          const fourier = createFourier();
-          fourier.configure({
-            windowSize: fixture.windowSize,
-            windowCount,
-          });
-
-          it('forward', () => {
-            const zeroImag = new Float32Array(fixture.windowSize).fill(0);
-            const signal: ComplexArray = {
-              real: fixture.input.slice(),
-              imag: zeroImag,
-            };
-            fourier.forward(signal);
-            assertArrayClose('real', signal.real, fixture.output.real);
-            assertArrayClose('imag', signal.imag, fixture.output.imag);
-          });
-
-          it('inverse', () => {
-            const zeroImag = new Float32Array(fixture.windowSize).fill(0);
-            const signal: ComplexArray = {
-              real: fixture.output.real.slice(),
-              imag: fixture.output.imag.slice(),
-            };
-            fourier.inverse(signal);
-            assertArrayClose('real', signal.real, fixture.input);
-            assertArrayClose('imag', signal.imag, zeroImag);
-          });
-        });
-      }
-    });
-  }
-
-  for (const mode of allGpuFourierModes) {
+  for (const mode of allFourierModes) {
     describe(mode, () => {
       for (const fixture of fourierFixtures) {
         describe(fixture.name, () => {

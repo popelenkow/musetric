@@ -1,5 +1,6 @@
-// GPU shaders based on CPU implementation from ../cpuFftRadix4/utils.ts
-// See transform.wgsl and reverse.wgsl for algorithm attribution
+// Based on FFT.js by Fedor Indutny (MIT License)
+// Source: https://github.com/indutny/fft.js
+// Adapted for WGSL and the Musetric project
 
 import reverseShader from './reverse.wgsl?raw';
 import transformShader from './transform.wgsl?raw';
