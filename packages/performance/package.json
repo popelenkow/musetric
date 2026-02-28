@@ -18,6 +18,7 @@
     "@musetric/audio": "workspace:*",
     "@musetric/eslint-config": "workspace:*",
     "@musetric/kill-process": "workspace:*",
+    "@musetric/resource-utils": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@webgpu/types": "catalog:",

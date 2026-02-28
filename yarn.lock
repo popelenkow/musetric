@@ -1307,6 +1307,7 @@ __metadata:
     typescript: "catalog:"
     vitest: "catalog:"
   peerDependencies:
+    "@musetric/resource-utils": "workspace:*"
     mediabunny: 1.35.1
   languageName: unknown
   linkType: soft
@@ -1454,6 +1455,7 @@ __metadata:
     "@musetric/audio": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
     "@musetric/kill-process": "workspace:*"
+    "@musetric/resource-utils": "workspace:*"
     "@types/node": "catalog:"
     "@types/react": "catalog:"
     "@webgpu/types": "catalog:"
