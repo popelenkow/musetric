@@ -1,4 +1,4 @@
-import { spectrogram } from '@musetric/audio';
+import { defaultSampleRate } from '@musetric/resource-utils';
 
 export const runs = 10;
 export const skipRuns = 10;
@@ -6,7 +6,6 @@ export const progress = 0.5;
 
 export const canvasWidth = 1920;
 export const canvasHeight = 1080;
-const { sampleRate } = spectrogram.defaultConfig;
 
 const getWindowSizes = () => {
   const sizes: number[] = [];
@@ -18,7 +17,7 @@ const getWindowSizes = () => {
 export const windowSizes = getWindowSizes();
 
 const createWave = () => {
-  const result = new Float32Array(sampleRate * 60 * 3);
+  const result = new Float32Array(defaultSampleRate * 60 * 3);
   for (let i = 0; i < result.length; i++) {
     result[i] = Math.random() * 2 - 1;
   }

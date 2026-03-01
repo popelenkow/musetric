@@ -1,22 +1,22 @@
 import {
   type FourierMode,
   getCanvasSize,
-  resizeCanvas,
-  setCanvasSize,
-  type spectrogram,
+  spectrogram,
   subscribeResizeObserver,
-  type ViewSize,
 } from '@musetric/audio';
-import { createSingletonManager } from '@musetric/resource-utils';
+import {
+  createSingletonManager,
+  defaultSampleRate,
+} from '@musetric/resource-utils';
 import { create } from 'zustand';
+import { envs } from '../../common/envs.js';
+import { getGpuDevice } from '../../common/gpu.js';
 import { usePlayerStore } from '../player/store.js';
-import { useSettingsStore } from '../settings/store.js';
-import { createSpectrogramPipeline } from './pipeline.js';
+import { type SettingsState, useSettingsStore } from '../settings/store.js';
 
 export type SpectrogramState = {
   pipeline?: spectrogram.Pipeline;
-  viewSize?: ViewSize;
-  isConfigured?: boolean;
+  canvas?: HTMLCanvasElement;
 };
 
 type Unmount = () => void;
@@ -26,62 +26,80 @@ export type SpectrogramActions = {
 
 type State = SpectrogramState & SpectrogramActions;
 export const useSpectrogramStore = create<State>((set, get) => {
-  const configure = () => {
-    const { pipeline, viewSize } = get();
-    const { sampleRate } = usePlayerStore.getState();
-    const settings = useSettingsStore.getState();
-    if (!pipeline || !sampleRate || !viewSize) return;
-
-    const config: spectrogram.PipelineConfig = {
-      ...settings,
-      viewSize,
-      sampleRate,
-    };
-    pipeline.configure(config);
-    set({ isConfigured: true });
-  };
-
   const render = async () => {
-    const { pipeline, isConfigured } = get();
+    const { pipeline } = get();
     const { channels, progress } = usePlayerStore.getState();
-    if (!pipeline || !channels || !isConfigured) return;
+    if (!pipeline || !channels) return;
     await pipeline.render(channels[0], progress);
   };
 
   const singletonManager = createSingletonManager(
     async (
-      canvas: OffscreenCanvas,
+      canvas: HTMLCanvasElement,
+      offscreenCanvas: OffscreenCanvas,
       fourierMode: FourierMode,
-      viewSize: ViewSize,
     ) => {
-      const pipeline = await createSpectrogramPipeline(canvas, fourierMode);
-      set({ pipeline, viewSize });
-      configure();
+      const profiling = envs.spectrogramProfiling;
+      const device = await getGpuDevice(profiling);
+      const settings = useSettingsStore.getState();
+      const { sampleRate = defaultSampleRate } = usePlayerStore.getState();
+      const config: spectrogram.PipelineConfig = {
+        ...settings,
+        viewSize: getCanvasSize(canvas),
+        sampleRate,
+      };
+
+      const pipeline = spectrogram.createPipeline({
+        device,
+        fourierMode,
+        canvas: offscreenCanvas,
+        config,
+        onMetrics: profiling
+          ? (metrics) => {
+              console.table(metrics);
+            }
+          : undefined,
+      });
+      set({ pipeline, canvas });
       await render();
       return pipeline;
     },
     async (pipeline) => {
-      set({ pipeline: undefined, viewSize: undefined, isConfigured: false });
+      set({ pipeline: undefined, canvas: undefined });
       pipeline.destroy();
       return Promise.resolve();
     },
   );
 
-  useSettingsStore.subscribe(
-    (state) => state,
-    () => {
-      configure();
+  usePlayerStore.subscribe(
+    (state) => state.sampleRate,
+    (sampleRate) => {
+      if (!sampleRate) return;
+      get().pipeline?.updateConfig({ sampleRate });
       void render();
     },
   );
 
-  usePlayerStore.subscribe(
-    (state) => state.sampleRate,
-    () => {
-      configure();
-      void render();
-    },
-  );
+  const subscribeSettingPatch = (key: keyof SettingsState) => {
+    useSettingsStore.subscribe(
+      (state) => state[key],
+      (value) => {
+        get().pipeline?.updateConfig({
+          [key]: value,
+        });
+        void render();
+      },
+    );
+  };
+  subscribeSettingPatch('windowSize');
+  subscribeSettingPatch('visibleTimeBefore');
+  subscribeSettingPatch('visibleTimeAfter');
+  subscribeSettingPatch('zeroPaddingFactor');
+  subscribeSettingPatch('windowName');
+  subscribeSettingPatch('minDecibel');
+  subscribeSettingPatch('minFrequency');
+  subscribeSettingPatch('maxFrequency');
+  subscribeSettingPatch('colors');
 
   usePlayerStore.subscribe(
     (state) => state,
@@ -97,17 +115,13 @@ export const useSpectrogramStore = create<State>((set, get) => {
   const ref: State = {
     mount: (canvas) => {
       const { fourierMode } = useSettingsStore.getState();
-      const initViewSize = resizeCanvas(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      void singletonManager.create(offscreenCanvas, fourierMode, initViewSize);
+      void singletonManager.create(canvas, offscreenCanvas, fourierMode);
       const unsubscribeResizeObserver = subscribeResizeObserver(
         canvas,
         async () => {
-          const viewSize = getCanvasSize(canvas);
-          setCanvasSize(offscreenCanvas, viewSize);
-          set({ viewSize });
-          configure();
+          get().pipeline?.updateConfig({ viewSize: getCanvasSize(canvas) });
           await render();
         },
       );

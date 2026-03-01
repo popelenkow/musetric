@@ -80,7 +80,7 @@ export const useWaveformStore = create<State>((set, get) => {
       const unsubscribeProgress = usePlayerStore.subscribe(
         (state) => state.progress,
         (progress) => {
-          const worker = get().worker;
+          const { worker } = get();
           if (!worker) return;
           worker.postMessage({
             type: 'progress',
@@ -92,7 +92,7 @@ export const useWaveformStore = create<State>((set, get) => {
       const unsubscribeColors = useSettingsStore.subscribe(
         (state) => state.colors,
         (colors) => {
-          const worker = get().worker;
+          const { worker } = get();
           if (!worker) return;
           worker.postMessage({
             type: 'colors',
@@ -110,7 +110,7 @@ export const useWaveformStore = create<State>((set, get) => {
       };
     },
     attachCanvas: (canvas) => {
-      const worker = get().worker;
+      const { worker } = get();
       if (!worker || unsubscribeResizeObserver) return;
 
       resizeCanvas(canvas);

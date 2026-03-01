@@ -1,6 +1,6 @@
 import {
   type FourierMode,
-  spectrogram,
+  type spectrogram,
   type ViewColors,
 } from '@musetric/audio';
 import { create } from 'zustand';
@@ -12,7 +12,19 @@ export type SettingsState = {
 } & Omit<spectrogram.PipelineConfig, 'sampleRate' | 'viewSize'>;
 
 const initialState: SettingsState = {
-  ...spectrogram.defaultConfig,
+  windowSize: 1024 * 4,
+  visibleTimeBefore: 2.0,
+  visibleTimeAfter: 2.0,
+  zeroPaddingFactor: 2,
+  windowName: 'hamming',
+  minDecibel: -40,
+  minFrequency: 120,
+  maxFrequency: 4000,
+  colors: {
+    background: '#000000',
+    played: '#ffffff',
+    unplayed: '#888888',
+  },
   fourierMode: 'fftRadix4',
   open: false,
 };

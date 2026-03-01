@@ -1,3 +1,4 @@
+import { setCanvasSize } from '../../common/canvas.js';
 import { type ExtPipelineConfig } from '../config.js';
 import { createColors } from './colors.js';
 import { createPipeline } from './pipeline.js';
@@ -5,7 +6,7 @@ import { createStateProgress } from './progress.js';
 
 export type Config = Pick<
   ExtPipelineConfig,
-  'visibleTimeBefore' | 'visibleTimeAfter' | 'colors'
+  'viewSize' | 'visibleTimeBefore' | 'visibleTimeAfter' | 'colors'
 >;
 
 export type Draw = {
@@ -57,6 +58,7 @@ export const createDraw = (
       pass.end();
     },
     configure: (view, config) => {
+      setCanvasSize(canvas, config.viewSize);
       progress.write(config);
       colors.write(config);
       bindGroup = device.createBindGroup({

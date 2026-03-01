@@ -9,6 +9,9 @@ export const setCanvasSize = (
   canvas: HTMLCanvasElement | OffscreenCanvas,
   viewSize: ViewSize,
 ) => {
+  if (canvas.width === viewSize.width && canvas.height === viewSize.height) {
+    return;
+  }
   canvas.width = viewSize.width;
   canvas.height = viewSize.height;
 };

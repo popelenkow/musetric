@@ -1,6 +1,6 @@
 import { createCallLatest } from '@musetric/resource-utils';
 import { type FourierMode, fouriers } from '../fourier/index.js';
-import { type PipelineConfig } from './config.js';
+import { applyPatchConfig, type PipelineConfig } from './config.js';
 import { createDecibelify } from './decibelify/index.js';
 import { createDraw } from './draw/index.js';
 import { createMagnitudify } from './magnitudify/index.js';
@@ -12,7 +12,7 @@ import { createWindowing } from './windowing/index.js';
 
 export type Pipeline = {
   render: (wave: Float32Array, progress: number) => Promise<void>;
-  configure: (config: PipelineConfig) => void;
+  updateConfig: (config: Partial<PipelineConfig>) => void;
   destroy: () => void;
 };
 
@@ -20,17 +20,21 @@ export type CreatePipelineOptions = {
   device: GPUDevice;
   fourierMode: FourierMode;
   canvas: OffscreenCanvas;
+  config: PipelineConfig;
   onMetrics?: (metrics: PipelineMetrics) => void;
 };
 
 export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
   const { device, fourierMode, canvas, onMetrics } = options;
 
-  let isConfigureRequested = true;
-
   const timer = createPipelineTimer(device, onMetrics);
   const { markers } = timer;
 
+  let draftConfig: Partial<PipelineConfig> = options.config;
+  let config = {
+    ...options.config,
+    windowCount: options.config.viewSize.width,
+  };
   const state = createPipelineState(device);
   const sliceWave = createSliceWave(device, markers.sliceWave);
   const windowing = createWindowing(device, markers.windowing);
@@ -44,8 +48,8 @@ export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
   const draw = createDraw(device, canvas, markers.draw);
 
   const configure = markers.configure(() => {
-    state.configure();
-    const { config, signal, texture } = state;
+    state.configure(config);
+    const { signal, texture } = state;
     sliceWave.configure(signal.real, config);
     windowing.configure(signal.real, config);
     fourier.configure(signal, {
@@ -87,8 +91,10 @@ export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
   );
 
   const render = markers.total(async (wave: Float32Array, progress: number) => {
-    if (isConfigureRequested) {
-      isConfigureRequested = false;
+    if (Object.keys(draftConfig).length) {
+      config = { ...config, ...draftConfig };
+      config.windowCount = config.viewSize.width;
+      draftConfig = {};
       configure();
     }
 
@@ -102,12 +108,8 @@ export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
       await render(wave, progress);
       await timer.finish();
     }),
-    configure: (newConfig) => {
-      state.config = {
-        ...newConfig,
-        windowCount: newConfig.viewSize.width,
-      };
-      isConfigureRequested = true;
+    updateConfig: (patchConfig) => {
+      draftConfig = applyPatchConfig(draftConfig, patchConfig, config);
     },
     destroy: () => {
       timer.destroy();
