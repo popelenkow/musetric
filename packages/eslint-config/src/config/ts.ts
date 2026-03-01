@@ -4,12 +4,12 @@ import { jsConfig } from './js.js';
 
 export const tsConfig: Linter.Config = {
   ...jsConfig,
-  files: ['**/*.ts'],
+  files: ['**/*.{ts,tsx}'],
   languageOptions: {
     ...jsConfig.languageOptions,
     parser: tsEslint.parser,
     parserOptions: {
-      project: ['./tsconfig.json'],
+      projectService: true,
       tsconfigRootDir: process.cwd(),
     },
   },

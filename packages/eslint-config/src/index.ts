@@ -1,16 +1,14 @@
 import type { Linter } from 'eslint';
 import { jsConfig } from './config/js.js';
-import { getTsConfigs } from './tsConfigs.js';
+import { reactConfig } from './config/react.js';
 
 export const config = () => {
-  const cwd = process.cwd();
-
   const configs: Linter.Config[] = [
     {
       ignores: jsConfig.ignores,
     },
     jsConfig,
-    ...getTsConfigs(cwd),
+    reactConfig,
     {
       files: ['**/*.config.ts'],
       rules: {
