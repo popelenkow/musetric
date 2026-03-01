@@ -3,6 +3,7 @@
   "references": [{ "path": "./tsconfig.es.json" }],
   "compilerOptions": {
     "lib": ["ES2024", "DOM", "WebWorker"],
-    "types": ["@webgpu/types", "vite/client"]
+    "types": ["@webgpu/types", "vite/client"],
+    "outDir": "${configDir}/.tsbuildinfo/dist"
   }
 }

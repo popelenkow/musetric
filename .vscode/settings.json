@@ -22,14 +22,13 @@
   "files.eol": "\n",
   "files.exclude": {
     "**/.yarn": true,
-    "**/*.tsbuildinfo": true,
     "**/.eslintcache": true
   },
   "files.watcherExclude": {
     "**/node_modules/**": true,
     "**/.yarn/**": true,
     "**/.eslintcache": true,
-    "**/*.tsbuildinfo": true,
+    "**/.tsbuildinfo/**": true,
     "**/dist/**": true,
     "**/tmp/**": true,
     "**/backend/storage/**": true
@@ -38,7 +37,7 @@
     "**/node_modules/**": true,
     "**/.yarn/**": true,
     "**/.eslintcache": true,
-    "**/*.tsbuildinfo": true,
+    "**/.tsbuildinfo/**": true,
     "**/dist/**": true,
     "**/tmp/**": true,
     "**/backend/storage/**": true

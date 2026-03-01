@@ -7,12 +7,11 @@
 **/backend/storage/
 **/.eslintrc.local.json
 **/yarn-error.log
-**/tsconfig.tsbuildinfo
 **/.eslintcache
 **/.venv/
 **/__pycache__/
 **/*.db
-**/*.tsbuildinfo
+**/.tsbuildinfo/
 **/.vite/
 **/__snapshots__/
 **/.DS_Store

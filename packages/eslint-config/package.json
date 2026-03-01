@@ -8,7 +8,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "project:build": "tsc --build tsconfig.build.json",
+    "project:build": "tsc --build",
     "check:ts": "tsc --build",
     "check:lint": "eslint . --cache",
     "check:lint:fix": "eslint . --fix --cache"

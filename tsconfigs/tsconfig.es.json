@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "${configDir}/.tsbuildinfo/es.tsbuildinfo"
+  },
   "include": ["${configDir}/src/**/*.es.ts"],
   "exclude": []
 }

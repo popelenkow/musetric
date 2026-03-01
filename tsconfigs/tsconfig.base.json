@@ -31,6 +31,7 @@
     "allowJs": true,
     "composite": true,
     "incremental": true,
+    "tsBuildInfoFile": "${configDir}/.tsbuildinfo/src.tsbuildinfo",
     "customConditions": ["monorepo"]
   },
   "include": [

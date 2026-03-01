@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2024", "DOM"]
+    "lib": ["ES2024", "DOM"],
+    "noEmit": true,
+    "tsBuildInfoFile": "${configDir}/.tsbuildinfo/test.tsbuildinfo"
   },
   "include": ["${configDir}/src/**/__tests__/**/*.ts"],
   "exclude": [

@@ -2,6 +2,7 @@
   "extends": "../../tsconfigs/tsconfig.es.json",
   "compilerOptions": {
     "lib": ["ES2024", "DOM"],
-    "types": ["@webgpu/types", "vite/client"]
+    "types": ["@webgpu/types", "vite/client"],
+    "outDir": "${configDir}/.tsbuildinfo/dist"
   }
 }
