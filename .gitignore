@@ -5,13 +5,12 @@ tmp/
 **/backend/storage/
 .eslintrc.local.json
 yarn-error.log
-tsconfig.tsbuildinfo
 .eslintcache
 .venv/
 __pycache__/
 *.db
 *.db-journal
-*.tsbuildinfo
+**/.tsbuildinfo/
 .vite/
 __snapshots__/
 .DS_Store

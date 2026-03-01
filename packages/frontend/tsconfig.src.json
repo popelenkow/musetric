@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": ["ES2024", "DOM"],
     "types": ["@webgpu/types", "vite/client"],
+    "outDir": "${configDir}/.tsbuildinfo/dist",
     "jsx": "react-jsx"
   }
 }

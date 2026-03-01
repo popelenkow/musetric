@@ -6,7 +6,7 @@
   "scripts": {
     "dev:start": "yarn project:init && node --import tsx --conditions=monorepo --watch src/index.ts -- musetric-backend",
     "dev:stop": "kill-process musetric-backend",
-    "project:build": "tsc --build tsconfig.build.json",
+    "project:build": "tsc --build",
     "project:init": "node --import tsx --conditions=monorepo ./scripts/init.js",
     "project:start": "node dist/index.js",
     "docker:build:cpu": "docker build --progress=plain -f Dockerfile.runtime --build-arg variant=cpu -t musetric-runtime-cpu ../.. && docker build --progress=plain -f Dockerfile --build-arg RUNTIME_IMAGE=musetric-runtime-cpu -t musetric-cpu ../..",

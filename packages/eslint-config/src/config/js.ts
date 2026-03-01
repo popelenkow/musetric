@@ -5,7 +5,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export const jsConfig: Linter.Config = {
   files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
-  ignores: ['dist/**/*', 'storage/**/*'],
+  ignores: ['dist/**/*', '.tsbuildinfo/**/*', 'storage/**/*'],
   languageOptions: {
     ecmaVersion: 2024,
     sourceType: 'module',

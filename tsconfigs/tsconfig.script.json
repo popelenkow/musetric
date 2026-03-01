@@ -3,8 +3,13 @@
   "compilerOptions": {
     "types": ["node"],
     "rootDir": "${configDir}",
-    "tsBuildInfoFile": "${configDir}/tsconfig.script.tsbuildinfo"
+    "noEmit": true,
+    "tsBuildInfoFile": "${configDir}/.tsbuildinfo/script.tsbuildinfo"
   },
   "include": ["${configDir}/**/*.ts"],
-  "exclude": ["${configDir}/src/**/*", "${configDir}/dist/**/*"]
+  "exclude": [
+    "${configDir}/src/**/*",
+    "${configDir}/dist/**/*",
+    "${configDir}/.tsbuildinfo/**/*"
+  ]
 }
