@@ -1,4 +1,4 @@
 {
-  "extends": "../../tsconfig.cross.json",
+  "extends": "../../tsconfigs/tsconfig.cross.json",
   "references": [{ "path": "./tsconfig.src.json" }]
 }

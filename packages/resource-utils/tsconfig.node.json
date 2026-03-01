@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.node.json",
+  "extends": "../../tsconfigs/tsconfig.node.json",
   "references": [
     { "path": "./tsconfig.src.json" },
     { "path": "./tsconfig.cross.json" }
