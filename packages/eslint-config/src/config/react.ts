@@ -7,9 +7,6 @@ import { tsConfig } from './ts.js';
 export const reactConfig: Linter.Config = {
   ...tsConfig,
   files: ['**/*.{ts,tsx}'],
-  languageOptions: {
-    ...tsConfig.languageOptions,
-  },
   plugins: {
     ...tsConfig.plugins,
     react: reactPlugin,
