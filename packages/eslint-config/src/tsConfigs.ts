@@ -26,6 +26,7 @@ const tsConfigItems: TsConfigItem[] = [
       'src/**/*.node.ts',
       'src/**/*.worker.ts',
       'src/**/*.worklet.ts',
+      'src/**/__tests__/*.ts',
     ],
   },
   {
@@ -57,6 +58,18 @@ const tsConfigItems: TsConfigItem[] = [
     path: './tsconfig.script.json',
     files: ['**/*.ts'],
     ignores: ['src/**/*', 'dist/**/*', 'storage/**/*'],
+  },
+  {
+    path: './tsconfig.test.json',
+    files: ['src/**/__tests__/**/*.ts'],
+    ignores: [
+      'src/**/*.es.ts',
+      'src/**/*.cross.ts',
+      'src/**/*.dom.ts',
+      'src/**/*.node.ts',
+      'src/**/*.worker.ts',
+      'src/**/*.worklet.ts',
+    ],
   },
 ];
 
