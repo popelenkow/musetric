@@ -27,7 +27,7 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
 
   useEffect(() => {
     if (status !== 'success' || !canvas) return;
-    attachCanvas(canvas);
+    return attachCanvas(canvas);
   }, [attachCanvas, canvas, status]);
 
   if (status === 'pending') {

@@ -33,15 +33,15 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
 
   return (
     <canvas
-      key={fourierMode}
       ref={setCanvas}
+      key={fourierMode}
       style={{ width: '100%', height: '100%', display: 'block' }}
       onClick={async (event) => {
-        const { visibleTimeBefore, visibleTimeAfter } =
+        const { visibleTimeBefore, visibleTimeAfter, sampleRate } =
           useSettingsStore.getState();
-        const { progress, frameCount, sampleRate } = usePlayerStore.getState();
+        const { progress, frameCount } = usePlayerStore.getState();
 
-        if (!frameCount || !sampleRate) {
+        if (!frameCount) {
           return;
         }
 

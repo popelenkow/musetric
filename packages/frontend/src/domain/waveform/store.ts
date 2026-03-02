@@ -30,13 +30,11 @@ export type WaveformState = {
 type Unmount = () => void;
 export type WaveformActions = {
   mount: (projectId: number, type: api.wave.Type) => Unmount;
-  attachCanvas: (canvas: HTMLCanvasElement) => void;
+  attachCanvas: (canvas: HTMLCanvasElement) => Unmount | undefined;
 };
 
 type State = WaveformState & WaveformActions;
 export const useWaveformStore = create<State>((set, get) => {
-  let unsubscribeResizeObserver: (() => void) | undefined = undefined;
-
   const singletonManager = createSingletonManager(
     async (projectId: number, type: api.wave.Type) => {
       const port = createWaveformWorker();
@@ -104,14 +102,12 @@ export const useWaveformStore = create<State>((set, get) => {
       return () => {
         unsubscribeProgress();
         unsubscribeColors();
-        unsubscribeResizeObserver?.();
-        unsubscribeResizeObserver = undefined;
         void singletonManager.destroy();
       };
     },
     attachCanvas: (canvas) => {
       const { worker } = get();
-      if (!worker || unsubscribeResizeObserver) return;
+      if (!worker) return;
 
       resizeCanvas(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
@@ -124,14 +120,19 @@ export const useWaveformStore = create<State>((set, get) => {
         [offscreenCanvas],
       );
 
-      unsubscribeResizeObserver = subscribeResizeObserver(canvas, async () => {
-        const viewSize = getCanvasSize(canvas);
-        worker.postMessage({
-          type: 'resize',
-          viewSize,
-        });
-        return Promise.resolve();
-      });
+      const unsubscribeResizeObserver = subscribeResizeObserver(
+        canvas,
+        async () => {
+          const viewSize = getCanvasSize(canvas);
+          worker.postMessage({
+            type: 'resize',
+            viewSize,
+          });
+          return Promise.resolve();
+        },
+      );
+
+      return unsubscribeResizeObserver;
     },
   };
   return ref;
