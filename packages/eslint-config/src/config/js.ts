@@ -43,6 +43,7 @@ export const jsConfig: Linter.Config = {
         },
       },
     ],
+    'no-useless-rename': ['error'],
     'no-duplicate-imports': ['error'],
     'simple-import-sort/imports': [
       'error',
