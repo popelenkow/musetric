@@ -5,6 +5,7 @@ import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoints } from '../../api/index.js';
 import { ViewError } from '../../components/ViewError.js';
+import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { SegmentLCurrent } from './current.js';
 import { SegmentNext } from './next.js';
@@ -54,7 +55,7 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
   const { t } = useTranslation();
   const subtitleQuery = useQuery(endpoints.subtitle.get(projectId));
 
-  const duration = usePlayerStore((s) => s.duration);
+  const duration = useDecoderStore((s) => s.duration);
   const progress = usePlayerStore((s) => s.progress);
 
   const { current, next, currentTime } = getSubtitleLines(
