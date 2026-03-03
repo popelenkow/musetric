@@ -10,6 +10,7 @@ import {
 } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { envs } from '../../common/envs.js';
+import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { type SettingsState, useSettingsStore } from '../settings/store.js';
 import { createSpectrogramWorker } from './port.js';
@@ -57,7 +58,7 @@ export type SpectrogramActions = {
 
 type State = SpectrogramState & SpectrogramActions;
 export const useSpectrogramStore = create<State>((set, get) => {
-  usePlayerStore.subscribe(
+  useDecoderStore.subscribe(
     (state) => state.channels?.[0]?.buffer,
     (waveBuffer) => {
       if (!waveBuffer) return;
@@ -97,7 +98,8 @@ export const useSpectrogramStore = create<State>((set, get) => {
       const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
       const settings = useSettingsStore.getState();
-      const { channels, progress } = usePlayerStore.getState();
+      const { channels } = useDecoderStore.getState();
+      const { progress } = usePlayerStore.getState();
       port.postMessage(
         {
           type: 'init',

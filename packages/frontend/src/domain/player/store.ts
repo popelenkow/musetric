@@ -1,18 +1,11 @@
-import {
-  type AudioPlayer,
-  type ChannelArrays,
-  createAudioPlayer,
-  decodeMp4,
-} from '@musetric/audio';
+import { type AudioPlayer, createAudioPlayer } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { useDecoderStore } from '../decoder/store.js';
 
 export type PlayerState = {
   player?: AudioPlayer;
-  channels?: ChannelArrays<SharedArrayBuffer>;
-  frameCount?: number;
-  duration: number;
   playing: boolean;
   progress: number;
   startFrame: number;
@@ -22,9 +15,6 @@ export type PlayerState = {
 
 export const initialState: PlayerState = {
   player: undefined,
-  channels: undefined,
-  frameCount: undefined,
-  duration: 0,
   playing: false,
   progress: 0,
   startFrame: 0,
@@ -35,7 +25,7 @@ export const initialState: PlayerState = {
 type Unmount = () => void;
 
 export type PlayerActions = {
-  mount: (encodedBuffer: Uint8Array<ArrayBuffer>) => Unmount;
+  mount: () => Unmount;
   play: () => Promise<void>;
   pause: () => void;
   seek: (fraction: number) => Promise<void>;
@@ -45,7 +35,7 @@ type State = PlayerState & PlayerActions;
 export const usePlayerStore = create<State>()(
   subscribeWithSelector((set, get) => {
     const singletonManager = createSingletonManager(
-      async (encodedBuffer: Uint8Array<ArrayBuffer>) => {
+      async () => {
         const player = await createAudioPlayer({
           progress: (progress) => {
             set({ progress });
@@ -54,28 +44,14 @@ export const usePlayerStore = create<State>()(
             set({ playing: false, progress: 0, startFrame: 0, startTime: 0 });
           },
         });
-        try {
-          const { sampleRate } = player.context;
-          const decoded = await decodeMp4(encodedBuffer.buffer, sampleRate);
-          set({
-            player,
-            channels: decoded.channels,
-            frameCount: decoded.frameCount,
-            duration: decoded.frameCount / sampleRate,
-            playing: false,
-            progress: 0,
-            startFrame: 0,
-            startTime: 0,
-            status: 'success',
-          });
-        } catch (error) {
-          console.error('Failed to decode project audio track', error);
-          set({
-            status: 'error',
-          });
-          return player;
-        }
-
+        set({
+          player,
+          playing: false,
+          progress: 0,
+          startFrame: 0,
+          startTime: 0,
+          status: 'success',
+        });
         return player;
       },
       async (player) => {
@@ -87,14 +63,15 @@ export const usePlayerStore = create<State>()(
 
     return {
       ...initialState,
-      mount: (encodedBuffer) => {
-        void singletonManager.create(encodedBuffer);
+      mount: () => {
+        void singletonManager.create();
         return () => {
           void singletonManager.destroy();
         };
       },
       play: async () => {
-        const { player, frameCount, channels, startFrame } = get();
+        const { player, startFrame } = get();
+        const { frameCount, channels } = useDecoderStore.getState();
         if (!player || !frameCount || !channels) return;
         await player.play(channels, frameCount, startFrame);
         set({ playing: true, startTime: player.context.currentTime });
@@ -110,7 +87,8 @@ export const usePlayerStore = create<State>()(
         set({ playing: false, startFrame: newStartFrame });
       },
       seek: async (fraction) => {
-        const { frameCount, player, channels, playing } = get();
+        const { player, playing } = get();
+        const { frameCount, channels } = useDecoderStore.getState();
         if (!frameCount || !player || !channels) return;
         const context = player.context;
         const newStartFrame = Math.floor(frameCount * fraction);

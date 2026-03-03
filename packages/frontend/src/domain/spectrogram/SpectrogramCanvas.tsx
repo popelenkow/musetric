@@ -2,18 +2,17 @@ import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewError } from '../../components/ViewError.js';
 import { ViewPending } from '../../components/ViewPending.js';
+import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { useSettingsStore } from '../settings/store.js';
 import { useSpectrogramStore } from './store.js';
 
-export type SpectrogramCanvasProps = {
-  status: 'pending' | 'error' | 'success';
-};
-export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
-  const { status } = props;
+export const SpectrogramCanvas: FC = () => {
   const { t } = useTranslation();
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
   const seek = usePlayerStore((s) => s.seek);
+  const decoderStatus = useDecoderStore((s) => s.status);
+  const spectrogramStatus = useSpectrogramStore((s) => s.status);
   const playerStatus = usePlayerStore((s) => s.status);
   const fourierMode = useSettingsStore((s) => s.fourierMode);
   const mount = useSpectrogramStore((s) => s.mount);
@@ -23,11 +22,15 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
     return mount(canvas);
   }, [mount, canvas]);
 
-  if (status === 'error' || playerStatus === 'error') {
+  if (
+    decoderStatus === 'error' ||
+    spectrogramStatus === 'error' ||
+    playerStatus === 'error'
+  ) {
     return <ViewError message={t('pages.project.progress.error.audioTrack')} />;
   }
 
-  if (status === 'pending' || playerStatus === 'pending') {
+  if (decoderStatus === 'pending' || playerStatus === 'pending') {
     return <ViewPending />;
   }
 
@@ -39,7 +42,8 @@ export const SpectrogramCanvas: FC<SpectrogramCanvasProps> = (props) => {
       onClick={async (event) => {
         const { visibleTimeBefore, visibleTimeAfter, sampleRate } =
           useSettingsStore.getState();
-        const { progress, frameCount } = usePlayerStore.getState();
+        const { progress } = usePlayerStore.getState();
+        const { frameCount } = useDecoderStore.getState();
 
         if (!frameCount) {
           return;
