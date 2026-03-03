@@ -1,7 +1,10 @@
-import { type ChannelArrays, decodeMp4 } from '@musetric/audio';
+import { type ChannelArrays } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
+import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { createDecoderWorker } from './port.js';
+import { type FromDecoderWorkerMessage } from './protocol.es.js';
 
 export type DecoderState = {
   channels?: ChannelArrays<SharedArrayBuffer>;
@@ -19,31 +22,45 @@ const initialState: DecoderState = {
 
 type Unmount = () => void;
 export type DecoderActions = {
-  mount: (
-    encodedBuffer: Uint8Array<ArrayBuffer>,
-    sampleRate: number,
-  ) => Unmount;
+  mount: (projectId: number, sampleRate: number) => Unmount;
 };
 
 type State = DecoderState & DecoderActions;
 export const useDecoderStore = create<State>()(
   subscribeWithSelector((set) => {
     const singletonManager = createSingletonManager(
-      async (encodedBuffer: Uint8Array<ArrayBuffer>, sampleRate: number) => {
-        try {
-          const decoded = await decodeMp4(encodedBuffer.buffer, sampleRate);
-          set({
-            channels: decoded.channels,
-            frameCount: decoded.frameCount,
-            duration: decoded.frameCount / sampleRate,
-            status: 'success',
-          });
-        } catch (error) {
-          console.error('Failed to decode project audio track', error);
+      async (projectId: number, sampleRate: number) => {
+        const port = createDecoderWorker();
+        port.onerror = () => {
           set({ status: 'error' });
-        }
+        };
+
+        port.onmessage = createPortMessageHandler<FromDecoderWorkerMessage>({
+          state: (message) => {
+            set({ status: message.status });
+          },
+          decoded: (message) => {
+            set({
+              channels: message.channels,
+              frameCount: message.frameCount,
+              duration: message.duration,
+              status: 'success',
+            });
+          },
+        });
+
+        port.postMessage({
+          type: 'init',
+          projectId,
+          sampleRate,
+        });
+
+        set(initialState);
+        await Promise.resolve();
+        return port;
       },
-      async () => {
+      async (port) => {
+        port.terminate();
         set(initialState);
         return Promise.resolve();
       },
@@ -51,8 +68,8 @@ export const useDecoderStore = create<State>()(
 
     return {
       ...initialState,
-      mount: (encodedBuffer, sampleRate) => {
-        void singletonManager.create(encodedBuffer, sampleRate);
+      mount: (projectId, sampleRate) => {
+        void singletonManager.create(projectId, sampleRate);
         return () => {
           void singletonManager.destroy();
         };
