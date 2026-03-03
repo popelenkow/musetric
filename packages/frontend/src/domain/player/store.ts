@@ -13,7 +13,6 @@ export type PlayerState = {
   channels?: ChannelArrays<SharedArrayBuffer>;
   frameCount?: number;
   duration: number;
-  sampleRate?: number;
   playing: boolean;
   progress: number;
   startFrame: number;
@@ -63,7 +62,6 @@ export const usePlayerStore = create<State>()(
             channels: decoded.channels,
             frameCount: decoded.frameCount,
             duration: decoded.frameCount / sampleRate,
-            sampleRate,
             playing: false,
             progress: 0,
             startFrame: 0,
