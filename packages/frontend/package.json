@@ -14,6 +14,7 @@
     "check:translations:fix": "i18next -c ./i18next.parser.config.ts"
   },
   "devDependencies": {
+    "@alexanderolsen/libsamplerate-js": "catalog:",
     "@emotion/react": "catalog:",
     "@emotion/styled": "catalog:",
     "@hookform/resolvers": "catalog:",

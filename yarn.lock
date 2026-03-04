@@ -5,6 +5,13 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@alexanderolsen/libsamplerate-js@npm:2.1.2":
+  version: 2.1.2
+  resolution: "@alexanderolsen/libsamplerate-js@npm:2.1.2"
+  checksum: 10c0/39f9b8201ac775fafdaecbfdb8fe91f89fa86b3811cff911c150a76a755b9a94ee97f4c3d6a1835ea2e393e15c016c1b061dbf246df44563b7aad4bdbc616518
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.28.6, @babel/code-frame@npm:^7.29.0":
   version: 7.29.0
   resolution: "@babel/code-frame@npm:7.29.0"
@@ -1293,6 +1300,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@musetric/audio@workspace:packages/audio"
   dependencies:
+    "@alexanderolsen/libsamplerate-js": "catalog:"
     "@musetric/eslint-config": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@types/audioworklet": "catalog:"
@@ -1307,6 +1315,7 @@ __metadata:
     typescript: "catalog:"
     vitest: "catalog:"
   peerDependencies:
+    "@alexanderolsen/libsamplerate-js": 2.1.2
     "@musetric/resource-utils": "workspace:*"
     mediabunny: 1.35.1
   languageName: unknown
@@ -1384,6 +1393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@musetric/frontend@workspace:packages/frontend"
   dependencies:
+    "@alexanderolsen/libsamplerate-js": "catalog:"
     "@emotion/react": "catalog:"
     "@emotion/styled": "catalog:"
     "@hookform/resolvers": "catalog:"
@@ -1449,6 +1459,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@musetric/performance@workspace:packages/performance"
   dependencies:
+    "@alexanderolsen/libsamplerate-js": "catalog:"
     "@emotion/react": "catalog:"
     "@emotion/styled": "catalog:"
     "@mui/material": "catalog:"

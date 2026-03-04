@@ -1,6 +1,5 @@
 export * from './audioPlayer/audioPlayer.js';
 export * from './audioPlayer/port.js';
-export * from './common/audioBuffer.js';
 export * from './common/canvas.js';
 export * from './common/channelBuffers.es.js';
 export * from './common/colors.js';
