@@ -1,8 +1,6 @@
 import { Box, Stack } from '@mui/material';
 import { type api } from '@musetric/api';
-import { useQuery } from '@tanstack/react-query';
 import { type FC, useEffect } from 'react';
-import { endpoints } from '../../api/index.js';
 import { useDecoderStore } from '../../domain/decoder/store.js';
 import { Player } from '../../domain/player/Player.js';
 import { usePlayerStore } from '../../domain/player/store.js';
@@ -19,8 +17,6 @@ export type ProjectViewProps = {
 export const ProjectView: FC<ProjectViewProps> = (props) => {
   const { project } = props;
 
-  const audio = useQuery(endpoints.audioDelivery.get(project.id, 'lead'));
-
   const mountPlayer = usePlayerStore((s) => s.mount);
   const player = usePlayerStore((s) => s.player);
   const mountDecoder = useDecoderStore((s) => s.mount);
@@ -30,9 +26,9 @@ export const ProjectView: FC<ProjectViewProps> = (props) => {
   }, [mountPlayer]);
 
   useEffect(() => {
-    if (!audio.data || !player) return;
-    return mountDecoder(audio.data, player.context.sampleRate);
-  }, [audio.data, player, mountDecoder]);
+    if (!player) return;
+    return mountDecoder(project.id, player.context.sampleRate);
+  }, [project.id, player, mountDecoder]);
 
   return (
     <ProjectLayout
