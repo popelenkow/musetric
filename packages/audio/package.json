@@ -28,10 +28,12 @@
     "test": "vitest run"
   },
   "peerDependencies": {
+    "@alexanderolsen/libsamplerate-js": "2.1.2",
     "@musetric/resource-utils": "workspace:*",
     "mediabunny": "1.35.1"
   },
   "devDependencies": {
+    "@alexanderolsen/libsamplerate-js": "catalog:",
     "@musetric/eslint-config": "workspace:*",
     "@musetric/resource-utils": "workspace:*",
     "@types/audioworklet": "catalog:",

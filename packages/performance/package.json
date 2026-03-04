@@ -12,6 +12,7 @@
     "check:lint:fix": "eslint . --fix --cache"
   },
   "devDependencies": {
+    "@alexanderolsen/libsamplerate-js": "catalog:",
     "@emotion/react": "catalog:",
     "@emotion/styled": "catalog:",
     "@mui/material": "catalog:",
