@@ -1,33 +1,12 @@
-import { spectrogram } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
-import {
-  createPortMessageHandler,
-  wrapMessagePort,
-} from '@musetric/resource-utils/cross/messagePort';
-import { getGpuDevice } from '../../common/gpu.es.js';
-import {
-  type FromSpectrogramWorkerMessage,
-  type ToSpectrogramWorkerMessage,
-} from './protocol.es.js';
-
-declare const self: DedicatedWorkerGlobalScope;
-
-const port = wrapMessagePort(self).typed<
-  ToSpectrogramWorkerMessage,
-  FromSpectrogramWorkerMessage
->();
-const onError = () => {
-  port.postMessage({
-    type: 'state',
-    status: 'error',
-  });
-};
-port.addEventListener('error', onError);
-port.addEventListener('unhandledrejection', onError);
-port.addEventListener('messageerror', onError);
+import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
+import { getGpuDevice } from '../common/gpuDevice.js';
+import { createPipeline, type Pipeline } from './pipeline.js';
+import { createPort } from './port.worker.js';
+import { type ToSpectrogramWorkerMessage } from './portMessage.js';
 
 type State = {
-  pipeline?: spectrogram.Pipeline;
+  pipeline?: Pipeline;
   wave?: Float32Array<SharedArrayBuffer>;
   progress: number;
 };
@@ -35,6 +14,8 @@ type State = {
 const state: State = {
   progress: 0,
 };
+
+const port = createPort();
 
 const render = async () => {
   const { pipeline, wave, progress } = state;
@@ -45,7 +26,7 @@ const render = async () => {
 const singletonManager = createSingletonManager(
   async (message: ToSpectrogramWorkerMessage & { type: 'init' }) => {
     const device = await getGpuDevice(message.profiling);
-    const pipeline = spectrogram.createPipeline({
+    const pipeline = createPipeline({
       device,
       canvas: message.canvas,
       fourierMode: message.fourierMode,

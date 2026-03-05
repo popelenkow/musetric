@@ -16,7 +16,7 @@ import { createWaveformWorker } from './port.js';
 import {
   type FromWaveformWorkerMessage,
   type ToWaveformWorkerMessage,
-} from './protocol.es.js';
+} from './portMessage.es.js';
 
 export type WaveformState = {
   worker?: TypedMessagePort<

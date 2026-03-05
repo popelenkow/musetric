@@ -5,6 +5,8 @@ export * from './magnitudify/index.js';
 export * from './pipeline.js';
 export * from './pipelineState/index.js';
 export * from './pipelineTimer.js';
+export * from './port.js';
+export * from './portMessage.js';
 export * from './remap/index.js';
 export * from './sliceWave/index.js';
 export * from './windowFunction.js';

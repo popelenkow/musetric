@@ -9,7 +9,7 @@ import axios from 'axios';
 import {
   type FromWaveformWorkerMessage,
   type ToWaveformWorkerMessage,
-} from './protocol.es.js';
+} from './portMessage.es.js';
 
 declare const self: DedicatedWorkerGlobalScope;
 

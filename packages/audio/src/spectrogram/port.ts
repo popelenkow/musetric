@@ -1,8 +1,11 @@
-import { wrapMessagePort } from '@musetric/resource-utils/cross/messagePort';
+import {
+  type TypedMessagePort,
+  wrapMessagePort,
+} from '@musetric/resource-utils/cross/messagePort';
 import {
   type FromSpectrogramWorkerMessage,
   type ToSpectrogramWorkerMessage,
-} from './protocol.es.js';
+} from './portMessage.js';
 import spectrogramWorkerUrl from './spectrogram.worker.ts?worker&url';
 
 export const createSpectrogramWorker = () => {
@@ -12,3 +15,8 @@ export const createSpectrogramWorker = () => {
     ToSpectrogramWorkerMessage
   >();
 };
+export type SpectrogramWorker = TypedMessagePort<
+  Worker,
+  FromSpectrogramWorkerMessage,
+  ToSpectrogramWorkerMessage
+>;

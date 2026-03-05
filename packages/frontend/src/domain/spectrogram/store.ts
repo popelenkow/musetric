@@ -1,23 +1,15 @@
 import {
   getCanvasSize,
-  type spectrogram,
+  spectrogram,
   subscribeResizeObserver,
   type ViewSize,
 } from '@musetric/audio';
-import {
-  createPortMessageHandler,
-  type TypedMessagePort,
-} from '@musetric/resource-utils/cross/messagePort';
+import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { envs } from '../../common/envs.js';
 import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { type SettingsState, useSettingsStore } from '../settings/store.js';
-import { createSpectrogramWorker } from './port.js';
-import {
-  type FromSpectrogramWorkerMessage,
-  type ToSpectrogramWorkerMessage,
-} from './protocol.es.js';
 
 const configKeys = [
   'windowSize',
@@ -43,11 +35,7 @@ const getWorkerConfig = (
   );
 
 export type SpectrogramState = {
-  port?: TypedMessagePort<
-    Worker,
-    FromSpectrogramWorkerMessage,
-    ToSpectrogramWorkerMessage
-  >;
+  port?: spectrogram.SpectrogramWorker;
   status: 'pending' | 'error' | 'success';
 };
 
@@ -83,14 +71,15 @@ export const useSpectrogramStore = create<State>((set, get) => {
     port: undefined,
     status: 'pending',
     mount: (canvas) => {
-      const port = createSpectrogramWorker();
+      const port = spectrogram.createSpectrogramWorker();
       set({ port });
 
-      port.onmessage = createPortMessageHandler<FromSpectrogramWorkerMessage>({
-        state: (message) => {
-          set({ status: message.status });
-        },
-      });
+      port.onmessage =
+        createPortMessageHandler<spectrogram.FromSpectrogramWorkerMessage>({
+          state: (message) => {
+            set({ status: message.status });
+          },
+        });
       port.onerror = () => {
         set({ status: 'error' });
       };

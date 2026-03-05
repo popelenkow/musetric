@@ -1,12 +1,11 @@
-import { type FourierMode, type spectrogram } from '@musetric/audio';
-
-export type InitConfig = Omit<spectrogram.PipelineConfig, 'viewSize'>;
+import type { FourierMode } from '../fourier/fouriers.js';
+import type { PipelineConfig } from './config.js';
 
 export type ToSpectrogramWorkerMessage =
   | {
       type: 'init';
       canvas: OffscreenCanvas;
-      config: spectrogram.PipelineConfig;
+      config: PipelineConfig;
       progress: number;
       waveBuffer?: SharedArrayBuffer;
       fourierMode: FourierMode;
@@ -22,7 +21,7 @@ export type ToSpectrogramWorkerMessage =
     }
   | {
       type: 'config';
-      patch: Partial<spectrogram.PipelineConfig>;
+      patch: Partial<PipelineConfig>;
     };
 
 export type FromSpectrogramWorkerMessage = {
