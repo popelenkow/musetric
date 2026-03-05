@@ -1,11 +1,11 @@
 import { createCallLatest } from '@musetric/resource-utils';
-import { type FourierMode, fouriers } from '../fourier/index.js';
 import {
   applySpectrogramPatchConfig,
   type SpectrogramConfig,
 } from './config.js';
 import { createSpectrogramDecibelify } from './decibelify/index.js';
 import { createSpectrogramDraw } from './draw/index.js';
+import { type FourierMode, fouriers } from './fourier/fouriers.js';
 import { createSpectrogramMagnitudify } from './magnitudify/index.js';
 import { createSpectrogramPipelineState } from './pipelineState/index.js';
 import {
