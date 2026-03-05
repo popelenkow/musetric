@@ -2,16 +2,16 @@ import { createState, type State } from './state.js';
 
 const workgroupSize = 64;
 
-export type Magnitudify = {
+export type SpectrogramMagnitudify = {
   run: (encoder: GPUCommandEncoder) => void;
   configure: State['configure'];
   destroy: State['destroy'];
 };
 
-export const createMagnitudify = (
+export const createSpectrogramMagnitudify = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): Magnitudify => {
+): SpectrogramMagnitudify => {
   const state = createState(device);
 
   return {

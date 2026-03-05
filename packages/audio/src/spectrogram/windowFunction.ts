@@ -103,6 +103,8 @@ export const windowFunctions = {
   triangular,
 } as const;
 
-export type WindowName = keyof typeof windowFunctions;
+export type SpectrogramWindowName = keyof typeof windowFunctions;
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-export const windowNames = Object.keys(windowFunctions) as WindowName[];
+export const spectrogramWindowNames = Object.keys(
+  windowFunctions,
+) as SpectrogramWindowName[];

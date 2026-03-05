@@ -1,17 +1,17 @@
 import { type ComplexGpuBuffer } from '../../common/complexArray.js';
-import { type ExtPipelineConfig } from '../config.js';
+import { type ExtSpectrogramConfig } from '../config.js';
 import { createSignalBuffer } from './signal.js';
 import { createStateTexture, type StateTexture } from './texture.js';
 
-export type PipelineState = {
+export type SpectrogramPipelineState = {
   signal: ComplexGpuBuffer;
   texture: StateTexture;
-  configure: (config: ExtPipelineConfig) => void;
+  configure: (config: ExtSpectrogramConfig) => void;
   zerofyImag: (encoder: GPUCommandEncoder) => void;
   destroy: () => void;
 };
-export const createPipelineState = (device: GPUDevice) => {
-  const ref: PipelineState = {
+export const createSpectrogramPipelineState = (device: GPUDevice) => {
+  const ref: SpectrogramPipelineState = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     signal: undefined!,
     texture: createStateTexture(device),

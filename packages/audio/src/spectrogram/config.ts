@@ -1,16 +1,16 @@
 import { type ViewColors } from '../common/colors.js';
 import { type ViewSize } from '../common/viewSize.js';
-import { type WindowName } from './windowFunction.js';
+import { type SpectrogramWindowName } from './windowFunction.js';
 
-export type ZeroPaddingFactor = 1 | 2 | 4;
+export type SpectrogramZeroPaddingFactor = 1 | 2 | 4;
 
-export type PipelineConfig = {
+export type SpectrogramConfig = {
   windowSize: number;
   sampleRate: number;
   visibleTimeBefore: number;
   visibleTimeAfter: number;
-  zeroPaddingFactor: ZeroPaddingFactor;
-  windowName: WindowName;
+  zeroPaddingFactor: SpectrogramZeroPaddingFactor;
+  windowName: SpectrogramWindowName;
   minDecibel: number;
   minFrequency: number;
   maxFrequency: number;
@@ -18,26 +18,26 @@ export type PipelineConfig = {
   colors: ViewColors;
 };
 
-export type ExtPipelineConfig = PipelineConfig & {
+export type ExtSpectrogramConfig = SpectrogramConfig & {
   windowCount: number;
 };
 
-export const applyPatchConfig = (
-  draftConfig: Partial<PipelineConfig>,
-  patchConfig: Partial<PipelineConfig>,
-  config: PipelineConfig,
+export const applySpectrogramPatchConfig = (
+  draftConfig: Partial<SpectrogramConfig>,
+  patchConfig: Partial<SpectrogramConfig>,
+  config: SpectrogramConfig,
 ) => {
   type Entry =
     | {
-        key: keyof PipelineConfig;
+        key: keyof SpectrogramConfig;
         value: undefined;
       }
     | {
-        [Key in keyof PipelineConfig]: {
+        [Key in keyof SpectrogramConfig]: {
           key: Key;
-          value: PipelineConfig[Key];
+          value: SpectrogramConfig[Key];
         };
-      }[keyof PipelineConfig];
+      }[keyof SpectrogramConfig];
   type RunCallback = (entry: Entry) => void;
   const run = (callback: RunCallback) => {
     Object.entries(patchConfig).forEach((entry) => {

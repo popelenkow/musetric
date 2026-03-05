@@ -2,16 +2,16 @@ import { createState, type State } from './state.js';
 
 const workgroupSize = 64;
 
-export type Windowing = {
+export type SpectrogramWindowing = {
   run: (encoder: GPUCommandEncoder) => void;
   configure: State['configure'];
   destroy: State['destroy'];
 };
 
-export const createWindowing = (
+export const createSpectrogramWindowing = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): Windowing => {
+): SpectrogramWindowing => {
   const state = createState(device);
   return {
     run: (encoder) => {

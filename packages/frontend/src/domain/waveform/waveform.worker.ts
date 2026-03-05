@@ -1,6 +1,11 @@
 import { api } from '@musetric/api';
 import { requestWithAxios } from '@musetric/api/dom';
-import { setCanvasSize, type ViewColors, waveform } from '@musetric/audio';
+import {
+  createWaveformPipeline,
+  setCanvasSize,
+  type ViewColors,
+  type WaveformPipeline,
+} from '@musetric/audio';
 import {
   createPortMessageHandler,
   wrapMessagePort,
@@ -16,7 +21,7 @@ declare const self: DedicatedWorkerGlobalScope;
 type State = {
   canvas?: OffscreenCanvas;
   wave?: Float32Array<ArrayBuffer>;
-  pipeline?: waveform.Pipeline;
+  pipeline?: WaveformPipeline;
   progress: number;
   colors?: ViewColors;
 };
@@ -33,7 +38,7 @@ const port = wrapMessagePort(self).typed<
 const initializePipeline = () => {
   const { canvas, colors } = state;
   if (!canvas || !colors) return;
-  state.pipeline = waveform.createPipeline(canvas, colors);
+  state.pipeline = createWaveformPipeline(canvas, colors);
 };
 
 const render = (): boolean => {

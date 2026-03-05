@@ -1,12 +1,15 @@
 import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { getGpuDevice } from '../common/gpuDevice.js';
-import { createPipeline, type Pipeline } from './pipeline.js';
+import {
+  createSpectrogramPipeline,
+  type SpectrogramPipeline,
+} from './pipeline.js';
 import { createPort } from './port.worker.js';
 import { type ToSpectrogramWorkerMessage } from './portMessage.js';
 
 type State = {
-  pipeline?: Pipeline;
+  pipeline?: SpectrogramPipeline;
   wave?: Float32Array<SharedArrayBuffer>;
   progress: number;
 };
@@ -26,7 +29,7 @@ const render = async () => {
 const singletonManager = createSingletonManager(
   async (message: ToSpectrogramWorkerMessage & { type: 'init' }) => {
     const device = await getGpuDevice(message.profiling);
-    const pipeline = createPipeline({
+    const pipeline = createSpectrogramPipeline({
       device,
       canvas: message.canvas,
       fourierMode: message.fourierMode,

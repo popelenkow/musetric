@@ -1,9 +1,9 @@
-import { type ExtPipelineConfig } from '../config.js';
+import { type SpectrogramConfig } from '../config.js';
 import { createParams, type StateParams } from './params.js';
 import { createPipeline } from './pipeline.js';
 
 export type Config = Pick<
-  ExtPipelineConfig,
+  SpectrogramConfig,
   | 'windowSize'
   | 'sampleRate'
   | 'zeroPaddingFactor'
