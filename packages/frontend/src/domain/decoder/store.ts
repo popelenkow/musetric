@@ -4,7 +4,7 @@ import { createPortMessageHandler } from '@musetric/resource-utils/cross/message
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { createDecoderWorker } from './port.js';
-import { type FromDecoderWorkerMessage } from './protocol.es.js';
+import { type FromDecoderWorkerMessage } from './portMessage.es.js';
 
 export type DecoderState = {
   channels?: ChannelArrays<SharedArrayBuffer>;

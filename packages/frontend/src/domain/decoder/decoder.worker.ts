@@ -9,7 +9,7 @@ import axios from 'axios';
 import {
   type FromDecoderWorkerMessage,
   type ToDecoderWorkerMessage,
-} from './protocol.es.js';
+} from './portMessage.es.js';
 
 declare const self: DedicatedWorkerGlobalScope;
 

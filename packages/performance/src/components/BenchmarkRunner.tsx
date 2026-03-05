@@ -1,8 +1,10 @@
 import { Box } from '@mui/material';
-import { type FourierMode } from '@musetric/audio';
+import { createGpuContext, type FourierMode } from '@musetric/audio';
 import { type FC, useEffect, useRef } from 'react';
 import { canvasHeight, canvasWidth } from '../constants.js';
 import { type MetricsData, runBenchmark } from '../runBenchmarks.js';
+
+const { device } = await createGpuContext(true);
 
 export type BenchmarkRunnerProps = {
   fourierMode: FourierMode;
@@ -22,10 +24,11 @@ export const BenchmarkRunner: FC<BenchmarkRunnerProps> = (props) => {
     if (!canvas) {
       throw new Error('Canvas element not found');
     }
+    const offscreenCanvas = canvas.transferControlToOffscreen();
 
     const run = async () => {
-      const offscreenCanvas = canvas.transferControlToOffscreen();
       const metrics = await runBenchmark(
+        device,
         offscreenCanvas,
         fourierMode,
         windowSize,

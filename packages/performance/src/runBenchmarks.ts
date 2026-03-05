@@ -1,4 +1,4 @@
-import { createGpuContext, type FourierMode } from '@musetric/audio';
+import { type FourierMode } from '@musetric/audio';
 import { runPipeline } from './runPipeline.js';
 import { waitNextFrame } from './waitNextFrame.js';
 
@@ -11,13 +11,12 @@ export type MetricsData = {
 export type BenchmarkData = Record<FourierMode, Record<number, MetricsData>>;
 
 export const runBenchmark = async (
+  device: GPUDevice,
   canvas: OffscreenCanvas,
   mode: FourierMode,
   windowSize: number,
 ) => {
-  const { device } = await createGpuContext(true);
-
-  const metrics = await runPipeline(mode, windowSize, device, canvas);
+  const metrics = await runPipeline(device, canvas, mode, windowSize);
   await waitNextFrame(15);
   return metrics;
 };

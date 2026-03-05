@@ -4,10 +4,10 @@ import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
 
 export const runPipeline = async (
-  fourierMode: FourierMode,
-  windowSize: number,
   device: GPUDevice,
   canvas: OffscreenCanvas,
+  fourierMode: FourierMode,
+  windowSize: number,
 ): Promise<{
   first: Record<string, number>;
   average: Record<string, number>;

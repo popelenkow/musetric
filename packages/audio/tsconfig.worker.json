@@ -1,4 +1,4 @@
 {
-  "extends": "../../tsconfigs/tsconfig.worklet.json",
+  "extends": "../../tsconfigs/tsconfig.worker.json",
   "references": [{ "path": "./tsconfig.src.json" }]
 }

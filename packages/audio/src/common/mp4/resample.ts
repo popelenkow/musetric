@@ -1,5 +1,5 @@
 import { ConverterType, create } from '@alexanderolsen/libsamplerate-js';
-import { type ChannelArrays } from '../channelBuffers.es.js';
+import { type ChannelArrays } from '../channelBuffers.js';
 
 const resampleChannel = async (
   channel: Float32Array<ArrayBuffer>,

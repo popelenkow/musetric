@@ -2,7 +2,7 @@ import { wrapMessagePort } from '@musetric/resource-utils/cross/messagePort';
 import {
   type FromWaveformWorkerMessage,
   type ToWaveformWorkerMessage,
-} from './protocol.es.js';
+} from './portMessage.es.js';
 import waveformWorkerUrl from './waveform.worker.ts?worker&url';
 
 export const createWaveformWorker = () => {
