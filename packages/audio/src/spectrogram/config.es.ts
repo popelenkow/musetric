@@ -33,3 +33,16 @@ export type SpectrogramConfig = {
   viewSize: ViewSize;
   colors: ViewColors;
 };
+export const allSpectrogramConfigKeys = [
+  'windowSize',
+  'sampleRate',
+  'visibleTimeBefore',
+  'visibleTimeAfter',
+  'zeroPaddingFactor',
+  'windowName',
+  'minDecibel',
+  'minFrequency',
+  'maxFrequency',
+  'viewSize',
+  'colors',
+] as const satisfies (keyof SpectrogramConfig)[];

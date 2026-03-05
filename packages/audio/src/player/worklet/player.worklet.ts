@@ -5,8 +5,11 @@ import {
 import {
   type ChannelArrays,
   toChannelArrays,
-} from '../common/channelBuffers.es.js';
-import type { FromWorkletMessage, ToWorkletMessage } from './portMessage.js';
+} from '../../common/channelBuffers.es.js';
+import type {
+  FromWorkletMessage,
+  ToWorkletMessage,
+} from '../portMessage.es.js';
 
 type Process = (output: Float32Array<ArrayBuffer>[]) => boolean;
 

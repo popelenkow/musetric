@@ -1,10 +1,13 @@
-import { type ChannelArrays } from '@musetric/audio';
+import {
+  type ChannelArrays,
+  createDecoderMainPort,
+  type FromDecoderWorkerMessage,
+} from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { createDecoderWorker } from './port.js';
-import { type FromDecoderWorkerMessage } from './portMessage.es.js';
+import decoderWorkerUrl from './decoder.worker.ts?worker&url';
 
 export type DecoderState = {
   channels?: ChannelArrays<SharedArrayBuffer>;
@@ -30,7 +33,7 @@ export const useDecoderStore = create<State>()(
   subscribeWithSelector((set) => {
     const singletonManager = createSingletonManager(
       async (projectId: number, sampleRate: number) => {
-        const port = createDecoderWorker();
+        const port = createDecoderMainPort(decoderWorkerUrl);
         port.onerror = () => {
           set({ status: 'error' });
         };

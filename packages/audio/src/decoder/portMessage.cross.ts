@@ -1,4 +1,4 @@
-import { type ChannelArrays } from '@musetric/audio';
+import { type ChannelArrays } from '../common/channelBuffers.es.js';
 
 export type ToDecoderWorkerMessage = {
   type: 'init';

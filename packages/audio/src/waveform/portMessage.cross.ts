@@ -1,11 +1,13 @@
-import { type api } from '@musetric/api';
-import { type ViewColors, type ViewSize } from '@musetric/audio';
+import type { ViewColors } from '../common/colors.es.js';
+import type { ViewSize } from '../common/viewSize.es.js';
+
+export type WaveType = 'lead' | 'backing' | 'instrumental';
 
 export type ToWaveformWorkerMessage =
   | {
       type: 'init';
       projectId: number;
-      waveType: api.wave.Type;
+      waveType: WaveType;
       colors: ViewColors;
       progress: number;
     }

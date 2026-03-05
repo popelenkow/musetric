@@ -1,4 +1,4 @@
-import { type ChannelArrays } from '../channelBuffers.es.js';
+import { type ChannelArrays } from '../../common/channelBuffers.es.js';
 import { type DemuxedTrack } from './demux.js';
 
 const concatChannel = (
