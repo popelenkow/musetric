@@ -2,16 +2,16 @@ import { createState, type State } from './state.js';
 
 const workgroupSize = 16;
 
-export type Remap = {
+export type SpectrogramRemap = {
   run: (encoder: GPUCommandEncoder) => void;
   configure: State['configure'];
   destroy: State['destroy'];
 };
 
-export const createRemap = (
+export const createSpectrogramRemap = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): Remap => {
+): SpectrogramRemap => {
   const state = createState(device);
 
   return {

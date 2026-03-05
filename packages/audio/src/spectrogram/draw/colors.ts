@@ -1,5 +1,5 @@
 import { parseHexColor } from '../../common/colors.js';
-import { type Config } from './index.js';
+import { type SpectrogramDrawConfig } from './index.js';
 
 const toVec4 = (hex: string): [number, number, number, number] => {
   const { red, green, blue } = parseHexColor(hex);
@@ -8,7 +8,7 @@ const toVec4 = (hex: string): [number, number, number, number] => {
 
 export type StateColors = {
   buffer: GPUBuffer;
-  write: (config: Config) => void;
+  write: (config: SpectrogramDrawConfig) => void;
   destroy: () => void;
 };
 export const createColors = (device: GPUDevice): StateColors => {
@@ -21,7 +21,7 @@ export const createColors = (device: GPUDevice): StateColors => {
 
   const ref: StateColors = {
     buffer,
-    write: (config: Config) => {
+    write: (config: SpectrogramDrawConfig) => {
       const { colors } = config;
       array.set([
         ...toVec4(colors.played),

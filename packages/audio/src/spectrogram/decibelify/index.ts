@@ -2,15 +2,15 @@ import { createState, type State } from './state.js';
 
 const workgroupSize = 64;
 
-export type Decibelify = {
+export type SpectrogramDecibelify = {
   run: (encoder: GPUCommandEncoder) => void;
   configure: State['configure'];
   destroy: State['destroy'];
 };
-export const createDecibelify = (
+export const createSpectrogramDecibelify = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): Decibelify => {
+): SpectrogramDecibelify => {
   const state = createState(device);
 
   return {

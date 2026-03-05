@@ -8,7 +8,7 @@ import {
   TableRow,
   useTheme,
 } from '@mui/material';
-import { spectrogram } from '@musetric/audio';
+import { spectrogramTimerLabels } from '@musetric/audio';
 import { type FC } from 'react';
 import { windowSizes } from '../constants.js';
 import { getMetric } from '../getMetric.js';
@@ -87,7 +87,7 @@ export const MetricsTable: FC<MetricsTableProps> = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {spectrogram.timerLabels.map((metric, metricIdx) => (
+          {spectrogramTimerLabels.map((metric, metricIdx) => (
             <TableRow
               key={metric}
               sx={{

@@ -1,16 +1,20 @@
 import { type ViewColors } from '../common/colors.js';
-import { type WaveSegment } from './generateSegments.js';
+import { type WaveformSegment } from './generateSegments.js';
 
-export type Draw = {
-  run: (segments: WaveSegment[], progress: number, colors: ViewColors) => void;
+export type WaveformDraw = {
+  run: (
+    segments: WaveformSegment[],
+    progress: number,
+    colors: ViewColors,
+  ) => void;
 };
-export const createDraw = (canvas: OffscreenCanvas): Draw => {
+export const createWaveformDraw = (canvas: OffscreenCanvas): WaveformDraw => {
   const context = canvas.getContext('2d');
   if (!context) {
     throw new Error('Context 2D not available on the canvas');
   }
 
-  const ref: Draw = {
+  const ref: WaveformDraw = {
     run: (segments, progress, colors) => {
       const width = canvas.width;
       const height = canvas.height;

@@ -1,4 +1,8 @@
-import { type FourierMode, spectrogram } from '@musetric/audio';
+import {
+  createSpectrogramPipeline,
+  type FourierMode,
+  type SpectrogramConfig,
+} from '@musetric/audio';
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
@@ -14,7 +18,7 @@ export const runPipeline = async (
   maxDeviation: Record<string, { positive: number; negative: number }>;
 }> => {
   const metricsArray: Record<string, number>[] = [];
-  const config: spectrogram.PipelineConfig = {
+  const config: SpectrogramConfig = {
     windowSize,
     sampleRate: defaultSampleRate,
     visibleTimeBefore: 2.0,
@@ -34,7 +38,7 @@ export const runPipeline = async (
       unplayed: '#888888',
     },
   };
-  const pipeline = spectrogram.createPipeline({
+  const pipeline = createSpectrogramPipeline({
     device,
     canvas,
     fourierMode,

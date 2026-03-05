@@ -1,11 +1,11 @@
 import type { FourierMode } from '../fourier/fouriers.js';
-import type { PipelineConfig } from './config.js';
+import type { SpectrogramConfig } from './config.js';
 
 export type ToSpectrogramWorkerMessage =
   | {
       type: 'init';
       canvas: OffscreenCanvas;
-      config: PipelineConfig;
+      config: SpectrogramConfig;
       progress: number;
       waveBuffer?: SharedArrayBuffer;
       fourierMode: FourierMode;
@@ -21,7 +21,7 @@ export type ToSpectrogramWorkerMessage =
     }
   | {
       type: 'config';
-      patch: Partial<PipelineConfig>;
+      patch: Partial<SpectrogramConfig>;
     };
 
 export type FromSpectrogramWorkerMessage = {

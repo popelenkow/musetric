@@ -1,22 +1,22 @@
 import { type ViewColors } from '../common/colors.js';
-import { createDraw } from './draw.js';
-import { generateSegments } from './generateSegments.js';
+import { createWaveformDraw } from './draw.js';
+import { generateWaveformSegments } from './generateSegments.js';
 
 const barStep = 3;
 
-export type Pipeline = {
+export type WaveformPipeline = {
   render: (wave: Float32Array<ArrayBuffer>, progress: number) => void;
 };
-export const createPipeline = (
+export const createWaveformPipeline = (
   canvas: OffscreenCanvas,
   colors: ViewColors,
-): Pipeline => {
-  const draw = createDraw(canvas);
+): WaveformPipeline => {
+  const draw = createWaveformDraw(canvas);
 
   return {
     render: (wave, progress) => {
       const segmentCount = Math.floor(canvas.width / barStep);
-      const segments = generateSegments(wave, segmentCount);
+      const segments = generateWaveformSegments(wave, segmentCount);
       draw.run(segments, progress, colors);
     },
   };

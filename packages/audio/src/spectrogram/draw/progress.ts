@@ -1,8 +1,8 @@
-import { type Config } from './index.js';
+import { type SpectrogramDrawConfig } from './index.js';
 
 export type StateProgress = {
   buffer: GPUBuffer;
-  write: (config: Config) => void;
+  write: (config: SpectrogramDrawConfig) => void;
   destroy: () => void;
 };
 export const createStateProgress = (device: GPUDevice): StateProgress => {
@@ -14,7 +14,7 @@ export const createStateProgress = (device: GPUDevice): StateProgress => {
   });
   const ref: StateProgress = {
     buffer,
-    write: (config: Config) => {
+    write: (config: SpectrogramDrawConfig) => {
       const { visibleTimeBefore, visibleTimeAfter } = config;
       const progress =
         visibleTimeBefore / (visibleTimeBefore + visibleTimeAfter);

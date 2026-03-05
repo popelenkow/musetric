@@ -2,17 +2,17 @@ import { createState, type State } from './state.js';
 
 const workgroupSize = 64;
 
-export type SliceWave = {
+export type SpectrogramSliceWave = {
   run: (encoder: GPUCommandEncoder) => void;
   configure: State['configure'];
   write: State['write'];
   destroy: () => void;
 };
 
-export const createSliceWave = (
+export const createSpectrogramSliceWave = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): SliceWave => {
+): SpectrogramSliceWave => {
   const state = createState(device);
 
   return {

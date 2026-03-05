@@ -1,51 +1,59 @@
 import { createCallLatest } from '@musetric/resource-utils';
 import { type FourierMode, fouriers } from '../fourier/index.js';
-import { applyPatchConfig, type PipelineConfig } from './config.js';
-import { createDecibelify } from './decibelify/index.js';
-import { createDraw } from './draw/index.js';
-import { createMagnitudify } from './magnitudify/index.js';
-import { createPipelineState } from './pipelineState/index.js';
-import { createPipelineTimer, type PipelineMetrics } from './pipelineTimer.js';
-import { createRemap } from './remap/index.js';
-import { createSliceWave } from './sliceWave/index.js';
-import { createWindowing } from './windowing/index.js';
+import {
+  applySpectrogramPatchConfig,
+  type SpectrogramConfig,
+} from './config.js';
+import { createSpectrogramDecibelify } from './decibelify/index.js';
+import { createSpectrogramDraw } from './draw/index.js';
+import { createSpectrogramMagnitudify } from './magnitudify/index.js';
+import { createSpectrogramPipelineState } from './pipelineState/index.js';
+import {
+  createSpectrogramPipelineTimer,
+  type SpectrogramPipelineMetrics,
+} from './pipelineTimer.js';
+import { createSpectrogramRemap } from './remap/index.js';
+import { createSpectrogramSliceWave } from './sliceWave/index.js';
+import { createSpectrogramWindowing } from './windowing/index.js';
 
-export type Pipeline = {
+export type SpectrogramPipeline = {
   render: (wave: Float32Array, progress: number) => Promise<void>;
-  updateConfig: (config: Partial<PipelineConfig>) => void;
+  updateConfig: (config: Partial<SpectrogramConfig>) => void;
   destroy: () => void;
 };
 
-export type CreatePipelineOptions = {
+export type CreateSpectrogramPipelineOptions = {
   device: GPUDevice;
   fourierMode: FourierMode;
   canvas: OffscreenCanvas;
-  config: PipelineConfig;
-  onMetrics?: (metrics: PipelineMetrics) => void;
+  config: SpectrogramConfig;
+  onMetrics?: (metrics: SpectrogramPipelineMetrics) => void;
 };
 
-export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
+export const createSpectrogramPipeline = (
+  options: CreateSpectrogramPipelineOptions,
+): SpectrogramPipeline => {
   const { device, fourierMode, canvas, onMetrics } = options;
 
-  const timer = createPipelineTimer(device, onMetrics);
+  const timer = createSpectrogramPipelineTimer(device, onMetrics);
   const { markers } = timer;
 
-  let draftConfig: Partial<PipelineConfig> = options.config;
+  let draftConfig: Partial<SpectrogramConfig> = options.config;
   let config = {
     ...options.config,
     windowCount: options.config.viewSize.width,
   };
-  const state = createPipelineState(device);
-  const sliceWave = createSliceWave(device, markers.sliceWave);
-  const windowing = createWindowing(device, markers.windowing);
+  const state = createSpectrogramPipelineState(device);
+  const sliceWave = createSpectrogramSliceWave(device, markers.sliceWave);
+  const windowing = createSpectrogramWindowing(device, markers.windowing);
   const fourier = fouriers[fourierMode](device, {
     reverse: markers.fourierReverse,
     transform: markers.fourierTransform,
   });
-  const magnitudify = createMagnitudify(device, markers.magnitudify);
-  const decibelify = createDecibelify(device, markers.decibelify);
-  const remap = createRemap(device, markers.remap);
-  const draw = createDraw(device, canvas, markers.draw);
+  const magnitudify = createSpectrogramMagnitudify(device, markers.magnitudify);
+  const decibelify = createSpectrogramDecibelify(device, markers.decibelify);
+  const remap = createSpectrogramRemap(device, markers.remap);
+  const draw = createSpectrogramDraw(device, canvas, markers.draw);
 
   const configure = markers.configure(() => {
     state.configure(config);
@@ -109,7 +117,11 @@ export const createPipeline = (options: CreatePipelineOptions): Pipeline => {
       await timer.finish();
     }),
     updateConfig: (patchConfig) => {
-      draftConfig = applyPatchConfig(draftConfig, patchConfig, config);
+      draftConfig = applySpectrogramPatchConfig(
+        draftConfig,
+        patchConfig,
+        config,
+      );
     },
     destroy: () => {
       timer.destroy();

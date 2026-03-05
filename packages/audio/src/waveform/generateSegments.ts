@@ -1,14 +1,14 @@
-export type WaveSegment = {
+export type WaveformSegment = {
   min: number;
   max: number;
 };
 
-export const generateSegments = (
+export const generateWaveformSegments = (
   data: Float32Array<ArrayBuffer>,
   width: number,
-): WaveSegment[] => {
+): WaveformSegment[] => {
   const step = data.length / (2 * width);
-  const segments: WaveSegment[] = [];
+  const segments: WaveformSegment[] = [];
   for (let i = 0; i < width; i++) {
     const start = Math.floor(i * step);
     const end = Math.floor((i + 1) * step);

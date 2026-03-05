@@ -1,24 +1,24 @@
 import { setCanvasSize } from '../../common/canvas.js';
-import { type ExtPipelineConfig } from '../config.js';
+import { type SpectrogramConfig } from '../config.js';
 import { createColors } from './colors.js';
 import { createPipeline } from './pipeline.js';
 import { createStateProgress } from './progress.js';
 
-export type Config = Pick<
-  ExtPipelineConfig,
+export type SpectrogramDrawConfig = Pick<
+  SpectrogramConfig,
   'viewSize' | 'visibleTimeBefore' | 'visibleTimeAfter' | 'colors'
 >;
 
-export type Draw = {
+export type SpectrogramDraw = {
   run: (encoder: GPUCommandEncoder) => void;
-  configure: (view: GPUTextureView, config: Config) => void;
+  configure: (view: GPUTextureView, config: SpectrogramDrawConfig) => void;
   destroy: () => void;
 };
-export const createDraw = (
+export const createSpectrogramDraw = (
   device: GPUDevice,
   canvas: OffscreenCanvas,
   marker?: GPUComputePassTimestampWrites,
-): Draw => {
+): SpectrogramDraw => {
   const context = canvas.getContext('webgpu');
   if (!context) {
     throw new Error('WebGPU context not available on the canvas');
@@ -35,7 +35,7 @@ export const createDraw = (
   // eslint-disable-next-line @typescript-eslint/init-declarations
   let bindGroup: GPUBindGroup;
 
-  const ref: Draw = {
+  const ref: SpectrogramDraw = {
     run: (encoder) => {
       const view = context.getCurrentTexture().createView({
         label: 'draw-view',
