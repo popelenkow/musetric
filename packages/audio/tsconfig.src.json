@@ -2,10 +2,17 @@
   "extends": "../../tsconfigs/tsconfig.base.json",
   "references": [
     { "path": "./tsconfig.es.json" },
-    { "path": "./tsconfig.cross.json" }
+    { "path": "./tsconfig.cross.json" },
+    { "path": "./tsconfig.src.spectrogram.json" }
   ],
   "compilerOptions": {
     "lib": ["ES2024", "DOM"],
-    "types": ["@webgpu/types"]
-  }
+    "types": ["vite/client"]
+  },
+  "include": [
+    "${configDir}/src/common/**/*",
+    "${configDir}/src/player/**/*",
+    "${configDir}/src/waveform/**/*",
+    "${configDir}/src/index.ts"
+  ]
 }

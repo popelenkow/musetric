@@ -1,4 +1,4 @@
-import { setCanvasSize } from '../../common/canvas.js';
+import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
 import { type SpectrogramConfig } from '../config.es.js';
 import { createColors } from './colors.js';
 import { createPipeline } from './pipeline.js';
@@ -58,7 +58,7 @@ export const createSpectrogramDraw = (
       pass.end();
     },
     configure: (view, config) => {
-      setCanvasSize(canvas, config.viewSize);
+      setOffscreenCanvasSize(canvas, config.viewSize);
       progress.write(config);
       colors.write(config);
       bindGroup = device.createBindGroup({

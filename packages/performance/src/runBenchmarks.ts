@@ -1,4 +1,4 @@
-import { type FourierMode } from '@musetric/audio';
+import { type FourierMode } from '@musetric/audio/spectrogram';
 import { runPipeline } from './runPipeline.js';
 import { waitNextFrame } from './waitNextFrame.js';
 

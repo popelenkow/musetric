@@ -106,8 +106,3 @@ export const windowFunctions: Record<SpectrogramWindowName, WindowFunction> = {
   rectangular,
   triangular,
 };
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-export const spectrogramWindowNames = Object.keys(
-  windowFunctions,
-) as SpectrogramWindowName[];

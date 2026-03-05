@@ -3,8 +3,7 @@
   "references": [
     { "path": "./tsconfig.es.json" },
     { "path": "./tsconfig.cross.json" },
-    { "path": "./tsconfig.src.json" },
-    { "path": "./tsconfig.worklet.json" }
+    { "path": "./tsconfig.src.json" }
   ],
   "compilerOptions": {
     "types": ["@webgpu/types"]
