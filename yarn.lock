@@ -1410,7 +1410,6 @@ __metadata:
     "@types/react": "catalog:"
     "@types/react-dom": "catalog:"
     "@vitejs/plugin-react": "catalog:"
-    "@webgpu/types": "catalog:"
     axios: "catalog:"
     cpx2: "catalog:"
     date-fns: "catalog:"

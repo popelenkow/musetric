@@ -1,11 +1,11 @@
 import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
-import { getGpuDevice } from './common/gpuDevice.cross.js';
+import { getGpuDevice } from './common/gpuDevice.js';
 import {
   createSpectrogramPipeline,
   type SpectrogramPipeline,
 } from './pipeline.js';
-import { createPort } from './port.worker.js';
+import { createSpectrogramWorkerScope } from './port.worker.js';
 import { type ToSpectrogramWorkerMessage } from './portMessage.cross.js';
 
 type State = {
@@ -18,7 +18,7 @@ const state: State = {
   progress: 0,
 };
 
-const port = createPort();
+const port = createSpectrogramWorkerScope();
 
 const render = async () => {
   const { pipeline, wave, progress } = state;

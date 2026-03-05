@@ -8,7 +8,7 @@ import {
   TableRow,
   useTheme,
 } from '@mui/material';
-import { spectrogramTimerLabels } from '@musetric/audio';
+import { spectrogramTimerLabels } from '@musetric/audio/spectrogram';
 import { type FC } from 'react';
 import { windowSizes } from '../constants.js';
 import { getMetric } from '../getMetric.js';

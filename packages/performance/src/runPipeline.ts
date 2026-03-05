@@ -2,7 +2,7 @@ import {
   createSpectrogramPipeline,
   type FourierMode,
   type SpectrogramConfig,
-} from '@musetric/audio';
+} from '@musetric/audio/spectrogram';
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { progress, runs, skipRuns, wave } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';

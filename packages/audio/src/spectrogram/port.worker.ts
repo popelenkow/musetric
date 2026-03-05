@@ -4,7 +4,7 @@ import {
   type ToSpectrogramWorkerMessage,
 } from './portMessage.cross.js';
 
-export const createPort = () => {
+export const createSpectrogramWorkerScope = () => {
   const port = wrapMessagePort(self).typed<
     ToSpectrogramWorkerMessage,
     FromSpectrogramWorkerMessage

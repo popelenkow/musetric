@@ -1,5 +1,8 @@
 import { Box } from '@mui/material';
-import { createGpuContext, type FourierMode } from '@musetric/audio';
+import {
+  createGpuContext,
+  type FourierMode,
+} from '@musetric/audio/spectrogram';
 import { type FC, useEffect, useRef } from 'react';
 import { canvasHeight, canvasWidth } from '../constants.js';
 import { type MetricsData, runBenchmark } from '../runBenchmarks.js';

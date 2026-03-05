@@ -1,4 +1,4 @@
-import { createGpuContext, type GpuContext } from './gpuContext.cross.js';
+import { createGpuContext, type GpuContext } from './gpuContext.js';
 
 let gpuContext: GpuContext | undefined = undefined;
 let promise: Promise<GpuContext> | undefined = undefined;

@@ -7,6 +7,3 @@ export const fouriers: Record<FourierMode, CreateFourier> = {
   fftRadix2: createFftRadix2,
   fftRadix4: createFftRadix4,
 };
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-export const allFourierModes = Object.keys(fouriers) as FourierMode[];
