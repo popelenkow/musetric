@@ -1,4 +1,4 @@
-import { type ComplexGpuBuffer } from '../../../common/complexArray.js';
+import { type ComplexGpuBuffer } from '../../common/complexArray.js';
 import { type FourierConfig } from '../config.js';
 import { assertWindowSizePowerOfTwo } from '../isPowerOfTwo.js';
 import { createParams, type StateParams } from './params.js';

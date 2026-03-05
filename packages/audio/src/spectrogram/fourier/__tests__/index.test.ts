@@ -1,8 +1,8 @@
 import { afterAll, describe, it } from 'vitest';
-import { complexArrayFrom } from '../../../../common/complexArray.js';
-import { createComplexGpuBufferReader } from '../../../../common/gpuBufferReader/index.js';
-import { createGpuContext } from '../../../../common/gpuContext.js';
-import { allFourierModes, fouriers } from '../../fouriers.js';
+import { complexArrayFrom } from '../../common/complexArray.js';
+import { createComplexGpuBufferReader } from '../../common/gpuBufferReader/index.js';
+import { createGpuContext } from '../../common/gpuContext.cross.js';
+import { allFourierModes, fouriers } from '../fouriers.js';
 import { assertArrayClose, createBuffers, windowCount } from './common.js';
 import { fourierFixtures } from './fixture.js';
 

@@ -1,5 +1,5 @@
-import { type ComplexGpuBuffer } from '../../common/complexArray.js';
-import { type ExtSpectrogramConfig } from '../config.js';
+import { type ComplexGpuBuffer } from '../common/complexArray.js';
+import { type ExtSpectrogramConfig } from '../common/extConfig.js';
 import { createSignalBuffer } from './signal.js';
 import { createStateTexture, type StateTexture } from './texture.js';
 

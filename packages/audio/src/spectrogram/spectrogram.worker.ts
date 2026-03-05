@@ -1,12 +1,12 @@
 import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
-import { getGpuDevice } from '../common/gpuDevice.js';
+import { getGpuDevice } from './common/gpuDevice.cross.js';
 import {
   createSpectrogramPipeline,
   type SpectrogramPipeline,
 } from './pipeline.js';
 import { createPort } from './port.worker.js';
-import { type ToSpectrogramWorkerMessage } from './portMessage.js';
+import { type ToSpectrogramWorkerMessage } from './portMessage.cross.js';
 
 type State = {
   pipeline?: SpectrogramPipeline;

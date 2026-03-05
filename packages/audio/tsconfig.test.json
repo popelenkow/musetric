@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfigs/tsconfig.test.json",
   "references": [
+    { "path": "./tsconfig.es.json" },
+    { "path": "./tsconfig.cross.json" },
     { "path": "./tsconfig.src.json" },
     { "path": "./tsconfig.worklet.json" }
   ],

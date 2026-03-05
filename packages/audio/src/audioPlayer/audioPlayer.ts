@@ -3,7 +3,7 @@ import { createPortMessageHandler } from '@musetric/resource-utils/cross/message
 import {
   type ChannelArrays,
   toChannelBuffers,
-} from '../common/channelBuffers.js';
+} from '../common/channelBuffers.es.js';
 import { createPlayerNode, getPlayerPort } from './port.js';
 
 export type AudioPlayer = {

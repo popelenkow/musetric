@@ -1,4 +1,4 @@
-import { type ViewColors } from '../common/colors.js';
+import { type ViewColors } from '../common/colors.es.js';
 import { createWaveformDraw } from './draw.js';
 import { generateWaveformSegments } from './generateSegments.js';
 

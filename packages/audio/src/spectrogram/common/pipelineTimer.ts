@@ -2,7 +2,7 @@ import {
   createCpuTimer,
   createGpuTimer,
   roundDuration,
-} from '../common/timer/index.js';
+} from './timer/index.js';
 
 export const spectrogramTimerLabels = [
   'configure',
