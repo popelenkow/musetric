@@ -5,7 +5,7 @@ import {
 import {
   type FromSpectrogramWorkerMessage,
   type ToSpectrogramWorkerMessage,
-} from './portMessage.js';
+} from './portMessage.cross.js';
 import spectrogramWorkerUrl from './spectrogram.worker.ts?worker&url';
 
 export const createSpectrogramWorker = () => {

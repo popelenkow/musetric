@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfigs/tsconfig.worker.json",
-  "references": [{ "path": "./tsconfig.src.json" }]
+  "references": [
+    { "path": "./tsconfig.es.json" },
+    { "path": "./tsconfig.cross.json" },
+    { "path": "./tsconfig.src.json" }
+  ]
 }

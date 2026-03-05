@@ -1,17 +1,15 @@
 import { createCallLatest } from '@musetric/resource-utils';
-import {
-  applySpectrogramPatchConfig,
-  type SpectrogramConfig,
-} from './config.js';
-import { createSpectrogramDecibelify } from './decibelify/index.js';
-import { createSpectrogramDraw } from './draw/index.js';
-import { type FourierMode, fouriers } from './fourier/fouriers.js';
-import { createSpectrogramMagnitudify } from './magnitudify/index.js';
-import { createSpectrogramPipelineState } from './pipelineState/index.js';
+import { applySpectrogramPatchConfig } from './common/extConfig.js';
 import {
   createSpectrogramPipelineTimer,
   type SpectrogramPipelineMetrics,
-} from './pipelineTimer.js';
+} from './common/pipelineTimer.js';
+import { type FourierMode, type SpectrogramConfig } from './config.es.js';
+import { createSpectrogramDecibelify } from './decibelify/index.js';
+import { createSpectrogramDraw } from './draw/index.js';
+import { fouriers } from './fourier/fouriers.js';
+import { createSpectrogramMagnitudify } from './magnitudify/index.js';
+import { createSpectrogramPipelineState } from './pipelineState/index.js';
 import { createSpectrogramRemap } from './remap/index.js';
 import { createSpectrogramSliceWave } from './sliceWave/index.js';
 import { createSpectrogramWindowing } from './windowing/index.js';

@@ -1,4 +1,4 @@
-import { type ChannelArrays } from '../channelBuffers.js';
+import { type ChannelArrays } from '../channelBuffers.es.js';
 
 const toSharedArray = (data: Float32Array): Float32Array<SharedArrayBuffer> => {
   const shared = new SharedArrayBuffer(data.byteLength);

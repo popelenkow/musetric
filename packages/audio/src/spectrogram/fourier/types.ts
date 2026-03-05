@@ -1,4 +1,4 @@
-import { type ComplexGpuBuffer } from '../../common/complexArray.js';
+import { type ComplexGpuBuffer } from '../common/complexArray.js';
 import { type FourierConfig } from './config.js';
 
 export type Fourier = {

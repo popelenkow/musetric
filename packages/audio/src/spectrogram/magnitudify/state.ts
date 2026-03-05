@@ -1,5 +1,5 @@
-import { type ComplexGpuBuffer } from '../../common/complexArray.js';
-import { type ExtSpectrogramConfig } from '../config.js';
+import { type ComplexGpuBuffer } from '../common/complexArray.js';
+import { type ExtSpectrogramConfig } from '../common/extConfig.js';
 import { createParams, type StateParams } from './params.js';
 import { createPipelines, type Pipelines } from './pipeline.js';
 

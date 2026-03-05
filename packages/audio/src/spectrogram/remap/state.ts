@@ -1,4 +1,4 @@
-import { type SpectrogramConfig } from '../config.js';
+import { type SpectrogramConfig } from '../config.es.js';
 import { createParams, type StateParams } from './params.js';
 import { createPipeline } from './pipeline.js';
 

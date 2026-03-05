@@ -1,4 +1,4 @@
-import { type ChannelBuffers } from '../common/channelBuffers.js';
+import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 
 export type ToWorkletMessage =
   | { type: 'play'; buffers: ChannelBuffers; startFrame: number }

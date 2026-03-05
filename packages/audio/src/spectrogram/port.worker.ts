@@ -2,7 +2,7 @@ import { wrapMessagePort } from '@musetric/resource-utils/cross/messagePort';
 import {
   type FromSpectrogramWorkerMessage,
   type ToSpectrogramWorkerMessage,
-} from './portMessage.js';
+} from './portMessage.cross.js';
 
 export const createPort = () => {
   const port = wrapMessagePort(self).typed<

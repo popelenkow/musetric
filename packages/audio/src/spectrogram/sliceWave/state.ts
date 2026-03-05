@@ -1,4 +1,4 @@
-import { type ExtSpectrogramConfig } from '../config.js';
+import { type ExtSpectrogramConfig } from '../common/extConfig.js';
 import { createParams, type StateParams } from './params.js';
 import { createPipeline } from './pipeline.js';
 import { createStateWave, type StateWave } from './wave.js';

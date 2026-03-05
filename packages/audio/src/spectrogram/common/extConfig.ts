@@ -1,22 +1,4 @@
-import { type ViewColors } from '../common/colors.js';
-import { type ViewSize } from '../common/viewSize.js';
-import { type SpectrogramWindowName } from './windowFunction.js';
-
-export type SpectrogramZeroPaddingFactor = 1 | 2 | 4;
-
-export type SpectrogramConfig = {
-  windowSize: number;
-  sampleRate: number;
-  visibleTimeBefore: number;
-  visibleTimeAfter: number;
-  zeroPaddingFactor: SpectrogramZeroPaddingFactor;
-  windowName: SpectrogramWindowName;
-  minDecibel: number;
-  minFrequency: number;
-  maxFrequency: number;
-  viewSize: ViewSize;
-  colors: ViewColors;
-};
+import type { SpectrogramConfig } from '../config.es.js';
 
 export type ExtSpectrogramConfig = SpectrogramConfig & {
   windowCount: number;

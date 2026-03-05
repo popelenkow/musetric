@@ -1,5 +1,5 @@
 import { setCanvasSize } from '../../common/canvas.js';
-import { type SpectrogramConfig } from '../config.js';
+import { type SpectrogramConfig } from '../config.es.js';
 import { createColors } from './colors.js';
 import { createPipeline } from './pipeline.js';
 import { createStateProgress } from './progress.js';
