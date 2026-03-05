@@ -11,6 +11,5 @@ export * from './common/mp4/index.js';
 export * from './common/resizeObserver.js';
 export * from './common/timer/index.js';
 export * from './common/viewSize.js';
-export * from './fourier/index.js';
 export * from './spectrogram/index.js';
 export * from './waveform/index.js';

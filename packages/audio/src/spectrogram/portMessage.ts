@@ -1,5 +1,5 @@
-import type { FourierMode } from '../fourier/fouriers.js';
 import type { SpectrogramConfig } from './config.js';
+import type { FourierMode } from './fourier/fouriers.js';
 
 export type ToSpectrogramWorkerMessage =
   | {
