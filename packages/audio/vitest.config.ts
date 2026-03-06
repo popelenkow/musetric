@@ -5,6 +5,7 @@ const isSkip = process.platform === 'linux';
 
 export default defineConfig({
   test: {
+    dir: 'src',
     exclude: isSkip ? ['**/*'] : [],
     passWithNoTests: isSkip,
     browser: {

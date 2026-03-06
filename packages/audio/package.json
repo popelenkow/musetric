@@ -6,17 +6,53 @@
   "sideEffects": false,
   "exports": {
     "./package.json": "./package.json",
+    ".": {
+      "monorepo": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./decoder": {
+      "monorepo": "./src/decoder/index.ts",
+      "types": "./dist/decoder/index.d.ts",
+      "import": "./dist/decoder/index.js",
+      "default": "./dist/decoder/index.js"
+    },
+    "./decoder/worker": {
+      "monorepo": "./src/decoder/worker/index.worker.ts",
+      "types": "./dist/decoder/worker/index.worker.d.ts",
+      "import": "./dist/decoder/worker/index.worker.js",
+      "default": "./dist/decoder/worker/index.worker.js"
+    },
+    "./player": {
+      "monorepo": "./src/player/index.ts",
+      "types": "./dist/player/index.d.ts",
+      "import": "./dist/player/index.js",
+      "default": "./dist/player/index.js"
+    },
     "./spectrogram": {
       "monorepo": "./src/spectrogram/index.ts",
       "types": "./dist/spectrogram/index.d.ts",
       "import": "./dist/spectrogram/index.js",
       "default": "./dist/spectrogram/index.js"
     },
-    ".": {
-      "monorepo": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+    "./spectrogram/worker": {
+      "monorepo": "./src/spectrogram/worker/index.worker.ts",
+      "types": "./dist/spectrogram/worker/index.worker.d.ts",
+      "import": "./dist/spectrogram/worker/index.worker.js",
+      "default": "./dist/spectrogram/worker/index.worker.js"
+    },
+    "./waveform": {
+      "monorepo": "./src/waveform/index.ts",
+      "types": "./dist/waveform/index.d.ts",
+      "import": "./dist/waveform/index.js",
+      "default": "./dist/waveform/index.js"
+    },
+    "./waveform/worker": {
+      "monorepo": "./src/waveform/worker/index.worker.ts",
+      "types": "./dist/waveform/worker/index.worker.d.ts",
+      "import": "./dist/waveform/worker/index.worker.js",
+      "default": "./dist/waveform/worker/index.worker.js"
     }
   },
   "scripts": {

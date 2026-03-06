@@ -1,29 +1,20 @@
 import { type api } from '@musetric/api';
 import {
+  createWaveformMainPort,
   getCanvasSize,
   resizeCanvas,
   subscribeResizeObserver,
+  type WaveformMainPort,
 } from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
-import {
-  createPortMessageHandler,
-  type TypedMessagePort,
-} from '@musetric/resource-utils/cross/messagePort';
+import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { usePlayerStore } from '../player/store.js';
 import { useSettingsStore } from '../settings/store.js';
-import { createWaveformWorker } from './port.js';
-import {
-  type FromWaveformWorkerMessage,
-  type ToWaveformWorkerMessage,
-} from './portMessage.es.js';
+import waveformWorkerUrl from './waveform.worker.ts?worker&url';
 
 export type WaveformState = {
-  worker?: TypedMessagePort<
-    Worker,
-    FromWaveformWorkerMessage,
-    ToWaveformWorkerMessage
-  >;
+  port?: WaveformMainPort;
   status: 'pending' | 'error' | 'success';
 };
 
@@ -37,9 +28,9 @@ type State = WaveformState & WaveformActions;
 export const useWaveformStore = create<State>((set, get) => {
   const singletonManager = createSingletonManager(
     async (projectId: number, type: api.wave.Type) => {
-      const port = createWaveformWorker();
+      const port = createWaveformMainPort(waveformWorkerUrl);
 
-      port.onmessage = createPortMessageHandler<FromWaveformWorkerMessage>({
+      port.onmessage = createPortMessageHandler({
         state: (message) => {
           set({ status: message.status });
         },
@@ -58,19 +49,19 @@ export const useWaveformStore = create<State>((set, get) => {
         progress,
       });
 
-      set({ worker: port, status: 'pending' });
+      set({ port, status: 'pending' });
       await Promise.resolve();
       return port;
     },
     async (port) => {
       port.terminate();
-      set({ worker: undefined, status: 'pending' });
+      set({ port: undefined, status: 'pending' });
       return Promise.resolve();
     },
   );
 
   const ref: State = {
-    worker: undefined,
+    port: undefined,
     status: 'pending',
     mount: (projectId, type) => {
       void singletonManager.create(projectId, type);
@@ -78,7 +69,7 @@ export const useWaveformStore = create<State>((set, get) => {
       const unsubscribeProgress = usePlayerStore.subscribe(
         (state) => state.progress,
         (progress) => {
-          const { worker } = get();
+          const { port: worker } = get();
           if (!worker) return;
           worker.postMessage({
             type: 'progress',
@@ -90,7 +81,7 @@ export const useWaveformStore = create<State>((set, get) => {
       const unsubscribeColors = useSettingsStore.subscribe(
         (state) => state.colors,
         (colors) => {
-          const { worker } = get();
+          const { port: worker } = get();
           if (!worker) return;
           worker.postMessage({
             type: 'colors',
@@ -106,7 +97,7 @@ export const useWaveformStore = create<State>((set, get) => {
       };
     },
     attachCanvas: (canvas) => {
-      const { worker } = get();
+      const { port: worker } = get();
       if (!worker) return;
 
       resizeCanvas(canvas);

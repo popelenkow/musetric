@@ -1,4 +1,4 @@
-import { type ChannelArrays } from '../channelBuffers.es.js';
+import { type ChannelArrays } from '../../common/channelBuffers.es.js';
 import { toChannelSharedArrays } from './buffers.js';
 import { decodeTrack } from './decode.js';
 import { withDemuxedTrack } from './demux.js';

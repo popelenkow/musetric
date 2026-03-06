@@ -1,9 +1,10 @@
 import {
-  createSpectrogramWorker,
+  allSpectrogramConfigKeys,
+  createSpectrogramMainPort,
   type FromSpectrogramWorkerMessage,
   getCanvasSize,
   type SpectrogramConfig,
-  type SpectrogramWorker,
+  type SpectrogramMainPort,
   subscribeResizeObserver,
   type ViewSize,
 } from '@musetric/audio';
@@ -14,31 +15,17 @@ import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { type SettingsState, useSettingsStore } from '../settings/store.js';
 
-const configKeys = [
-  'windowSize',
-  'sampleRate',
-  'visibleTimeBefore',
-  'visibleTimeAfter',
-  'zeroPaddingFactor',
-  'windowName',
-  'minDecibel',
-  'minFrequency',
-  'maxFrequency',
-  'viewSize',
-  'colors',
-] as const satisfies (keyof SpectrogramConfig)[];
-
 const getWorkerConfig = (
   state: SettingsState & { viewSize: ViewSize },
 ): SpectrogramConfig =>
-  configKeys.reduce(
+  allSpectrogramConfigKeys.reduce(
     (config, key) => ({ ...config, [key]: state[key] }),
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     {} as SpectrogramConfig,
   );
 
 export type SpectrogramState = {
-  port?: SpectrogramWorker;
+  port?: SpectrogramMainPort;
   status: 'pending' | 'error' | 'success';
 };
 
@@ -74,7 +61,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
     port: undefined,
     status: 'pending',
     mount: (canvas) => {
-      const port = createSpectrogramWorker();
+      const port = createSpectrogramMainPort();
       set({ port });
 
       port.onmessage = createPortMessageHandler<FromSpectrogramWorkerMessage>({

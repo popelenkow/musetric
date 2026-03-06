@@ -11,6 +11,7 @@
   },
   "include": [
     "${configDir}/src/common/**/*",
+    "${configDir}/src/decoder/**/*",
     "${configDir}/src/player/**/*",
     "${configDir}/src/waveform/**/*",
     "${configDir}/src/index.ts"

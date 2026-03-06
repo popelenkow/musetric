@@ -5,7 +5,7 @@ import { generateWaveformSegments } from './generateSegments.js';
 const barStep = 3;
 
 export type WaveformPipeline = {
-  render: (wave: Float32Array<ArrayBuffer>, progress: number) => void;
+  render: (wave: Float32Array, progress: number) => void;
 };
 export const createWaveformPipeline = (
   canvas: OffscreenCanvas,

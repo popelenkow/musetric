@@ -1,8 +1,12 @@
 {
   "extends": "../../tsconfigs/tsconfig.worker.json",
+  "compilerOptions": {
+    "types": ["@webgpu/types"]
+  },
   "references": [
     { "path": "./tsconfig.es.json" },
     { "path": "./tsconfig.cross.json" },
+    { "path": "./tsconfig.src.spectrogram.json" },
     { "path": "./tsconfig.src.json" }
   ]
 }
