@@ -39,10 +39,6 @@ export const createDecoderWorkerRuntime = (
     init: (message) => {
       state.projectId = message.projectId;
       state.sampleRate = message.sampleRate;
-      port.postMessage({
-        type: 'state',
-        status: 'pending',
-      });
       void decodeAudioTrack(message.projectId, message.sampleRate);
     },
   });
