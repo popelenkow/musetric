@@ -6,7 +6,6 @@ import {
   subscribeResizeObserver,
   type WaveformMainPort,
 } from '@musetric/audio';
-import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { usePlayerStore } from '../player/store.js';
@@ -26,8 +25,30 @@ export type WaveformActions = {
 
 type State = WaveformState & WaveformActions;
 export const useWaveformStore = create<State>((set, get) => {
-  const singletonManager = createSingletonManager(
-    async (projectId: number, type: api.wave.Type) => {
+  usePlayerStore.subscribe(
+    (state) => state.progress,
+    (progress) => {
+      get().port?.postMessage({
+        type: 'progress',
+        progress,
+      });
+    },
+  );
+
+  useSettingsStore.subscribe(
+    (state) => state.colors,
+    (colors) => {
+      get().port?.postMessage({
+        type: 'colors',
+        colors,
+      });
+    },
+  );
+
+  const ref: State = {
+    port: undefined,
+    status: 'pending',
+    mount: (projectId, type) => {
       const port = createWaveformMainPort(waveformWorkerUrl);
 
       port.onmessage = createPortMessageHandler({
@@ -39,71 +60,28 @@ export const useWaveformStore = create<State>((set, get) => {
         set({ status: 'error' });
       };
 
-      const { colors } = useSettingsStore.getState();
-      const { progress } = usePlayerStore.getState();
       port.postMessage({
         type: 'init',
         projectId,
         waveType: type,
-        colors,
-        progress,
+        colors: useSettingsStore.getState().colors,
+        progress: usePlayerStore.getState().progress,
       });
-
-      set({ port, status: 'pending' });
-      await Promise.resolve();
-      return port;
-    },
-    async (port) => {
-      port.terminate();
-      set({ port: undefined, status: 'pending' });
-      return Promise.resolve();
-    },
-  );
-
-  const ref: State = {
-    port: undefined,
-    status: 'pending',
-    mount: (projectId, type) => {
-      void singletonManager.create(projectId, type);
-
-      const unsubscribeProgress = usePlayerStore.subscribe(
-        (state) => state.progress,
-        (progress) => {
-          const { port: worker } = get();
-          if (!worker) return;
-          worker.postMessage({
-            type: 'progress',
-            progress,
-          });
-        },
-      );
-
-      const unsubscribeColors = useSettingsStore.subscribe(
-        (state) => state.colors,
-        (colors) => {
-          const { port: worker } = get();
-          if (!worker) return;
-          worker.postMessage({
-            type: 'colors',
-            colors,
-          });
-        },
-      );
+      set({ port });
 
       return () => {
-        unsubscribeProgress();
-        unsubscribeColors();
-        void singletonManager.destroy();
+        port.terminate();
+        set({ port: undefined, status: 'pending' });
       };
     },
     attachCanvas: (canvas) => {
-      const { port: worker } = get();
-      if (!worker) return;
+      const { port } = get();
+      if (!port) return;
 
       resizeCanvas(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      worker.postMessage(
+      port.postMessage(
         {
           type: 'attachCanvas',
           canvas: offscreenCanvas,
@@ -115,7 +93,7 @@ export const useWaveformStore = create<State>((set, get) => {
         canvas,
         async () => {
           const viewSize = getCanvasSize(canvas);
-          worker.postMessage({
+          port.postMessage({
             type: 'resize',
             viewSize,
           });

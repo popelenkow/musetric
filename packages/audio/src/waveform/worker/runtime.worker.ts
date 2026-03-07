@@ -59,10 +59,6 @@ export const createWaveformWorkerRuntime = (
     init: (message) => {
       state.colors = message.colors;
       state.progress = message.progress;
-      port.postMessage({
-        type: 'state',
-        status: 'pending',
-      });
       void loadWave(message.projectId, message.waveType);
     },
     attachCanvas: (message) => {

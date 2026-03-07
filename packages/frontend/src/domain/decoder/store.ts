@@ -3,7 +3,6 @@ import {
   createDecoderMainPort,
   type FromDecoderWorkerMessage,
 } from '@musetric/audio';
-import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
@@ -31,8 +30,9 @@ export type DecoderActions = {
 type State = DecoderState & DecoderActions;
 export const useDecoderStore = create<State>()(
   subscribeWithSelector((set) => {
-    const singletonManager = createSingletonManager(
-      async (projectId: number, sampleRate: number) => {
+    return {
+      ...initialState,
+      mount: (projectId, sampleRate) => {
         const port = createDecoderMainPort(decoderWorkerUrl);
         port.onerror = () => {
           set({ status: 'error' });
@@ -58,23 +58,9 @@ export const useDecoderStore = create<State>()(
           sampleRate,
         });
 
-        set(initialState);
-        await Promise.resolve();
-        return port;
-      },
-      async (port) => {
-        port.terminate();
-        set(initialState);
-        return Promise.resolve();
-      },
-    );
-
-    return {
-      ...initialState,
-      mount: (projectId, sampleRate) => {
-        void singletonManager.create(projectId, sampleRate);
         return () => {
-          void singletonManager.destroy();
+          port.terminate();
+          set(initialState);
         };
       },
     };
