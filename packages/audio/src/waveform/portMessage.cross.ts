@@ -8,12 +8,15 @@ export type ToWaveformWorkerMessage =
       type: 'init';
       projectId: number;
       waveType: WaveType;
-      colors: ViewColors;
       progress: number;
+    }
+  | {
+      type: 'deinit';
     }
   | {
       type: 'attachCanvas';
       canvas: OffscreenCanvas;
+      colors: ViewColors;
     }
   | {
       type: 'progress';
@@ -30,5 +33,5 @@ export type ToWaveformWorkerMessage =
 
 export type FromWaveformWorkerMessage = {
   type: 'state';
-  status: 'pending' | 'error' | 'success';
+  status: 'error' | 'success';
 };

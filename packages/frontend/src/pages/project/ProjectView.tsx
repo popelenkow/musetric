@@ -17,18 +17,13 @@ export type ProjectViewProps = {
 export const ProjectView: FC<ProjectViewProps> = (props) => {
   const { project } = props;
 
-  const mountPlayer = usePlayerStore((s) => s.mount);
   const player = usePlayerStore((s) => s.player);
-  const mountDecoder = useDecoderStore((s) => s.mount);
-
-  useEffect(() => {
-    return mountPlayer();
-  }, [mountPlayer]);
+  const initDecoder = useDecoderStore((s) => s.init);
 
   useEffect(() => {
     if (!player) return;
-    return mountDecoder(project.id, player.context.sampleRate);
-  }, [project.id, player, mountDecoder]);
+    return initDecoder(project.id, player.context.sampleRate);
+  }, [initDecoder, project.id, player]);
 
   return (
     <ProjectLayout

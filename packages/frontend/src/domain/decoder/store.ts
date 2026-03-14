@@ -1,6 +1,7 @@
 import {
   type ChannelArrays,
   createDecoderMainPort,
+  type DecoderMainPort,
   type FromDecoderWorkerMessage,
 } from '@musetric/audio';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
@@ -24,20 +25,22 @@ const initialState: DecoderState = {
 
 type Unmount = () => void;
 export type DecoderActions = {
-  mount: (projectId: number, sampleRate: number) => Unmount;
+  mount: () => Unmount;
+  init: (projectId: number, sampleRate: number) => Unmount | undefined;
 };
 
 type State = DecoderState & DecoderActions;
 export const useDecoderStore = create<State>()(
   subscribeWithSelector((set) => {
+    let port: DecoderMainPort | undefined = undefined;
+
     return {
       ...initialState,
-      mount: (projectId, sampleRate) => {
-        const port = createDecoderMainPort(decoderWorkerUrl);
+      mount: () => {
+        port = createDecoderMainPort(decoderWorkerUrl);
         port.onerror = () => {
           set({ status: 'error' });
         };
-
         port.onmessage = createPortMessageHandler<FromDecoderWorkerMessage>({
           state: (message) => {
             set({ status: message.status });
@@ -52,14 +55,22 @@ export const useDecoderStore = create<State>()(
           },
         });
 
-        port.postMessage({
+        return () => {
+          port?.terminate();
+          port = undefined;
+          set(initialState);
+        };
+      },
+      init: (projectId, sampleRate) => {
+        port?.postMessage({
           type: 'init',
           projectId,
           sampleRate,
         });
-
         return () => {
-          port.terminate();
+          port?.postMessage({
+            type: 'deinit',
+          });
           set(initialState);
         };
       },

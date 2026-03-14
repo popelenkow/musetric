@@ -15,12 +15,12 @@ export const SpectrogramCanvas: FC = () => {
   const spectrogramStatus = useSpectrogramStore((s) => s.status);
   const playerStatus = usePlayerStore((s) => s.status);
   const fourierMode = useSettingsStore((s) => s.fourierMode);
-  const mount = useSpectrogramStore((s) => s.mount);
+  const init = useSpectrogramStore((s) => s.init);
 
   useEffect(() => {
     if (!canvas) return;
-    return mount(canvas);
-  }, [mount, canvas]);
+    return init(canvas);
+  }, [canvas, init]);
 
   if (
     decoderStatus === 'error' ||

@@ -32,8 +32,8 @@ export const createPortMessageHandler = <Message extends { type: string }>(
   handlers: MessageHandlers<Message>,
 ) => {
   const handle = createMessageHandler(handlers);
-  return (event: MessageEvent<Message>): void => {
-    const ok = handle(event.data);
+  return async (event: MessageEvent<Message>): Promise<void> => {
+    const ok = await handle(event.data);
     if (!ok) {
       console.error('Unhandled port message type', {
         type: event.data.type,

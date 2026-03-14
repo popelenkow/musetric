@@ -1,6 +1,6 @@
 import { apiError } from '@musetric/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { type FC, useEffect } from 'react';
+import { type FC, useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoints } from '../../api/index.js';
 import { routes } from '../../app/router/routes.js';
@@ -10,6 +10,7 @@ import { useThemeViewColors } from '../../domain/settings/theme.js';
 import { ProjectProgressFlow } from './Flow/ProjectProgressFlow.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
 import { ProjectView } from './ProjectView.js';
+import { useWorkersStore } from './workersStore.js';
 
 export const ProjectPage: FC = () => {
   const queryClient = useQueryClient();
@@ -17,8 +18,11 @@ export const ProjectPage: FC = () => {
   useThemeViewColors();
 
   const { projectId } = routes.project.useAssertMatch();
-  const project = useQuery(endpoints.project.get(projectId));
 
+  const mount = useWorkersStore((s) => s.mount);
+  useLayoutEffect(() => mount(), [mount]);
+
+  const project = useQuery(endpoints.project.get(projectId));
   useEffect(
     () => endpoints.project.subscribeToStatus(queryClient),
     [queryClient],
