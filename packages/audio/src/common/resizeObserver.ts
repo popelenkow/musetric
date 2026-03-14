@@ -1,6 +1,6 @@
 export const subscribeResizeObserver = (
   element: Element,
-  callback: () => Promise<void>,
+  callback: () => void | Promise<void>,
 ) => {
   let isEntry = true;
   const observer = new ResizeObserver(() => {

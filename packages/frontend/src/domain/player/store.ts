@@ -57,7 +57,6 @@ export const usePlayerStore = create<State>()(
       async (player) => {
         await player.destroy();
         set(initialState);
-        return Promise.resolve();
       },
     );
 

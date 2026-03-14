@@ -91,16 +91,12 @@ export const useSpectrogramStore = create<State>((set, get) => {
         [offscreenCanvas],
       );
 
-      const unsubscribeResizeObserver = subscribeResizeObserver(
-        canvas,
-        async () => {
-          port.postMessage({
-            type: 'config',
-            patch: { viewSize: getCanvasSize(canvas) },
-          });
-          return Promise.resolve();
-        },
-      );
+      const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
+        port.postMessage({
+          type: 'config',
+          patch: { viewSize: getCanvasSize(canvas) },
+        });
+      });
       const unsubscribeSettings = useSettingsStore.subscribe(
         (state) => state,
         (state) => {

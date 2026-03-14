@@ -49,10 +49,9 @@ export const createSpectrogramWorkerRuntime = () => {
       void render();
       return pipeline;
     },
-    async (pipeline) => {
+    (pipeline) => {
       pipeline.destroy();
       state.pipeline = undefined;
-      return Promise.resolve();
     },
   );
 

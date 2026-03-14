@@ -89,17 +89,13 @@ export const useWaveformStore = create<State>((set, get) => {
         [offscreenCanvas],
       );
 
-      const unsubscribeResizeObserver = subscribeResizeObserver(
-        canvas,
-        async () => {
-          const viewSize = getCanvasSize(canvas);
-          port.postMessage({
-            type: 'resize',
-            viewSize,
-          });
-          return Promise.resolve();
-        },
-      );
+      const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
+        const viewSize = getCanvasSize(canvas);
+        port.postMessage({
+          type: 'resize',
+          viewSize,
+        });
+      });
 
       return unsubscribeResizeObserver;
     },

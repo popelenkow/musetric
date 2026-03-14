@@ -1,10 +1,10 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
-import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { type FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
 
-export const previewRouter: FastifyPluginAsyncZod = async (app) => {
+export const previewRouter: FastifyPluginCallbackZod = (app) => {
   app.addHook('onRoute', (opts) => {
     if (opts.schema) opts.schema.tags = ['preview'];
   });
@@ -34,6 +34,4 @@ export const previewRouter: FastifyPluginAsyncZod = async (app) => {
       return reply.send(stream);
     },
   });
-
-  return Promise.resolve();
 };
