@@ -56,10 +56,10 @@ export const createWaveformWorkerRuntime = (
   };
 
   port.onmessage = createPortMessageHandler<ToWaveformWorkerMessage>({
-    init: (message) => {
+    init: async (message) => {
       state.colors = message.colors;
       state.progress = message.progress;
-      void loadWave(message.projectId, message.waveType);
+      await loadWave(message.projectId, message.waveType);
     },
     attachCanvas: (message) => {
       state.canvas = message.canvas;

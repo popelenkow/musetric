@@ -3,12 +3,12 @@ export const subscribeResizeObserver = (
   callback: () => void | Promise<void>,
 ) => {
   let isEntry = true;
-  const observer = new ResizeObserver(() => {
+  const observer = new ResizeObserver(async () => {
     if (isEntry) {
       isEntry = false;
       return;
     }
-    void callback();
+    await callback();
   });
   observer.observe(element);
   return () => {

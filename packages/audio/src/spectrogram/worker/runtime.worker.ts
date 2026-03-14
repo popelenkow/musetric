@@ -46,7 +46,7 @@ export const createSpectrogramWorkerRuntime = () => {
         type: 'state',
         status: 'success',
       });
-      void render();
+      await render();
       return pipeline;
     },
     (pipeline) => {
@@ -56,24 +56,24 @@ export const createSpectrogramWorkerRuntime = () => {
   );
 
   port.onmessage = createPortMessageHandler<ToSpectrogramWorkerMessage>({
-    init: (message) => {
+    init: async (message) => {
       state.progress = message.progress;
       if (message.waveBuffer) {
         state.wave = new Float32Array(message.waveBuffer);
       }
-      void singletonManager.create(message);
+      await singletonManager.create(message);
     },
-    wave: (message) => {
+    wave: async (message) => {
       state.wave = new Float32Array(message.waveBuffer);
-      void render();
+      await render();
     },
-    progress: (message) => {
+    progress: async (message) => {
       state.progress = message.progress;
-      void render();
+      await render();
     },
-    config: (message) => {
+    config: async (message) => {
       state.pipeline?.updateConfig(message.patch);
-      void render();
+      await render();
     },
   });
 

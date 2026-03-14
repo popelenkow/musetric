@@ -1,6 +1,6 @@
 export type MessageHandler<Message, Type> = (
   message: Extract<Message, { type: Type }>,
-) => void;
+) => void | Promise<void>;
 
 export type MessageHandlers<Message extends { type: string }> = {
   [Type in Message['type']]: MessageHandler<Message, Type>;
