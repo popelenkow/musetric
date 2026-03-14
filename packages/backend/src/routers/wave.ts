@@ -1,10 +1,10 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
-import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { type FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
 
-export const waveRouter: FastifyPluginAsyncZod = async (app) => {
+export const waveRouter: FastifyPluginCallbackZod = (app) => {
   app.addHook('onRoute', (opts) => {
     if (opts.schema) opts.schema.tags = ['wave'];
   });
@@ -37,6 +37,4 @@ export const waveRouter: FastifyPluginAsyncZod = async (app) => {
       return reply.send(stream);
     },
   });
-
-  return Promise.resolve();
 };

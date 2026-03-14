@@ -1,13 +1,13 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
-import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { type FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import {
   resolveProcessing,
   resolveProcessingEvent,
 } from '../services/processingWorker/processingSummary.js';
 
-export const projectRouter: FastifyPluginAsyncZod = async (app) => {
+export const projectRouter: FastifyPluginCallbackZod = (app) => {
   app.addHook('onRoute', (routeOptions) => {
     if (routeOptions.schema) {
       routeOptions.schema.tags = ['project'];
@@ -140,6 +140,4 @@ export const projectRouter: FastifyPluginAsyncZod = async (app) => {
       reply.status(200).send();
     },
   });
-
-  return Promise.resolve();
 };

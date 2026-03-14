@@ -1,11 +1,11 @@
 import { api } from '@musetric/api';
 import { fastifyRoute } from '@musetric/api/node';
 import { fmp4AudioOutput } from '@musetric/toolkit';
-import { type FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { type FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
 
-export const audioDeliveryRouter: FastifyPluginAsyncZod = async (app) => {
+export const audioDeliveryRouter: FastifyPluginCallbackZod = (app) => {
   app.addHook('onRoute', (opts) => {
     if (opts.schema) opts.schema.tags = ['audioDelivery'];
   });
@@ -42,6 +42,4 @@ export const audioDeliveryRouter: FastifyPluginAsyncZod = async (app) => {
       return reply.send(stream);
     },
   });
-
-  return Promise.resolve();
 };

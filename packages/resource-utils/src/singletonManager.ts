@@ -10,7 +10,7 @@ export type SingletonManager<Args extends unknown[], Instance> = {
 
 export const createSingletonManager = <Args extends unknown[], Instance>(
   create: CreateFunction<Args, Instance>,
-  destroy: (instance: Instance) => Promise<void>,
+  destroy: (instance: Instance) => void | Promise<void>,
 ): SingletonManager<Args, Instance> => {
   let instancePromise: Promise<Instance> | undefined = undefined;
   let lastPromise: Promise<void> = Promise.resolve();
