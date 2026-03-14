@@ -36,10 +36,10 @@ export const createDecoderWorkerRuntime = (
   };
 
   port.onmessage = createPortMessageHandler<ToDecoderWorkerMessage>({
-    init: (message) => {
+    init: async (message) => {
       state.projectId = message.projectId;
       state.sampleRate = message.sampleRate;
-      void decodeAudioTrack(message.projectId, message.sampleRate);
+      await decodeAudioTrack(message.projectId, message.sampleRate);
     },
   });
 
