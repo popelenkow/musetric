@@ -1,9 +1,9 @@
 import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 
-export type ToWorkletMessage =
+export type ToPlayerWorkletMessage =
   | { type: 'play'; buffers: ChannelBuffers; startFrame: number }
   | { type: 'pause' };
 
-export type FromWorkletMessage = {
+export type FromPlayerWorkletMessage = {
   type: 'ended';
 };

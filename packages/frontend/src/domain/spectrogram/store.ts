@@ -25,22 +25,24 @@ const getWorkerConfig = (
   );
 
 export type SpectrogramState = {
-  port?: SpectrogramMainPort;
   status: 'pending' | 'error' | 'success';
 };
 
 type Unmount = () => void;
 export type SpectrogramActions = {
-  mount: (canvas: HTMLCanvasElement) => Unmount | undefined;
+  mount: () => Unmount;
+  init: (canvas: HTMLCanvasElement) => Unmount;
 };
 
 type State = SpectrogramState & SpectrogramActions;
-export const useSpectrogramStore = create<State>((set, get) => {
+export const useSpectrogramStore = create<State>((set) => {
+  let port: SpectrogramMainPort | undefined = undefined;
+
   useDecoderStore.subscribe(
     (state) => state.channels?.[0]?.buffer,
     (waveBuffer) => {
       if (!waveBuffer) return;
-      get().port?.postMessage({
+      port?.postMessage({
         type: 'wave',
         waveBuffer,
       });
@@ -50,7 +52,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
   usePlayerStore.subscribe(
     (state) => state.progress,
     (progress) => {
-      get().port?.postMessage({
+      port?.postMessage({
         type: 'progress',
         progress,
       });
@@ -58,27 +60,31 @@ export const useSpectrogramStore = create<State>((set, get) => {
   );
 
   return {
-    port: undefined,
     status: 'pending',
-    mount: (canvas) => {
-      const port = createSpectrogramMainPort();
-      set({ port });
-
+    mount: () => {
+      port = createSpectrogramMainPort();
+      port.onerror = () => {
+        set({ status: 'error' });
+      };
       port.onmessage = createPortMessageHandler<FromSpectrogramWorkerMessage>({
         state: (message) => {
           set({ status: message.status });
         },
       });
-      port.onerror = () => {
-        set({ status: 'error' });
-      };
 
+      return () => {
+        port?.terminate();
+        port = undefined;
+        set({ status: 'pending' });
+      };
+    },
+    init: (canvas) => {
       const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
       const settings = useSettingsStore.getState();
       const { channels } = useDecoderStore.getState();
       const { progress } = usePlayerStore.getState();
-      port.postMessage(
+      port?.postMessage(
         {
           type: 'init',
           canvas: offscreenCanvas,
@@ -92,15 +98,16 @@ export const useSpectrogramStore = create<State>((set, get) => {
       );
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        port.postMessage({
+        port?.postMessage({
           type: 'config',
           patch: { viewSize: getCanvasSize(canvas) },
         });
       });
+
       const unsubscribeSettings = useSettingsStore.subscribe(
         (state) => state,
         (state) => {
-          port.postMessage({
+          port?.postMessage({
             type: 'config',
             patch: getWorkerConfig({
               ...state,
@@ -113,8 +120,10 @@ export const useSpectrogramStore = create<State>((set, get) => {
       return () => {
         unsubscribeSettings();
         unsubscribeResizeObserver();
-        port.terminate();
-        set({ port: undefined, status: 'pending' });
+        port?.postMessage({
+          type: 'deinit',
+        });
+        set({ status: 'pending' });
       };
     },
   };

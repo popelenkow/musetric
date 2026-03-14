@@ -17,18 +17,18 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
   const seek = usePlayerStore((s) => s.seek);
-  const mount = useWaveformStore((s) => s.mount);
+  const init = useWaveformStore((s) => s.init);
   const attachCanvas = useWaveformStore((s) => s.attachCanvas);
   const status = useWaveformStore((s) => s.status);
 
   useEffect(() => {
-    return mount(projectId, type);
-  }, [mount, projectId, type]);
+    return init(projectId, type);
+  }, [init, projectId, type]);
 
   useEffect(() => {
-    if (status !== 'success' || !canvas) return;
+    if (!canvas) return;
     return attachCanvas(canvas);
-  }, [attachCanvas, canvas, status]);
+  }, [attachCanvas, canvas]);
 
   if (status === 'pending') {
     return <ViewPending />;

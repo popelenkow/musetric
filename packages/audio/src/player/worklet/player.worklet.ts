@@ -7,8 +7,8 @@ import {
   toChannelArrays,
 } from '../../common/channelBuffers.es.js';
 import type {
-  FromWorkletMessage,
-  ToWorkletMessage,
+  FromPlayerWorkletMessage,
+  ToPlayerWorkletMessage,
 } from '../portMessage.es.js';
 
 type Process = (output: Float32Array<ArrayBuffer>[]) => boolean;
@@ -22,8 +22,8 @@ const createProcessor = (messagePort: MessagePort): Processor => {
   let playing = false;
 
   const port = wrapMessagePort(messagePort).typed<
-    ToWorkletMessage,
-    FromWorkletMessage
+    ToPlayerWorkletMessage,
+    FromPlayerWorkletMessage
   >();
 
   port.onmessage = createPortMessageHandler({

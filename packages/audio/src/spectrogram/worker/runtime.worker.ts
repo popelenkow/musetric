@@ -28,41 +28,51 @@ export const createSpectrogramWorkerRuntime = () => {
   };
 
   const singletonManager = createSingletonManager(
-    async (message: ToSpectrogramWorkerMessage & { type: 'init' }) => {
-      const device = await getGpuDevice(message.profiling);
-      const pipeline = createSpectrogramPipeline({
-        device,
-        canvas: message.canvas,
-        fourierMode: message.fourierMode,
-        config: message.config,
-        onMetrics: message.profiling
-          ? (metrics) => {
-              console.table(metrics);
-            }
-          : undefined,
-      });
-      state.pipeline = pipeline;
-      port.postMessage({
-        type: 'state',
-        status: 'success',
-      });
-      await render();
-      return pipeline;
+    async (message: Extract<ToSpectrogramWorkerMessage, { type: 'init' }>) => {
+      try {
+        state.progress = message.progress;
+        state.wave = message.waveBuffer
+          ? new Float32Array(message.waveBuffer)
+          : undefined;
+
+        const device = await getGpuDevice(message.profiling);
+        const pipeline = createSpectrogramPipeline({
+          device,
+          canvas: message.canvas,
+          fourierMode: message.fourierMode,
+          config: message.config,
+          onMetrics: message.profiling
+            ? (metrics) => {
+                console.table(metrics);
+              }
+            : undefined,
+        });
+        state.pipeline = pipeline;
+        port.postMessage({
+          type: 'state',
+          status: 'success',
+        });
+        await render();
+        return pipeline;
+      } catch (error) {
+        console.error('Failed to init spectrogram pipeline', error);
+        port.postMessage({
+          type: 'state',
+          status: 'error',
+        });
+        return undefined;
+      }
     },
     (pipeline) => {
-      pipeline.destroy();
+      pipeline?.destroy();
       state.pipeline = undefined;
+      state.wave = undefined;
     },
   );
 
   port.onmessage = createPortMessageHandler<ToSpectrogramWorkerMessage>({
-    init: async (message) => {
-      state.progress = message.progress;
-      if (message.waveBuffer) {
-        state.wave = new Float32Array(message.waveBuffer);
-      }
-      await singletonManager.create(message);
-    },
+    init: singletonManager.create,
+    deinit: singletonManager.destroy,
     wave: async (message) => {
       state.wave = new Float32Array(message.waveBuffer);
       await render();

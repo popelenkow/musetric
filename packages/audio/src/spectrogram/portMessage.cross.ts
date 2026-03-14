@@ -11,6 +11,9 @@ export type ToSpectrogramWorkerMessage =
       profiling: boolean;
     }
   | {
+      type: 'deinit';
+    }
+  | {
       type: 'wave';
       waveBuffer: SharedArrayBuffer;
     }
@@ -25,5 +28,5 @@ export type ToSpectrogramWorkerMessage =
 
 export type FromSpectrogramWorkerMessage = {
   type: 'state';
-  status: 'pending' | 'error' | 'success';
+  status: 'error' | 'success';
 };

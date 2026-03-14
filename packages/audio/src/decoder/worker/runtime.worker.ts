@@ -41,6 +41,10 @@ export const createDecoderWorkerRuntime = (
       state.sampleRate = message.sampleRate;
       await decodeAudioTrack(message.projectId, message.sampleRate);
     },
+    deinit: () => {
+      state.projectId = undefined;
+      state.sampleRate = 0;
+    },
   });
 
   return {

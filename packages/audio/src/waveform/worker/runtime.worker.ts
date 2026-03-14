@@ -24,7 +24,7 @@ export const createWaveformWorkerRuntime = (
   };
   const port = createWaveformWorkerPort();
 
-  const initializePipeline = () => {
+  const initPipeline = () => {
     const { canvas, colors } = state;
     if (!canvas || !colors) return;
     state.pipeline = createWaveformPipeline(canvas, colors);
@@ -37,33 +37,33 @@ export const createWaveformWorkerRuntime = (
     return true;
   };
 
-  const loadWave = async (projectId: number, waveType: WaveType) => {
-    try {
-      const wave = await getWave(projectId, waveType);
-      state.wave = wave;
-      port.postMessage({
-        type: 'state',
-        status: 'success',
-      });
-      render();
-    } catch (error) {
-      console.error('Failed to load project wave', error);
-      port.postMessage({
-        type: 'state',
-        status: 'error',
-      });
-    }
-  };
-
   port.onmessage = createPortMessageHandler<ToWaveformWorkerMessage>({
     init: async (message) => {
-      state.colors = message.colors;
-      state.progress = message.progress;
-      await loadWave(message.projectId, message.waveType);
+      try {
+        const { progress, projectId, waveType } = message;
+        state.progress = progress;
+        const wave = await getWave(projectId, waveType);
+        state.wave = wave;
+        port.postMessage({
+          type: 'state',
+          status: 'success',
+        });
+        render();
+      } catch (error) {
+        console.error('Failed to load project wave', error);
+        port.postMessage({
+          type: 'state',
+          status: 'error',
+        });
+      }
+    },
+    deinit: () => {
+      state.wave = undefined;
     },
     attachCanvas: (message) => {
       state.canvas = message.canvas;
-      initializePipeline();
+      state.colors = message.colors;
+      initPipeline();
       render();
     },
     progress: (message) => {
@@ -72,7 +72,7 @@ export const createWaveformWorkerRuntime = (
     },
     colors: (message) => {
       state.colors = message.colors;
-      initializePipeline();
+      initPipeline();
       render();
     },
     resize: (message) => {
