@@ -15,15 +15,17 @@ export type AudioPlayer = {
 };
 
 export type AudioPlayerOptions = {
+  playerWorkletUrl: string;
   progress?: (progress: number) => void;
   end?: () => void;
 };
 
 export const createAudioPlayer = async (
-  options: AudioPlayerOptions = {},
+  options: AudioPlayerOptions,
 ): Promise<AudioPlayer> => {
+  const { playerWorkletUrl } = options;
   const context = new AudioContext({ sampleRate: defaultSampleRate });
-  const node = await createPlayerNode(context);
+  const node = await createPlayerNode(context, playerWorkletUrl);
   const port = getPlayerPort(node);
 
   port.onmessage = createPortMessageHandler({

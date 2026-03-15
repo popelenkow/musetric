@@ -7,6 +7,7 @@ import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { useDecoderStore } from '../decoder/store.js';
+import playerWorkletUrl from './player.worklet.ts?worker&url';
 
 export type PlayerState = {
   player?: AudioPlayer;
@@ -50,6 +51,7 @@ export const usePlayerStore = create<State>()(
     const singletonManager = createSingletonManager(
       async () => {
         const player = await createAudioPlayer({
+          playerWorkletUrl,
           progress: (progress) => {
             set({ progress });
           },

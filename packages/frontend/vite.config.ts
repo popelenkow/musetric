@@ -13,6 +13,9 @@ export default defineConfig({
   resolve: {
     conditions: defaultClientConditions.concat('monorepo'),
   },
+  worker: {
+    format: 'es',
+  },
   build: {
     target: 'es2022',
     assetsDir: '',

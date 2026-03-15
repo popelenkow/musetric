@@ -1,4 +1,3 @@
-import { ConverterType, create } from '@alexanderolsen/libsamplerate-js';
 import { type ChannelArrays } from '../../common/channelBuffers.es.js';
 
 const resampleChannel = async (
@@ -6,6 +5,8 @@ const resampleChannel = async (
   sourceSampleRate: number,
   targetSampleRate: number,
 ): Promise<Float32Array> => {
+  const { ConverterType, create } =
+    await import('@alexanderolsen/libsamplerate-js');
   const src = await create(1, sourceSampleRate, targetSampleRate, {
     converterType: ConverterType.SRC_SINC_FASTEST,
   });

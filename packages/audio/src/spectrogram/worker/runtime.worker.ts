@@ -14,7 +14,9 @@ export type SpectrogramWorkerState = {
   progress: number;
 };
 
-export const createSpectrogramWorkerRuntime = () => {
+export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
+  const device = await getGpuDevice(profiling);
+
   const state: SpectrogramWorkerState = {
     progress: 0,
   };
@@ -35,13 +37,12 @@ export const createSpectrogramWorkerRuntime = () => {
           ? new Float32Array(message.waveBuffer)
           : undefined;
 
-        const device = await getGpuDevice(message.profiling);
         const pipeline = createSpectrogramPipeline({
           device,
           canvas: message.canvas,
           fourierMode: message.fourierMode,
           config: message.config,
-          onMetrics: message.profiling
+          onMetrics: profiling
             ? (metrics) => {
                 console.table(metrics);
               }

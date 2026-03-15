@@ -8,10 +8,10 @@ import {
 } from '@musetric/audio';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
-import { envs } from '../../common/envs.js';
 import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { useSettingsStore } from '../settings/store.js';
+import spectrogramWorkerUrl from './spectrogram.worker.js?worker&url';
 
 export type SpectrogramState = {
   port?: SpectrogramMainPort;
@@ -50,7 +50,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
   return {
     status: 'pending',
     mount: () => {
-      const port = createSpectrogramMainPort();
+      const port = createSpectrogramMainPort(spectrogramWorkerUrl);
       set({ port });
       port.onerror = () => {
         set({ status: 'error' });
@@ -83,7 +83,6 @@ export const useSpectrogramStore = create<State>((set, get) => {
           progress,
           waveBuffer: channels?.[0]?.buffer,
           fourierMode: settings.fourierMode,
-          profiling: envs.spectrogramProfiling,
         },
         [offscreenCanvas],
       );

@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfigs/tsconfig.worklet.json",
+  "compilerOptions": {
+    "outDir": "${configDir}/.tsbuildinfo/dist"
+  }
+}

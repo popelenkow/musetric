@@ -19,4 +19,4 @@ const runApp = async () => {
   splashScreen.remove();
 };
 
-void runApp();
+await runApp();

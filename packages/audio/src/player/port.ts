@@ -2,17 +2,18 @@ import {
   type TypedMessagePort,
   wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
-import type {
-  FromPlayerWorkletMessage,
-  ToPlayerWorkletMessage,
+import {
+  type FromPlayerWorkletMessage,
+  playerProcessorName,
+  type ToPlayerWorkletMessage,
 } from './portMessage.es.js';
-import playerWorkletUrl from './worklet/player.worklet.ts?worker&url';
 
 export const createPlayerNode = async (
   context: AudioContext,
+  playerWorkletUrl: string,
 ): Promise<AudioWorkletNode> => {
   await context.audioWorklet.addModule(playerWorkletUrl);
-  const node = new AudioWorkletNode(context, 'player-processor', {
+  const node = new AudioWorkletNode(context, playerProcessorName, {
     numberOfOutputs: 1,
     outputChannelCount: [2],
   });
