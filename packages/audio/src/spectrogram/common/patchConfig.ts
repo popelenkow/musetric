@@ -1,0 +1,22 @@
+import {
+  applyPatchConfig,
+  type ApplyPatchConfigOptions,
+} from '../../common/patchConfig.es.js';
+import type { SpectrogramConfig } from '../config.es.js';
+
+export const applySpectrogramPatchConfig = (
+  options: ApplyPatchConfigOptions<SpectrogramConfig>,
+) =>
+  applyPatchConfig({
+    base: options.base,
+    draft: options.draft,
+    patch: options.patch,
+    isEqual: options.isEqual ?? {
+      viewSize: (first, second) =>
+        first.width === second.width && first.height === second.height,
+      colors: (first, second) =>
+        first.background === second.background &&
+        first.played === second.played &&
+        first.unplayed === second.unplayed,
+    },
+  });
