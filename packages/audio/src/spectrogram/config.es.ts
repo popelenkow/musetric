@@ -1,4 +1,5 @@
 import { type ViewColors } from '../common/colors.es.js';
+import { createConfigKeys, extractConfig } from '../common/config.es.js';
 import { type ViewSize } from '../common/viewSize.es.js';
 
 export type SpectrogramZeroPaddingFactor = 1 | 2 | 4;
@@ -33,7 +34,7 @@ export type SpectrogramConfig = {
   viewSize: ViewSize;
   colors: ViewColors;
 };
-export const allSpectrogramConfigKeys = [
+export const allSpectrogramConfigKeys = createConfigKeys<SpectrogramConfig>()([
   'windowSize',
   'sampleRate',
   'visibleTimeBefore',
@@ -45,4 +46,7 @@ export const allSpectrogramConfigKeys = [
   'maxFrequency',
   'viewSize',
   'colors',
-] as const satisfies (keyof SpectrogramConfig)[];
+]);
+
+export const extractSpectrogramConfig = (config: SpectrogramConfig) =>
+  extractConfig<SpectrogramConfig>(config, allSpectrogramConfigKeys);
