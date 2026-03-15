@@ -1,28 +1,17 @@
 import {
-  allSpectrogramConfigKeys,
   createSpectrogramMainPort,
+  extractSpectrogramConfig,
   type FromSpectrogramWorkerMessage,
   getCanvasSize,
-  type SpectrogramConfig,
   type SpectrogramMainPort,
   subscribeResizeObserver,
-  type ViewSize,
 } from '@musetric/audio';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { envs } from '../../common/envs.js';
 import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
-import { type SettingsState, useSettingsStore } from '../settings/store.js';
-
-const getWorkerConfig = (
-  state: SettingsState & { viewSize: ViewSize },
-): SpectrogramConfig =>
-  allSpectrogramConfigKeys.reduce(
-    (config, key) => ({ ...config, [key]: state[key] }),
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    {} as SpectrogramConfig,
-  );
+import { useSettingsStore } from '../settings/store.js';
 
 export type SpectrogramState = {
   port?: SpectrogramMainPort;
@@ -87,7 +76,10 @@ export const useSpectrogramStore = create<State>((set, get) => {
         {
           type: 'init',
           canvas: offscreenCanvas,
-          config: getWorkerConfig({ ...settings, viewSize }),
+          config: extractSpectrogramConfig({
+            ...settings,
+            viewSize,
+          }),
           progress,
           waveBuffer: channels?.[0]?.buffer,
           fourierMode: settings.fourierMode,
@@ -108,7 +100,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
         (state) => {
           get().port?.postMessage({
             type: 'config',
-            patch: getWorkerConfig({
+            patch: extractSpectrogramConfig({
               ...state,
               viewSize: getCanvasSize(canvas),
             }),

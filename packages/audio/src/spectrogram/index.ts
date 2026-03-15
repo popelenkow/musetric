@@ -3,6 +3,7 @@ export * from './common/extConfig.js';
 export * from './common/gpuBufferReader/index.js';
 export * from './common/gpuContext.js';
 export * from './common/gpuDevice.js';
+export * from './common/patchConfig.js';
 export * from './common/pipelineTimer.js';
 export * from './common/timer/index.js';
 export * from './common/windowFunction.js';
