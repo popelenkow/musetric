@@ -25,6 +25,7 @@ const getWorkerConfig = (
   );
 
 export type SpectrogramState = {
+  port?: SpectrogramMainPort;
   status: 'pending' | 'error' | 'success';
 };
 
@@ -35,14 +36,12 @@ export type SpectrogramActions = {
 };
 
 type State = SpectrogramState & SpectrogramActions;
-export const useSpectrogramStore = create<State>((set) => {
-  let port: SpectrogramMainPort | undefined = undefined;
-
+export const useSpectrogramStore = create<State>((set, get) => {
   useDecoderStore.subscribe(
     (state) => state.channels?.[0]?.buffer,
     (waveBuffer) => {
       if (!waveBuffer) return;
-      port?.postMessage({
+      get().port?.postMessage({
         type: 'wave',
         waveBuffer,
       });
@@ -52,7 +51,7 @@ export const useSpectrogramStore = create<State>((set) => {
   usePlayerStore.subscribe(
     (state) => state.progress,
     (progress) => {
-      port?.postMessage({
+      get().port?.postMessage({
         type: 'progress',
         progress,
       });
@@ -62,7 +61,8 @@ export const useSpectrogramStore = create<State>((set) => {
   return {
     status: 'pending',
     mount: () => {
-      port = createSpectrogramMainPort();
+      const port = createSpectrogramMainPort();
+      set({ port });
       port.onerror = () => {
         set({ status: 'error' });
       };
@@ -73,9 +73,8 @@ export const useSpectrogramStore = create<State>((set) => {
       });
 
       return () => {
-        port?.terminate();
-        port = undefined;
-        set({ status: 'pending' });
+        get().port?.terminate();
+        set({ port: undefined, status: 'pending' });
       };
     },
     init: (canvas) => {
@@ -84,7 +83,7 @@ export const useSpectrogramStore = create<State>((set) => {
       const settings = useSettingsStore.getState();
       const { channels } = useDecoderStore.getState();
       const { progress } = usePlayerStore.getState();
-      port?.postMessage(
+      get().port?.postMessage(
         {
           type: 'init',
           canvas: offscreenCanvas,
@@ -98,7 +97,7 @@ export const useSpectrogramStore = create<State>((set) => {
       );
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        port?.postMessage({
+        get().port?.postMessage({
           type: 'config',
           patch: { viewSize: getCanvasSize(canvas) },
         });
@@ -107,7 +106,7 @@ export const useSpectrogramStore = create<State>((set) => {
       const unsubscribeSettings = useSettingsStore.subscribe(
         (state) => state,
         (state) => {
-          port?.postMessage({
+          get().port?.postMessage({
             type: 'config',
             patch: getWorkerConfig({
               ...state,
@@ -120,10 +119,10 @@ export const useSpectrogramStore = create<State>((set) => {
       return () => {
         unsubscribeSettings();
         unsubscribeResizeObserver();
-        port?.postMessage({
+        get().port?.postMessage({
           type: 'deinit',
         });
-        set({ status: 'pending' });
+        set({ port: undefined, status: 'pending' });
       };
     },
   };

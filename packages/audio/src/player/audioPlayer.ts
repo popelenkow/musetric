@@ -1,18 +1,15 @@
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import {
-  type ChannelArrays,
-  toChannelBuffers,
-} from '../common/channelBuffers.es.js';
-import { createPlayerNode, getPlayerPort } from './port.js';
+  createPlayerNode,
+  getPlayerPort,
+  type PlayerMainPort,
+} from './port.js';
 
 export type AudioPlayer = {
   context: AudioContext;
-  play: (
-    channels: ChannelArrays,
-    frameCount: number,
-    startFrame: number,
-  ) => Promise<void>;
+  port: PlayerMainPort;
+  play: (frameCount: number, startFrame: number) => Promise<void>;
   pause: () => void;
   destroy: () => Promise<void>;
 };
@@ -50,14 +47,14 @@ export const createAudioPlayer = async (
 
   return {
     context,
-    play: async (channels, frameCount, startFrame) => {
+    port,
+    play: async (frameCount, startFrame) => {
       totalFrameCount = frameCount;
       playStartFrame = startFrame;
       if (context.state === 'suspended') {
         await context.resume();
       }
-      const buffers = toChannelBuffers(channels);
-      port.postMessage({ type: 'play', buffers, startFrame });
+      port.postMessage({ type: 'play', startFrame });
       startTime = context.currentTime;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);

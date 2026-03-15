@@ -1,4 +1,7 @@
-import { wrapMessagePort } from '@musetric/resource-utils/cross/messagePort';
+import {
+  type TypedMessagePort,
+  wrapMessagePort,
+} from '@musetric/resource-utils/cross/messagePort';
 import type {
   FromPlayerWorkletMessage,
   ToPlayerWorkletMessage,
@@ -17,7 +20,12 @@ export const createPlayerNode = async (
   return node;
 };
 
-export const getPlayerPort = (node: AudioWorkletNode) =>
+export type PlayerMainPort = TypedMessagePort<
+  MessagePort,
+  FromPlayerWorkletMessage,
+  ToPlayerWorkletMessage
+>;
+export const getPlayerPort = (node: AudioWorkletNode): PlayerMainPort =>
   wrapMessagePort(node.port).typed<
     FromPlayerWorkletMessage,
     ToPlayerWorkletMessage

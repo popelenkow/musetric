@@ -10,6 +10,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import decoderWorkerUrl from './decoder.worker.ts?worker&url';
 
 export type DecoderState = {
+  port?: DecoderMainPort;
   channels?: ChannelArrays<SharedArrayBuffer>;
   frameCount?: number;
   duration: number;
@@ -31,13 +32,12 @@ export type DecoderActions = {
 
 type State = DecoderState & DecoderActions;
 export const useDecoderStore = create<State>()(
-  subscribeWithSelector((set) => {
-    let port: DecoderMainPort | undefined = undefined;
-
+  subscribeWithSelector((set, get) => {
     return {
       ...initialState,
       mount: () => {
-        port = createDecoderMainPort(decoderWorkerUrl);
+        const port = createDecoderMainPort(decoderWorkerUrl);
+        set({ port });
         port.onerror = () => {
           set({ status: 'error' });
         };
@@ -56,22 +56,21 @@ export const useDecoderStore = create<State>()(
         });
 
         return () => {
-          port?.terminate();
-          port = undefined;
-          set(initialState);
+          get().port?.terminate();
+          set({ port: undefined, status: 'pending' });
         };
       },
       init: (projectId, sampleRate) => {
-        port?.postMessage({
+        get().port?.postMessage({
           type: 'init',
           projectId,
           sampleRate,
         });
         return () => {
-          port?.postMessage({
+          get().port?.postMessage({
             type: 'deinit',
           });
-          set(initialState);
+          set({ port: undefined, status: 'pending' });
         };
       },
     };

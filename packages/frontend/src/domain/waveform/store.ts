@@ -13,6 +13,7 @@ import { useSettingsStore } from '../settings/store.js';
 import waveformWorkerUrl from './waveform.worker.ts?worker&url';
 
 export type WaveformState = {
+  port?: WaveformMainPort;
   status: 'pending' | 'error' | 'success';
 };
 
@@ -24,13 +25,11 @@ export type WaveformActions = {
 };
 
 type State = WaveformState & WaveformActions;
-export const useWaveformStore = create<State>((set) => {
-  let port: WaveformMainPort | undefined = undefined;
-
+export const useWaveformStore = create<State>((set, get) => {
   usePlayerStore.subscribe(
     (state) => state.progress,
     (progress) => {
-      port?.postMessage({
+      get().port?.postMessage({
         type: 'progress',
         progress,
       });
@@ -40,7 +39,7 @@ export const useWaveformStore = create<State>((set) => {
   useSettingsStore.subscribe(
     (state) => state.colors,
     (colors) => {
-      port?.postMessage({
+      get().port?.postMessage({
         type: 'colors',
         colors,
       });
@@ -50,7 +49,8 @@ export const useWaveformStore = create<State>((set) => {
   const ref: State = {
     status: 'pending',
     mount: () => {
-      port = createWaveformMainPort(waveformWorkerUrl);
+      const port = createWaveformMainPort(waveformWorkerUrl);
+      set({ port });
       port.onerror = () => {
         set({ status: 'error' });
       };
@@ -61,30 +61,29 @@ export const useWaveformStore = create<State>((set) => {
       });
 
       return () => {
-        port?.terminate();
-        port = undefined;
-        set({ status: 'pending' });
+        get().port?.terminate();
+        set({ port: undefined, status: 'pending' });
       };
     },
     init: (projectId, type) => {
-      port?.postMessage({
+      get().port?.postMessage({
         type: 'init',
         projectId,
         waveType: type,
         progress: usePlayerStore.getState().progress,
       });
       return () => {
-        port?.postMessage({
+        get().port?.postMessage({
           type: 'deinit',
         });
-        set({ status: 'pending' });
+        set({ port: undefined, status: 'pending' });
       };
     },
     attachCanvas: (canvas) => {
       resizeCanvas(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      port?.postMessage(
+      get().port?.postMessage(
         {
           type: 'attachCanvas',
           canvas: offscreenCanvas,
@@ -95,7 +94,7 @@ export const useWaveformStore = create<State>((set) => {
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
         const viewSize = getCanvasSize(canvas);
-        port?.postMessage({
+        get().port?.postMessage({
           type: 'resize',
           viewSize,
         });

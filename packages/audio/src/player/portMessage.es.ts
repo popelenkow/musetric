@@ -1,7 +1,9 @@
 import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 
 export type ToPlayerWorkletMessage =
-  | { type: 'play'; buffers: ChannelBuffers; startFrame: number }
+  | { type: 'init'; buffers: ChannelBuffers }
+  | { type: 'deinit' }
+  | { type: 'play'; startFrame: number }
   | { type: 'pause' };
 
 export type FromPlayerWorkletMessage = {
