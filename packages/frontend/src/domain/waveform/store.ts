@@ -20,8 +20,11 @@ export type WaveformState = {
 type Unmount = () => void;
 export type WaveformActions = {
   mount: () => Unmount;
-  init: (projectId: number, type: api.wave.Type) => Unmount;
-  attachCanvas: (canvas: HTMLCanvasElement) => Unmount;
+  init: (
+    projectId: number,
+    type: api.wave.Type,
+    canvas: HTMLCanvasElement,
+  ) => Unmount;
 };
 
 type State = WaveformState & WaveformActions;
@@ -65,42 +68,39 @@ export const useWaveformStore = create<State>((set, get) => {
         set({ port: undefined, status: 'pending' });
       };
     },
-    init: (projectId, type) => {
-      get().port?.postMessage({
-        type: 'init',
-        projectId,
-        waveType: type,
-        progress: usePlayerStore.getState().progress,
-      });
-      return () => {
-        get().port?.postMessage({
-          type: 'deinit',
-        });
-        set({ port: undefined, status: 'pending' });
-      };
-    },
-    attachCanvas: (canvas) => {
+    init: (projectId, type, canvas) => {
       resizeCanvas(canvas);
+      const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
       get().port?.postMessage(
         {
-          type: 'attachCanvas',
+          type: 'init',
+          projectId,
+          waveType: type,
+          progress: usePlayerStore.getState().progress,
           canvas: offscreenCanvas,
           colors: useSettingsStore.getState().colors,
+          viewSize,
         },
         [offscreenCanvas],
       );
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        const viewSize = getCanvasSize(canvas);
+        const nextViewSize = getCanvasSize(canvas);
         get().port?.postMessage({
           type: 'resize',
-          viewSize,
+          viewSize: nextViewSize,
         });
       });
 
-      return unsubscribeResizeObserver;
+      return () => {
+        unsubscribeResizeObserver();
+        get().port?.postMessage({
+          type: 'deinit',
+        });
+        set({ status: 'pending' });
+      };
     },
   };
   return ref;
