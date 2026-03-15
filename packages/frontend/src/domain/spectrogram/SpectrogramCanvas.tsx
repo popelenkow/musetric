@@ -13,7 +13,6 @@ export const SpectrogramCanvas: FC = () => {
   const seek = usePlayerStore((s) => s.seek);
   const decoderStatus = useDecoderStore((s) => s.status);
   const spectrogramStatus = useSpectrogramStore((s) => s.status);
-  const playerStatus = usePlayerStore((s) => s.status);
   const fourierMode = useSettingsStore((s) => s.fourierMode);
   const init = useSpectrogramStore((s) => s.init);
 
@@ -22,15 +21,11 @@ export const SpectrogramCanvas: FC = () => {
     return init(canvas);
   }, [canvas, init]);
 
-  if (
-    decoderStatus === 'error' ||
-    spectrogramStatus === 'error' ||
-    playerStatus === 'error'
-  ) {
+  if (decoderStatus === 'error' || spectrogramStatus === 'error') {
     return <ViewError message={t('pages.project.progress.error.audioTrack')} />;
   }
 
-  if (decoderStatus === 'pending' || playerStatus === 'pending') {
+  if (decoderStatus === 'pending') {
     return <ViewPending />;
   }
 

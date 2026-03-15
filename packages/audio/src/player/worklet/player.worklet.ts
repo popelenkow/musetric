@@ -1,86 +1,22 @@
+/* eslint-disable no-restricted-syntax */
+import { createPlayerWorkletPort } from './port.worklet.js';
 import {
-  createPortMessageHandler,
-  wrapMessagePort,
-} from '@musetric/resource-utils/cross/messagePort';
-import {
-  type ChannelArrays,
-  toChannelArrays,
-} from '../../common/channelBuffers.es.js';
-import type {
-  FromPlayerWorkletMessage,
-  ToPlayerWorkletMessage,
-} from '../portMessage.es.js';
+  createPlayerWorkletRuntime,
+  type PlayerWorkletRuntime,
+} from './runtime.worklet.js';
 
-type Process = (output: Float32Array<ArrayBuffer>[]) => boolean;
-
-type Processor = {
-  process: Process;
-};
-const createProcessor = (messagePort: MessagePort): Processor => {
-  let channels: ChannelArrays | undefined = undefined;
-  let frameOffset = 0;
-  let playing = false;
-
-  const port = wrapMessagePort(messagePort).typed<
-    ToPlayerWorkletMessage,
-    FromPlayerWorkletMessage
-  >();
-
-  port.onmessage = createPortMessageHandler({
-    play: (message) => {
-      channels = toChannelArrays(message.buffers);
-      frameOffset = message.startFrame;
-      playing = true;
-    },
-    pause: () => {
-      playing = false;
-    },
-  });
-
-  return {
-    process: (output) => {
-      if (!channels || !playing) {
-        for (const out of output) {
-          out.fill(0);
-        }
-        return true;
-      }
-
-      for (let channel = 0; channel < output.length; channel++) {
-        const out = output[channel];
-        const data = channels[channel] ?? new Float32Array(0);
-        for (let i = 0; i < out.length; i++) {
-          const index = frameOffset + i;
-          out[i] = index < data.length ? data[index] : 0;
-        }
-      }
-
-      const frameCount = channels[0].length;
-      frameOffset += output[0].length;
-      if (frameOffset >= frameCount) {
-        playing = false;
-        port.postMessage({ type: 'ended' });
-      }
-
-      return true;
-    },
-  };
-};
-
-// eslint-disable-next-line no-restricted-syntax
-class PlayerProcessor extends AudioWorkletProcessor {
-  private readonly processor: Processor;
+class PlayerProcessor
+  extends AudioWorkletProcessor
+  implements AudioWorkletProcessorImpl
+{
+  private readonly runtime: PlayerWorkletRuntime;
   constructor() {
     super();
-    // eslint-disable-next-line no-restricted-syntax
-    this.processor = createProcessor(this.port);
+    const port = createPlayerWorkletPort(this.port);
+    this.runtime = createPlayerWorkletRuntime(port);
   }
-  process(
-    _inputs: Float32Array<ArrayBuffer>[][],
-    outputs: Float32Array<ArrayBuffer>[][],
-  ): boolean {
-    // eslint-disable-next-line no-restricted-syntax
-    return this.processor.process(outputs[0]);
+  process(_inputs: Float32Array[][], outputs: Float32Array[][]): boolean {
+    return this.runtime.process(outputs[0]);
   }
 }
 

@@ -1,4 +1,8 @@
-import { type AudioPlayer, createAudioPlayer } from '@musetric/audio';
+import {
+  type AudioPlayer,
+  createAudioPlayer,
+  toChannelBuffers,
+} from '@musetric/audio';
 import { createSingletonManager } from '@musetric/resource-utils';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
@@ -10,7 +14,6 @@ export type PlayerState = {
   progress: number;
   startFrame: number;
   startTime: number;
-  status: 'pending' | 'success' | 'error';
 };
 
 export const initialState: PlayerState = {
@@ -19,7 +22,6 @@ export const initialState: PlayerState = {
   progress: 0,
   startFrame: 0,
   startTime: 0,
-  status: 'pending',
 };
 
 type Unmount = () => void;
@@ -34,6 +36,17 @@ export type PlayerActions = {
 type State = PlayerState & PlayerActions;
 export const usePlayerStore = create<State>()(
   subscribeWithSelector((set, get) => {
+    useDecoderStore.subscribe(
+      (state) => state.channels,
+      (channels) => {
+        if (!channels) return;
+        get().player?.port.postMessage({
+          type: 'init',
+          buffers: toChannelBuffers(channels),
+        });
+      },
+    );
+
     const singletonManager = createSingletonManager(
       async () => {
         const player = await createAudioPlayer({
@@ -44,14 +57,7 @@ export const usePlayerStore = create<State>()(
             set({ playing: false, progress: 0, startFrame: 0, startTime: 0 });
           },
         });
-        set({
-          player,
-          playing: false,
-          progress: 0,
-          startFrame: 0,
-          startTime: 0,
-          status: 'success',
-        });
+        set({ player });
         return player;
       },
       async (player) => {
@@ -70,9 +76,9 @@ export const usePlayerStore = create<State>()(
       },
       play: async () => {
         const { player, startFrame } = get();
-        const { frameCount, channels } = useDecoderStore.getState();
-        if (!player || !frameCount || !channels) return;
-        await player.play(channels, frameCount, startFrame);
+        const { frameCount } = useDecoderStore.getState();
+        if (!player || !frameCount) return;
+        await player.play(frameCount, startFrame);
         set({ playing: true, startTime: player.context.currentTime });
       },
       pause: () => {
@@ -87,13 +93,13 @@ export const usePlayerStore = create<State>()(
       },
       seek: async (fraction) => {
         const { player, playing } = get();
-        const { frameCount, channels } = useDecoderStore.getState();
-        if (!frameCount || !player || !channels) return;
+        const { frameCount } = useDecoderStore.getState();
+        if (!frameCount || !player) return;
         const context = player.context;
         const newStartFrame = Math.floor(frameCount * fraction);
         set({ startFrame: newStartFrame, progress: fraction });
         if (playing) {
-          await player.play(channels, frameCount, newStartFrame);
+          await player.play(frameCount, newStartFrame);
           set({ startTime: context.currentTime });
         }
       },
