@@ -24,12 +24,6 @@ export const createWaveformWorkerRuntime = (
   };
   const port = createWaveformWorkerPort();
 
-  const initPipeline = () => {
-    const { canvas, colors } = state;
-    if (!canvas || !colors) return;
-    state.pipeline = createWaveformPipeline(canvas, colors);
-  };
-
   const render = (): boolean => {
     const { wave, pipeline, progress } = state;
     if (!wave || !pipeline) return false;
@@ -40,15 +34,21 @@ export const createWaveformWorkerRuntime = (
   port.onmessage = createPortMessageHandler<ToWaveformWorkerMessage>({
     init: async (message) => {
       try {
-        const { progress, projectId, waveType } = message;
+        const { progress, projectId, waveType, canvas, colors, viewSize } =
+          message;
         state.progress = progress;
+        state.canvas = canvas;
+        state.colors = colors;
+        setOffscreenCanvasSize(state.canvas, viewSize);
+        state.pipeline = createWaveformPipeline(canvas, colors);
+
         const wave = await getWave(projectId, waveType);
         state.wave = wave;
+        render();
         port.postMessage({
           type: 'state',
           status: 'success',
         });
-        render();
       } catch (error) {
         console.error('Failed to load project wave', error);
         port.postMessage({
@@ -60,19 +60,13 @@ export const createWaveformWorkerRuntime = (
     deinit: () => {
       state.wave = undefined;
     },
-    attachCanvas: (message) => {
-      state.canvas = message.canvas;
-      state.colors = message.colors;
-      initPipeline();
-      render();
-    },
     progress: (message) => {
       state.progress = message.progress;
       render();
     },
     colors: (message) => {
       state.colors = message.colors;
-      initPipeline();
+      state.pipeline?.setColors(message.colors);
       render();
     },
     resize: (message) => {
