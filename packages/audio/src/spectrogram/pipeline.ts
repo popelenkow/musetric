@@ -1,5 +1,6 @@
 import { createCallLatest } from '@musetric/resource-utils';
-import { applySpectrogramPatchConfig } from './common/extConfig.js';
+import type { ExtSpectrogramConfig } from './common/extConfig.js';
+import { applySpectrogramPatchConfig } from './common/patchConfig.js';
 import {
   createSpectrogramPipelineTimer,
   type SpectrogramPipelineMetrics,
@@ -37,7 +38,7 @@ export const createSpectrogramPipeline = (
   const { markers } = timer;
 
   let draftConfig: Partial<SpectrogramConfig> = options.config;
-  let config = {
+  let config: ExtSpectrogramConfig = {
     ...options.config,
     windowCount: options.config.viewSize.width,
   };
@@ -115,11 +116,11 @@ export const createSpectrogramPipeline = (
       await timer.finish();
     }),
     updateConfig: (patchConfig) => {
-      draftConfig = applySpectrogramPatchConfig(
-        draftConfig,
-        patchConfig,
-        config,
-      );
+      draftConfig = applySpectrogramPatchConfig({
+        base: config,
+        draft: draftConfig,
+        patch: patchConfig,
+      });
     },
     destroy: () => {
       timer.destroy();
