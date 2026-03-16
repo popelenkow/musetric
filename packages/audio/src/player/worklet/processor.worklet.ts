@@ -5,7 +5,7 @@ import {
   type PlayerWorkletRuntime,
 } from './runtime.worklet.js';
 
-class PlayerProcessor
+export class PlayerProcessor
   extends AudioWorkletProcessor
   implements AudioWorkletProcessorImpl
 {
@@ -19,5 +19,3 @@ class PlayerProcessor
     return this.runtime.process(outputs[0]);
   }
 }
-
-registerProcessor('player-processor', PlayerProcessor);

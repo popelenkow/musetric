@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfigs/tsconfig.worker.json",
   "compilerOptions": {
-    "types": ["vite/client"],
+    "types": ["@webgpu/types", "vite/client"],
     "outDir": "${configDir}/.tsbuildinfo/dist"
   }
 }

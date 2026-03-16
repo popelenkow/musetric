@@ -8,7 +8,6 @@ export type ToSpectrogramWorkerMessage =
       progress: number;
       waveBuffer?: SharedArrayBuffer;
       fourierMode: FourierMode;
-      profiling: boolean;
     }
   | {
       type: 'deinit';

@@ -1406,6 +1406,7 @@ __metadata:
     "@musetric/resource-utils": "workspace:*"
     "@musetric/spa-router": "workspace:*"
     "@tanstack/react-query": "catalog:"
+    "@types/audioworklet": "catalog:"
     "@types/node": "catalog:"
     "@types/react": "catalog:"
     "@types/react-dom": "catalog:"

@@ -6,7 +6,6 @@ import {
   type FromSpectrogramWorkerMessage,
   type ToSpectrogramWorkerMessage,
 } from './portMessage.cross.js';
-import spectrogramWorkerUrl from './worker/entry.worker.ts?worker&url';
 
 export type SpectrogramMainPort = TypedMessagePort<
   Worker,
@@ -14,7 +13,9 @@ export type SpectrogramMainPort = TypedMessagePort<
   ToSpectrogramWorkerMessage
 >;
 
-export const createSpectrogramMainPort = (): SpectrogramMainPort => {
+export const createSpectrogramMainPort = (
+  spectrogramWorkerUrl: string,
+): SpectrogramMainPort => {
   const worker = new Worker(spectrogramWorkerUrl, { type: 'module' });
   return wrapMessagePort(worker).typed<
     FromSpectrogramWorkerMessage,
