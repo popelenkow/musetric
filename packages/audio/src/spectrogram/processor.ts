@@ -2,39 +2,39 @@ import { createCallLatest } from '@musetric/resource-utils';
 import type { ExtSpectrogramConfig } from './common/extConfig.js';
 import { applySpectrogramPatchConfig } from './common/patchConfig.js';
 import {
-  createSpectrogramPipelineTimer,
-  type SpectrogramPipelineMetrics,
-} from './common/pipelineTimer.js';
+  createSpectrogramProcessorTimer,
+  type SpectrogramProcessorMetrics,
+} from './common/processorTimer.js';
 import { type FourierMode, type SpectrogramConfig } from './config.es.js';
 import { createSpectrogramDecibelify } from './decibelify/index.js';
 import { createSpectrogramDraw } from './draw/index.js';
 import { fouriers } from './fourier/fouriers.js';
 import { createSpectrogramMagnitudify } from './magnitudify/index.js';
-import { createSpectrogramPipelineState } from './pipelineState/index.js';
+import { createSpectrogramProcessorState } from './processorState/index.js';
 import { createSpectrogramRemap } from './remap/index.js';
 import { createSpectrogramSliceWave } from './sliceWave/index.js';
 import { createSpectrogramWindowing } from './windowing/index.js';
 
-export type SpectrogramPipeline = {
+export type SpectrogramProcessor = {
   render: (wave: Float32Array, progress: number) => Promise<void>;
   updateConfig: (config: Partial<SpectrogramConfig>) => void;
   destroy: () => void;
 };
 
-export type CreateSpectrogramPipelineOptions = {
+export type CreateSpectrogramProcessorOptions = {
   device: GPUDevice;
   fourierMode: FourierMode;
   canvas: OffscreenCanvas;
   config: SpectrogramConfig;
-  onMetrics?: (metrics: SpectrogramPipelineMetrics) => void;
+  onMetrics?: (metrics: SpectrogramProcessorMetrics) => void;
 };
 
-export const createSpectrogramPipeline = (
-  options: CreateSpectrogramPipelineOptions,
-): SpectrogramPipeline => {
+export const createSpectrogramProcessor = (
+  options: CreateSpectrogramProcessorOptions,
+): SpectrogramProcessor => {
   const { device, fourierMode, canvas, onMetrics } = options;
 
-  const timer = createSpectrogramPipelineTimer(device, onMetrics);
+  const timer = createSpectrogramProcessorTimer(device, onMetrics);
   const { markers } = timer;
 
   let draftConfig: Partial<SpectrogramConfig> = options.config;
@@ -42,7 +42,7 @@ export const createSpectrogramPipeline = (
     ...options.config,
     windowCount: options.config.viewSize.width,
   };
-  const state = createSpectrogramPipelineState(device);
+  const state = createSpectrogramProcessorState(device);
   const sliceWave = createSpectrogramSliceWave(device, markers.sliceWave);
   const windowing = createSpectrogramWindowing(device, markers.windowing);
   const fourier = fouriers[fourierMode](device, {
@@ -76,7 +76,7 @@ export const createSpectrogramPipeline = (
   );
   const createCommand = markers.createCommand(() => {
     const encoder = device.createCommandEncoder({
-      label: 'pipeline-render-encoder',
+      label: 'processor-render-encoder',
     });
     sliceWave.run(encoder);
     state.zerofyImag(encoder);

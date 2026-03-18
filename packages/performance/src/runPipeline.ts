@@ -1,5 +1,5 @@
 import {
-  createSpectrogramPipeline,
+  createSpectrogramProcessor,
   type FourierMode,
   type SpectrogramConfig,
 } from '@musetric/audio/spectrogram';
@@ -38,7 +38,7 @@ export const runPipeline = async (
       unplayed: '#888888',
     },
   };
-  const pipeline = createSpectrogramPipeline({
+  const processor = createSpectrogramProcessor({
     device,
     canvas,
     fourierMode,
@@ -47,10 +47,10 @@ export const runPipeline = async (
   });
 
   for (let i = 0; i < skipRuns + runs; i++) {
-    await pipeline.render(wave, progress);
+    await processor.render(wave, progress);
     await waitNextFrame(15);
   }
-  pipeline.destroy();
+  processor.destroy();
 
   const first = metricsArray[0] ?? {};
   const average: Record<string, number> = {};
