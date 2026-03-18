@@ -4,14 +4,15 @@ import { generateWaveformSegments } from './generateSegments.js';
 
 const barStep = 3;
 
-export type WaveformPipeline = {
+export type WaveformProcessor = {
   setColors: (colors: ViewColors) => void;
   render: (wave: Float32Array, progress: number) => void;
 };
-export const createWaveformPipeline = (
+
+export const createWaveformProcessor = (
   canvas: OffscreenCanvas,
   presetColors: ViewColors,
-): WaveformPipeline => {
+): WaveformProcessor => {
   const draw = createWaveformDraw(canvas);
   let colors = presetColors;
 

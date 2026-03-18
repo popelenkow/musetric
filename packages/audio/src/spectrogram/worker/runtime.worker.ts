@@ -1,15 +1,15 @@
 import { createSingletonManager } from '@musetric/resource-utils';
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { getGpuDevice } from '../common/gpuDevice.js';
-import {
-  createSpectrogramPipeline,
-  type SpectrogramPipeline,
-} from '../pipeline.js';
 import { type ToSpectrogramWorkerMessage } from '../portMessage.cross.js';
+import {
+  createSpectrogramProcessor,
+  type SpectrogramProcessor,
+} from '../processor.js';
 import { createSpectrogramWorkerPort } from './port.worker.js';
 
 export type SpectrogramWorkerState = {
-  pipeline?: SpectrogramPipeline;
+  processor?: SpectrogramProcessor;
   wave?: Float32Array<SharedArrayBuffer>;
   progress: number;
 };
@@ -24,9 +24,9 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   const port = createSpectrogramWorkerPort();
 
   const render = async () => {
-    const { pipeline, wave, progress } = state;
-    if (!pipeline || !wave) return;
-    await pipeline.render(wave, progress);
+    const { processor, wave, progress } = state;
+    if (!processor || !wave) return;
+    await processor.render(wave, progress);
   };
 
   const singletonManager = createSingletonManager(
@@ -37,7 +37,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
           ? new Float32Array(message.waveBuffer)
           : undefined;
 
-        const pipeline = createSpectrogramPipeline({
+        const processor = createSpectrogramProcessor({
           device,
           canvas: message.canvas,
           fourierMode: message.fourierMode,
@@ -48,15 +48,15 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
               }
             : undefined,
         });
-        state.pipeline = pipeline;
+        state.processor = processor;
         port.postMessage({
           type: 'state',
           status: 'success',
         });
         await render();
-        return pipeline;
+        return processor;
       } catch (error) {
-        console.error('Failed to init spectrogram pipeline', error);
+        console.error('Failed to init spectrogram processor', error);
         port.postMessage({
           type: 'state',
           status: 'error',
@@ -64,9 +64,9 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
         return undefined;
       }
     },
-    (pipeline) => {
-      pipeline?.destroy();
-      state.pipeline = undefined;
+    (processor) => {
+      processor?.destroy();
+      state.processor = undefined;
       state.wave = undefined;
     },
   );
@@ -83,7 +83,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
       await render();
     },
     config: async (message) => {
-      state.pipeline?.updateConfig(message.patch);
+      state.processor?.updateConfig(message.patch);
       await render();
     },
   });

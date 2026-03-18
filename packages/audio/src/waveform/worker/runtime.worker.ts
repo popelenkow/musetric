@@ -1,17 +1,20 @@
 import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import type { ViewColors } from '../../common/colors.es.js';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
-import { createWaveformPipeline, type WaveformPipeline } from '../pipeline.js';
 import {
   type ToWaveformWorkerMessage,
   type WaveType,
 } from '../portMessage.cross.js';
+import {
+  createWaveformProcessor,
+  type WaveformProcessor,
+} from '../processor.js';
 import { createWaveformWorkerPort } from './port.worker.js';
 
 export type WaveformWorkerState = {
   canvas?: OffscreenCanvas;
   wave?: Float32Array;
-  pipeline?: WaveformPipeline;
+  processor?: WaveformProcessor;
   progress: number;
   colors?: ViewColors;
 };
@@ -25,9 +28,9 @@ export const createWaveformWorkerRuntime = (
   const port = createWaveformWorkerPort();
 
   const render = (): boolean => {
-    const { wave, pipeline, progress } = state;
-    if (!wave || !pipeline) return false;
-    pipeline.render(wave, progress);
+    const { wave, processor, progress } = state;
+    if (!wave || !processor) return false;
+    processor.render(wave, progress);
     return true;
   };
 
@@ -40,7 +43,7 @@ export const createWaveformWorkerRuntime = (
         state.canvas = canvas;
         state.colors = colors;
         setOffscreenCanvasSize(state.canvas, viewSize);
-        state.pipeline = createWaveformPipeline(canvas, colors);
+        state.processor = createWaveformProcessor(canvas, colors);
 
         const wave = await getWave(projectId, waveType);
         state.wave = wave;
@@ -66,7 +69,7 @@ export const createWaveformWorkerRuntime = (
     },
     colors: (message) => {
       state.colors = message.colors;
-      state.pipeline?.setColors(message.colors);
+      state.processor?.setColors(message.colors);
       render();
     },
     resize: (message) => {

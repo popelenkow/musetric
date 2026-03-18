@@ -21,7 +21,7 @@ export const spectrogramTimerLabels = [
   'total',
 ] as const;
 export type SpectrogramTimerLabel = (typeof spectrogramTimerLabels)[number];
-export type SpectrogramPipelineMetrics = Record<SpectrogramTimerLabel, number>;
+export type SpectrogramProcessorMetrics = Record<SpectrogramTimerLabel, number>;
 
 const gpuLabels = [
   'sliceWave',
@@ -51,17 +51,17 @@ type Timer = ReturnType<typeof create>;
 
 type Markers = Partial<Timer['gpu']['markers']> & Timer['cpu']['markers'];
 
-export type SpectrogramPipelineTimer = {
+export type SpectrogramProcessorTimer = {
   markers: Markers;
   resolve: (encoder: GPUCommandEncoder) => void;
   finish: () => Promise<void>;
   destroy: () => void;
 };
 
-export const createSpectrogramPipelineTimer = (
+export const createSpectrogramProcessorTimer = (
   device: GPUDevice,
-  onMetrics?: (metrics: SpectrogramPipelineMetrics) => void,
-): SpectrogramPipelineTimer => {
+  onMetrics?: (metrics: SpectrogramProcessorMetrics) => void,
+): SpectrogramProcessorTimer => {
   if (!onMetrics) {
     return {
       markers: cpuLabels.reduce(
@@ -90,13 +90,13 @@ export const createSpectrogramPipelineTimer = (
     ...timer.cpu.markers,
   };
 
-  const pipelineTimer: SpectrogramPipelineTimer = {
+  const processorTimer: SpectrogramProcessorTimer = {
     markers,
     resolve: timer.gpu.resolve,
     finish: async () => {
       const gpuMetrics = await timer.gpu.read();
       const cpuMetrics = timer.cpu.read();
-      const metrics: SpectrogramPipelineMetrics = {
+      const metrics: SpectrogramProcessorMetrics = {
         ...gpuMetrics,
         ...cpuMetrics,
         other: 0,
@@ -108,18 +108,18 @@ export const createSpectrogramPipelineTimer = (
         .reduce((acc, key) => acc + metrics[key], 0);
       metrics.other = roundDuration(metrics.total - sum);
       const sortedMetrics =
-        spectrogramTimerLabels.reduce<SpectrogramPipelineMetrics>(
+        spectrogramTimerLabels.reduce<SpectrogramProcessorMetrics>(
           (acc, key) => ({
             ...acc,
             [key]: metrics[key],
           }),
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          {} as SpectrogramPipelineMetrics,
+          {} as SpectrogramProcessorMetrics,
         );
       onMetrics(sortedMetrics);
     },
     destroy: timer.gpu.destroy,
   };
 
-  return pipelineTimer;
+  return processorTimer;
 };
