@@ -1,8 +1,12 @@
+import {
+  createResourceCell,
+  type ResourceCell,
+} from '@musetric/resource-utils';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
 import { type SpectrogramConfig } from '../config.es.js';
-import { createColors } from './colors.js';
+import { createColorsCell } from './colors.js';
 import { createPipeline } from './pipeline.js';
-import { createStateProgress } from './progress.js';
+import { createStateProgressCell } from './progress.js';
 
 export type SpectrogramDrawConfig = Pick<
   SpectrogramConfig,
@@ -11,72 +15,94 @@ export type SpectrogramDrawConfig = Pick<
 
 export type SpectrogramDraw = {
   run: (encoder: GPUCommandEncoder) => void;
-  configure: (view: GPUTextureView, config: SpectrogramDrawConfig) => void;
-  destroy: () => void;
 };
-export const createSpectrogramDraw = (
+
+export type SpectrogramDrawArg = {
+  view: GPUTextureView;
+  config: SpectrogramDrawConfig;
+};
+
+export const createSpectrogramDrawCell = (
   device: GPUDevice,
   canvas: OffscreenCanvas,
   marker?: GPUComputePassTimestampWrites,
-): SpectrogramDraw => {
+): ResourceCell<SpectrogramDrawArg, SpectrogramDraw> => {
   const context = canvas.getContext('webgpu');
   if (!context) {
     throw new Error('WebGPU context not available on the canvas');
   }
 
   const pipeline = createPipeline(device, context);
-  const progress = createStateProgress(device);
-  const colors = createColors(device);
+  const progressCell = createStateProgressCell(device);
+  const colorsCell = createColorsCell(device);
   const sampler = device.createSampler({
     label: 'draw-sampler',
     magFilter: 'nearest',
     minFilter: 'nearest',
   });
-  // eslint-disable-next-line @typescript-eslint/init-declarations
-  let bindGroup: GPUBindGroup;
-
-  const ref: SpectrogramDraw = {
-    run: (encoder) => {
-      const view = context.getCurrentTexture().createView({
-        label: 'draw-view',
-      });
-      const pass = encoder.beginRenderPass({
-        label: 'draw-pass',
-        colorAttachments: [
-          {
-            view,
-            clearValue: { r: 0, g: 0, b: 0, a: 1 },
-            loadOp: 'clear',
-            storeOp: 'store',
-          },
-        ],
-        timestampWrites: marker,
-      });
-      pass.setPipeline(pipeline);
-      pass.setBindGroup(0, bindGroup);
-      pass.draw(3);
-      pass.end();
-    },
-    configure: (view, config) => {
-      setOffscreenCanvasSize(canvas, config.viewSize);
-      progress.write(config);
-      colors.write(config);
-      bindGroup = device.createBindGroup({
+  const bindGroupCell = createResourceCell({
+    create: (arg: {
+      view: GPUTextureView;
+      colors: GPUBuffer;
+      progress: GPUBuffer;
+    }): GPUBindGroup =>
+      device.createBindGroup({
         label: 'draw-bind-group',
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          { binding: 0, resource: { buffer: colors.buffer } },
-          { binding: 1, resource: { buffer: progress.buffer } },
+          { binding: 0, resource: { buffer: arg.colors } },
+          { binding: 1, resource: { buffer: arg.progress } },
           { binding: 2, resource: sampler },
-          { binding: 3, resource: view },
+          { binding: 3, resource: arg.view },
         ],
+      }),
+    dispose: () => undefined,
+    equals: (current, next) =>
+      current.view === next.view &&
+      current.colors === next.colors &&
+      current.progress === next.progress,
+  });
+
+  return {
+    get: (arg) => {
+      const { view, config } = arg;
+      setOffscreenCanvasSize(canvas, config.viewSize);
+      const progress = progressCell.get(config);
+      const colors = colorsCell.get(config);
+      const bindGroup = bindGroupCell.get({
+        view,
+        colors: colors.buffer,
+        progress: progress.buffer,
       });
+
+      return {
+        run: (encoder) => {
+          const targetView = context.getCurrentTexture().createView({
+            label: 'draw-view',
+          });
+          const pass = encoder.beginRenderPass({
+            label: 'draw-pass',
+            colorAttachments: [
+              {
+                view: targetView,
+                clearValue: { r: 0, g: 0, b: 0, a: 1 },
+                loadOp: 'clear',
+                storeOp: 'store',
+              },
+            ],
+            timestampWrites: marker,
+          });
+          pass.setPipeline(pipeline);
+          pass.setBindGroup(0, bindGroup);
+          pass.draw(3);
+          pass.end();
+        },
+      };
     },
-    destroy: () => {
-      colors.destroy();
-      progress.destroy();
+    dispose: () => {
+      bindGroupCell.dispose();
+      colorsCell.dispose();
+      progressCell.dispose();
     },
   };
-
-  return ref;
 };

@@ -1,47 +1,67 @@
+import {
+  createResourceCell,
+  type ResourceCell,
+} from '@musetric/resource-utils';
 import { type ExtSpectrogramConfig } from '../common/extConfig.js';
-import { createParams, type StateParams } from './params.js';
-import { createPipelines, type Pipelines } from './pipeline.js';
+import { createParamsCell, type StateParams } from './params.js';
+import { type Pipelines } from './pipeline.js';
 
 export type Config = Pick<
   ExtSpectrogramConfig,
   'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'minDecibel'
 >;
 
+export type StateArg = {
+  signal: GPUBuffer;
+  config: Config;
+};
+
 export type State = {
   pipelines: Pipelines;
   config: Config;
   params: StateParams;
   bindGroup: GPUBindGroup;
-  configure: (signal: GPUBuffer, config: Config) => void;
-  destroy: () => void;
 };
 
-export const createState = (device: GPUDevice) => {
-  const pipelines = createPipelines(device);
-  const params = createParams(device);
-
-  const ref: State = {
-    pipelines,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    config: undefined!,
-    params,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    bindGroup: undefined!,
-    configure: (signal, config) => {
-      ref.config = config;
-      params.write(config);
-      ref.bindGroup = device.createBindGroup({
+export const createStateCell = (
+  device: GPUDevice,
+  pipelines: Pipelines,
+): ResourceCell<StateArg, State> => {
+  const paramsCell = createParamsCell(device);
+  const bindGroupCell = createResourceCell({
+    create: (arg: { signal: GPUBuffer; buffer: GPUBuffer }): GPUBindGroup =>
+      device.createBindGroup({
         label: 'decibelify-bind-group',
         layout: pipelines.layout,
         entries: [
-          { binding: 0, resource: { buffer: signal } },
-          { binding: 1, resource: { buffer: params.buffer } },
+          { binding: 0, resource: { buffer: arg.signal } },
+          { binding: 1, resource: { buffer: arg.buffer } },
         ],
+      }),
+    dispose: () => undefined,
+    equals: (current, next) =>
+      current.signal === next.signal && current.buffer === next.buffer,
+  });
+
+  return {
+    get: (arg) => {
+      const { signal, config } = arg;
+      const params = paramsCell.get(config);
+      const bindGroup = bindGroupCell.get({
+        signal,
+        buffer: params.buffer,
       });
+
+      return {
+        pipelines,
+        config,
+        params,
+        bindGroup,
+      };
     },
-    destroy: () => {
-      params.destroy();
+    dispose: () => {
+      bindGroupCell.dispose();
+      paramsCell.dispose();
     },
   };
-  return ref;
 };

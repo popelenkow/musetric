@@ -1,51 +1,83 @@
+import {
+  createResourceCell,
+  type ResourceCell,
+} from '@musetric/resource-utils';
 import { type ExtSpectrogramConfig } from '../common/extConfig.js';
-import { createParams, type StateParams } from './params.js';
-import { createPipeline } from './pipeline.js';
-import { createWindowFunction } from './windowFunction.js';
+import { createParamsCell, type StateParams } from './params.js';
+import {
+  createWindowFunctionCell,
+  type StateWindowFunction,
+} from './windowFunction.js';
 
 export type Config = Pick<
   ExtSpectrogramConfig,
   'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'windowName'
 >;
 
+export type StateArg = {
+  signal: GPUBuffer;
+  config: Config;
+};
+
 export type State = {
   pipeline: GPUComputePipeline;
   config: Config;
   params: StateParams;
+  windowFunction: StateWindowFunction;
   bindGroup: GPUBindGroup;
-  configure: (signal: GPUBuffer, config: Config) => void;
-  destroy: () => void;
 };
-export const createState = (device: GPUDevice): State => {
-  const pipeline = createPipeline(device);
-  const params = createParams(device);
-  const windowFunction = createWindowFunction(device);
 
-  const ref: State = {
-    pipeline,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    config: undefined!,
-    params,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    bindGroup: undefined!,
-    configure: (signal, config) => {
-      ref.config = config;
-      params.write(config);
-      windowFunction.configure(config);
-      ref.bindGroup = device.createBindGroup({
+export const createStateCell = (
+  device: GPUDevice,
+  pipeline: GPUComputePipeline,
+): ResourceCell<StateArg, State> => {
+  const paramsCell = createParamsCell(device);
+  const windowFunctionCell = createWindowFunctionCell(device);
+  const bindGroupCell = createResourceCell({
+    create: (arg: {
+      signal: GPUBuffer;
+      params: GPUBuffer;
+      windowFunction: GPUBuffer;
+    }): GPUBindGroup =>
+      device.createBindGroup({
         label: 'windowing-bind-group',
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          { binding: 0, resource: { buffer: signal } },
-          { binding: 1, resource: { buffer: params.buffer } },
-          { binding: 2, resource: { buffer: windowFunction.buffer } },
+          { binding: 0, resource: { buffer: arg.signal } },
+          { binding: 1, resource: { buffer: arg.params } },
+          { binding: 2, resource: { buffer: arg.windowFunction } },
         ],
+      }),
+    dispose: () => undefined,
+    equals: (current, next) =>
+      current.signal === next.signal &&
+      current.params === next.params &&
+      current.windowFunction === next.windowFunction,
+  });
+
+  return {
+    get: (arg) => {
+      const { signal, config } = arg;
+      const params = paramsCell.get(config);
+      const windowFunction = windowFunctionCell.get(config);
+      const bindGroup = bindGroupCell.get({
+        signal,
+        params: params.buffer,
+        windowFunction: windowFunction.buffer,
       });
+
+      return {
+        pipeline,
+        config,
+        params,
+        windowFunction,
+        bindGroup,
+      };
     },
-    destroy: () => {
-      params.destroy();
-      windowFunction.destroy();
+    dispose: () => {
+      bindGroupCell.dispose();
+      windowFunctionCell.dispose();
+      paramsCell.dispose();
     },
   };
-  return ref;
 };

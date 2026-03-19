@@ -1,3 +1,4 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { type Config } from './state.js';
 
 export type RemapParams = {
@@ -45,37 +46,42 @@ const toParams = (config: Config): RemapParams => {
 export type StateParams = {
   value: RemapParams;
   buffer: GPUBuffer;
-  write: (config: Config) => void;
-  destroy: () => void;
 };
 
-export const createParams = (device: GPUDevice) => {
-  const array = new DataView(new ArrayBuffer(28));
+export const createParamsCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: Config): StateParams => {
+      const value = toParams(config);
+      const array = new DataView(new ArrayBuffer(28));
+      array.setUint32(0, value.halfSize, true);
+      array.setUint32(4, value.width, true);
+      array.setUint32(8, value.height, true);
+      array.setUint32(12, value.minBin, true);
+      array.setUint32(16, value.maxBin, true);
+      array.setFloat32(20, value.logMin, true);
+      array.setFloat32(24, value.logRange, true);
 
-  const buffer = device.createBuffer({
-    label: 'remap-params-buffer',
-    size: array.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-
-  const ref: StateParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    value: undefined!,
-    buffer,
-    write: (config) => {
-      ref.value = toParams(config);
-      array.setUint32(0, ref.value.halfSize, true);
-      array.setUint32(4, ref.value.width, true);
-      array.setUint32(8, ref.value.height, true);
-      array.setUint32(12, ref.value.minBin, true);
-      array.setUint32(16, ref.value.maxBin, true);
-      array.setFloat32(20, ref.value.logMin, true);
-      array.setFloat32(24, ref.value.logRange, true);
+      const buffer = device.createBuffer({
+        label: 'remap-params-buffer',
+        size: array.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
       device.queue.writeBuffer(buffer, 0, array.buffer);
+
+      return {
+        value,
+        buffer,
+      };
     },
-    destroy: () => {
-      buffer.destroy();
+    dispose: (params) => {
+      params.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.windowSize === next.windowSize &&
+      current.sampleRate === next.sampleRate &&
+      current.zeroPaddingFactor === next.zeroPaddingFactor &&
+      current.minFrequency === next.minFrequency &&
+      current.maxFrequency === next.maxFrequency &&
+      current.viewSize.width === next.viewSize.width &&
+      current.viewSize.height === next.viewSize.height,
+  });

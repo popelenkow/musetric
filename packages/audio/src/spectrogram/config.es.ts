@@ -50,3 +50,26 @@ export const allSpectrogramConfigKeys = createConfigKeys<SpectrogramConfig>()([
 
 export const extractSpectrogramConfig = (config: SpectrogramConfig) =>
   extractConfig<SpectrogramConfig>(config, allSpectrogramConfigKeys);
+
+const isConfigComplete = (
+  config: Partial<SpectrogramConfig>,
+): config is SpectrogramConfig =>
+  allSpectrogramConfigKeys.every((key) => config[key] !== undefined);
+
+export const buildSpectrogramConfig = (
+  base: SpectrogramConfig | undefined,
+  draft: Partial<SpectrogramConfig>,
+) => {
+  if (base) {
+    return {
+      ...base,
+      ...draft,
+    };
+  }
+
+  if (!isConfigComplete(draft)) {
+    return undefined;
+  }
+
+  return draft;
+};

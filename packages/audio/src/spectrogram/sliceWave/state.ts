@@ -1,7 +1,10 @@
+import {
+  createResourceCell,
+  type ResourceCell,
+} from '@musetric/resource-utils';
 import { type ExtSpectrogramConfig } from '../common/extConfig.js';
-import { createParams, type StateParams } from './params.js';
-import { createPipeline } from './pipeline.js';
-import { createStateWave, type StateWave } from './wave.js';
+import { createParamsCell, type StateParams } from './params.js';
+import { createStateWaveCell, type StateWave } from './wave.js';
 
 export type Config = Pick<
   ExtSpectrogramConfig,
@@ -13,53 +16,70 @@ export type Config = Pick<
   | 'zeroPaddingFactor'
 >;
 
+export type StateArg = {
+  out: GPUBuffer;
+  config: Config;
+};
+
 export type State = {
   pipeline: GPUComputePipeline;
   config: Config;
   params: StateParams;
   wave: StateWave;
   bindGroup: GPUBindGroup;
-  configure: (waves: GPUBuffer, config: Config) => void;
-  write: (waveArray: Float32Array, progress: number) => void;
-  destroy: () => void;
 };
 
-export const createState = (device: GPUDevice): State => {
-  const pipeline = createPipeline(device);
-  const params = createParams(device);
-  const wave = createStateWave(device);
-
-  const ref: State = {
-    pipeline,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    config: undefined!,
-    params,
-    wave,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    bindGroup: undefined!,
-    configure: (out, config) => {
-      ref.config = config;
-      params.write(config);
-      const { visibleSamples } = params.value;
-      wave.resize(visibleSamples);
-      ref.bindGroup = device.createBindGroup({
+export const createStateCell = (
+  device: GPUDevice,
+  pipeline: GPUComputePipeline,
+): ResourceCell<StateArg, State> => {
+  const paramsCell = createParamsCell(device);
+  const waveCell = createStateWaveCell(device);
+  const bindGroupCell = createResourceCell({
+    create: (arg: {
+      out: GPUBuffer;
+      params: GPUBuffer;
+      wave: GPUBuffer;
+    }): GPUBindGroup =>
+      device.createBindGroup({
         label: 'slice-wave-bind-group',
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          { binding: 0, resource: { buffer: wave.buffer } },
-          { binding: 1, resource: { buffer: out } },
-          { binding: 2, resource: { buffer: params.buffer } },
+          { binding: 0, resource: { buffer: arg.wave } },
+          { binding: 1, resource: { buffer: arg.out } },
+          { binding: 2, resource: { buffer: arg.params } },
         ],
+      }),
+    dispose: () => undefined,
+    equals: (current, next) =>
+      current.out === next.out &&
+      current.params === next.params &&
+      current.wave === next.wave,
+  });
+
+  return {
+    get: (arg) => {
+      const { out, config } = arg;
+      const params = paramsCell.get(config);
+      const wave = waveCell.get(params.value.visibleSamples);
+      const bindGroup = bindGroupCell.get({
+        out,
+        params: params.buffer,
+        wave: wave.buffer,
       });
+
+      return {
+        pipeline,
+        config,
+        params,
+        wave,
+        bindGroup,
+      };
     },
-    write: (waveArray, progress) => {
-      wave.write(waveArray, progress, ref.config);
-    },
-    destroy: () => {
-      params.destroy();
-      wave.destroy();
+    dispose: () => {
+      bindGroupCell.dispose();
+      waveCell.dispose();
+      paramsCell.dispose();
     },
   };
-
-  return ref;
 };

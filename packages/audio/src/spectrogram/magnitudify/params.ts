@@ -1,3 +1,4 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { type Config } from './state.js';
 
 export type MagnitudifyParams = {
@@ -13,31 +14,33 @@ const toParams = (config: Config): MagnitudifyParams => ({
 export type StateParams = {
   value: MagnitudifyParams;
   buffer: GPUBuffer;
-  write: (config: Config) => void;
-  destroy: () => void;
 };
 
-export const createParams = (device: GPUDevice) => {
-  const array = new Uint32Array(2);
-  const buffer = device.createBuffer({
-    label: 'magnitudify-params-buffer',
-    size: array.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
+export const createParamsCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: Config): StateParams => {
+      const value = toParams(config);
+      const array = new Uint32Array(2);
+      array[0] = value.windowSize;
+      array[1] = value.windowCount;
 
-  const ref: StateParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    value: undefined!,
-    buffer,
-    write: (config) => {
-      ref.value = toParams(config);
-      array[0] = ref.value.windowSize;
-      array[1] = ref.value.windowCount;
+      const buffer = device.createBuffer({
+        label: 'magnitudify-params-buffer',
+        size: array.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
       device.queue.writeBuffer(buffer, 0, array);
+
+      return {
+        value,
+        buffer,
+      };
     },
-    destroy: () => {
-      buffer.destroy();
+    dispose: (params) => {
+      params.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.windowSize === next.windowSize &&
+      current.windowCount === next.windowCount &&
+      current.zeroPaddingFactor === next.zeroPaddingFactor,
+  });

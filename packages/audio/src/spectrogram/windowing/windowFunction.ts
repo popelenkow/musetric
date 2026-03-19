@@ -1,32 +1,30 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { windowFunctions } from '../common/windowFunction.js';
 import { type Config } from './state.js';
 
 export type StateWindowFunction = {
   buffer: GPUBuffer;
-  configure: (config: Config) => void;
-  destroy: () => void;
 };
-export const createWindowFunction = (
-  device: GPUDevice,
-): StateWindowFunction => {
-  const ref: StateWindowFunction = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    buffer: undefined!,
-    configure: (config) => {
-      const { windowSize, windowName } = config;
-      const array = windowFunctions[windowName](windowSize);
+
+export const createWindowFunctionCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: Config): StateWindowFunction => {
+      const array = windowFunctions[config.windowName](config.windowSize);
       const buffer = device.createBuffer({
         label: 'windowing-window-function-buffer',
         size: array.byteLength,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
       device.queue.writeBuffer(buffer, 0, array);
-      ref.buffer?.destroy();
-      ref.buffer = buffer;
+
+      return {
+        buffer,
+      };
     },
-    destroy: () => {
-      ref.buffer?.destroy();
+    dispose: (windowFunction) => {
+      windowFunction.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.windowSize === next.windowSize &&
+      current.windowName === next.windowName,
+  });
