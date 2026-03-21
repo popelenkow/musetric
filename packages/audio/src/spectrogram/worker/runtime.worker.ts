@@ -11,21 +11,26 @@ export type SpectrogramWorkerState = {
   processor: SpectrogramProcessor;
   wave?: Float32Array<SharedArrayBuffer>;
   progress: number;
+  initialized: boolean;
 };
 
 export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   const device = await getGpuDevice(profiling);
 
-  const state: SpectrogramWorkerState = {
-    processor: createSpectrogramProcessor({
+  const createProcessor = () =>
+    createSpectrogramProcessor({
       device,
       onMetrics: profiling
         ? (metrics) => {
             console.table(metrics);
           }
         : undefined,
-    }),
+    });
+
+  const state: SpectrogramWorkerState = {
+    processor: createProcessor(),
     progress: 0,
+    initialized: false,
   };
 
   const port = createSpectrogramWorkerPort();
@@ -33,7 +38,14 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   const render = async () => {
     const { processor, wave, progress } = state;
     if (!wave) return;
-    await processor.render(wave, progress);
+    const ok = await processor.render(wave, progress);
+    if (ok && !state.initialized) {
+      state.initialized = true;
+      port.postMessage({
+        type: 'state',
+        status: 'success',
+      });
+    }
   };
 
   port.onmessage = createPortMessageHandler<ToSpectrogramWorkerMessage>({
@@ -43,24 +55,14 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
       state.wave = message.waveBuffer
         ? new Float32Array(message.waveBuffer)
         : undefined;
-      port.postMessage({
-        type: 'state',
-        status: 'success',
-      });
       await render();
     },
     deinit: () => {
       state.processor.dispose();
       state.wave = undefined;
       state.progress = 0;
-      state.processor = createSpectrogramProcessor({
-        device,
-        onMetrics: profiling
-          ? (metrics) => {
-              console.table(metrics);
-            }
-          : undefined,
-      });
+      state.initialized = false;
+      state.processor = createProcessor();
     },
     wave: async (message) => {
       state.wave = new Float32Array(message.waveBuffer);
