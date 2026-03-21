@@ -3,7 +3,7 @@ type IsValueEqual<Value> = (first: Value, second: Value) => boolean;
 export type ApplyPatchConfigOptions<Config> = {
   base?: Config;
   draft?: Partial<Config>;
-  patch: Partial<Config>;
+  patch?: Partial<Config>;
   isEqual?: {
     [Key in keyof Config]?: IsValueEqual<Config[Key]>;
   };
@@ -15,6 +15,10 @@ export const applyPatchConfig = <Config>(
   options: ApplyPatchConfigOptions<Config>,
 ) => {
   const { base, patch } = options;
+
+  if (!patch) {
+    return options.draft;
+  }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const keys = Object.keys(patch) as (keyof Config)[];
@@ -40,6 +44,10 @@ export const applyPatchConfig = <Config>(
 
     draft[key] = patchValue;
   });
+
+  if (Object.keys(draft).length === 0) {
+    return undefined;
+  }
 
   return draft;
 };

@@ -48,15 +48,15 @@ export type SpectrogramRuntime = {
 };
 
 export type SpectrogramConfigurator = {
-  configure: () => SpectrogramRuntime;
-  updateConfig: (config: Partial<SpectrogramConfig>) => void;
+  configure: () => SpectrogramRuntime | undefined;
+  updateConfig: (config?: Partial<SpectrogramConfig>) => void;
   dispose: () => void;
 };
 export const createSpectrogramConfigurator = (
   device: GPUDevice,
   markers: SpectrogramMarkers,
 ): SpectrogramConfigurator => {
-  let draftConfig: Partial<SpectrogramConfig> = {};
+  let draftConfig: Partial<SpectrogramConfig> | undefined = undefined;
   let config: ExtSpectrogramConfig | undefined = undefined;
   let runtime: SpectrogramRuntime | undefined = undefined;
 
@@ -74,12 +74,12 @@ export const createSpectrogramConfigurator = (
     draw: createSpectrogramDrawCell(device, markers.draw),
   };
 
-  const buildConfig = (): ExtSpectrogramConfig => {
+  const buildConfig = (): ExtSpectrogramConfig | undefined => {
     const baseConfig = buildSpectrogramConfig(config, draftConfig);
     if (!baseConfig) {
-      throw new Error('Incomplete spectrogram config');
+      return undefined;
     }
-    draftConfig = {};
+    draftConfig = undefined;
     return {
       ...baseConfig,
       windowCount: baseConfig.viewSize.width,
@@ -88,15 +88,15 @@ export const createSpectrogramConfigurator = (
 
   return {
     configure: markers.configure(() => {
-      if (!Object.keys(draftConfig).length) {
-        if (!runtime) {
-          throw new Error('No spectrogram config available');
-        }
+      if (!draftConfig) {
         return runtime;
       }
 
       config = buildConfig();
-      draftConfig = {};
+      if (!config) {
+        return undefined;
+      }
+      draftConfig = undefined;
       const state = cells.state.get(config);
       const { signal, texture } = state;
       const sliceWave = cells.sliceWave.get({ out: signal.real, config });

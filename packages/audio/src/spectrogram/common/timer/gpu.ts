@@ -9,7 +9,7 @@ export type GpuTimer<Label extends string> = {
   markers: GpuMarkers<Label>;
   resolve: (encoder: GPUCommandEncoder) => void;
   read: () => Promise<Record<Label, number>>;
-  destroy: () => void;
+  dispose: () => void;
 };
 
 export const createGpuTimer = <Labels extends readonly string[]>(
@@ -70,7 +70,7 @@ export const createGpuTimer = <Labels extends readonly string[]>(
       readBuffer.unmap();
       return result;
     },
-    destroy: () => {
+    dispose: () => {
       querySet.destroy();
       resolveBuffer.destroy();
       readBuffer.destroy();

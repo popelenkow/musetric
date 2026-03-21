@@ -61,19 +61,22 @@ const isConfigComplete = (
   allSpectrogramConfigKeys.every((key) => config[key] !== undefined);
 
 export const buildSpectrogramConfig = (
-  base: SpectrogramConfig | undefined,
-  draft: Partial<SpectrogramConfig>,
+  base?: SpectrogramConfig,
+  draft?: Partial<SpectrogramConfig>,
 ) => {
-  if (base) {
-    return {
-      ...base,
-      ...draft,
-    };
+  if (!draft) {
+    return base;
   }
 
-  if (!isConfigComplete(draft)) {
-    return undefined;
+  if (!base) {
+    if (!isConfigComplete(draft)) {
+      return undefined;
+    }
+    return draft;
   }
 
-  return draft;
+  return {
+    ...base,
+    ...draft,
+  };
 };
