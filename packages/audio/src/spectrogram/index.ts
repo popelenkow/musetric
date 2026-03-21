@@ -21,7 +21,7 @@ export * from './magnitudify/index.js';
 export * from './port.js';
 export * from './portMessage.cross.js';
 export * from './processor.js';
-export * from './processorState/index.js';
 export * from './remap/index.js';
 export * from './sliceWave/index.js';
+export * from './state/index.js';
 export * from './windowing/index.js';

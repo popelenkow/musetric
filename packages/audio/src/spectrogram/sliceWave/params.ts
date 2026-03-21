@@ -1,3 +1,4 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { type Config } from './state.js';
 
 export type SliceWaveParams = {
@@ -34,34 +35,39 @@ const toParams = (config: Config): SliceWaveParams => {
 export type StateParams = {
   value: SliceWaveParams;
   buffer: GPUBuffer;
-  write: (config: Config) => void;
-  destroy: () => void;
 };
 
-export const createParams = (device: GPUDevice): StateParams => {
-  const array = new DataView(new ArrayBuffer(20));
-  const buffer = device.createBuffer({
-    label: 'slice-wave-params-buffer',
-    size: array.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
+export const createParamsCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: Config): StateParams => {
+      const value = toParams(config);
+      const array = new DataView(new ArrayBuffer(20));
+      array.setUint32(0, value.windowSize, true);
+      array.setUint32(4, value.paddedWindowSize, true);
+      array.setUint32(8, value.windowCount, true);
+      array.setUint32(12, value.visibleSamples, true);
+      array.setFloat32(16, value.step, true);
 
-  const ref: StateParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    value: undefined!,
-    buffer,
-    write: (config) => {
-      ref.value = toParams(config);
-      array.setUint32(0, ref.value.windowSize, true);
-      array.setUint32(4, ref.value.paddedWindowSize, true);
-      array.setUint32(8, ref.value.windowCount, true);
-      array.setUint32(12, ref.value.visibleSamples, true);
-      array.setFloat32(16, ref.value.step, true);
+      const buffer = device.createBuffer({
+        label: 'slice-wave-params-buffer',
+        size: array.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
       device.queue.writeBuffer(buffer, 0, array.buffer);
+
+      return {
+        value,
+        buffer,
+      };
     },
-    destroy: () => {
-      buffer.destroy();
+    dispose: (params) => {
+      params.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.windowSize === next.windowSize &&
+      current.windowCount === next.windowCount &&
+      current.sampleRate === next.sampleRate &&
+      current.visibleTimeBefore === next.visibleTimeBefore &&
+      current.visibleTimeAfter === next.visibleTimeAfter &&
+      current.zeroPaddingFactor === next.zeroPaddingFactor,
+  });

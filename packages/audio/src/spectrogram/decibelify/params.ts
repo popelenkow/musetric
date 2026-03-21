@@ -1,3 +1,4 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { type Config } from './state.js';
 
 export type DecibelifyParams = {
@@ -15,31 +16,35 @@ const toParams = (config: Config): DecibelifyParams => ({
 export type StateParams = {
   value: DecibelifyParams;
   buffer: GPUBuffer;
-  write: (config: Config) => void;
-  destroy: () => void;
 };
-export const createParams = (device: GPUDevice) => {
-  const array = new DataView(new ArrayBuffer(12));
-  const buffer = device.createBuffer({
-    label: 'decibelify-params-buffer',
-    size: array.buffer.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
 
-  const ref: StateParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    value: undefined!,
-    buffer,
-    write: (config) => {
-      ref.value = toParams(config);
-      array.setUint32(0, ref.value.halfSize, true);
-      array.setUint32(4, ref.value.windowCount, true);
-      array.setFloat32(8, ref.value.decibelFactor, true);
+export const createParamsCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: Config): StateParams => {
+      const value = toParams(config);
+      const array = new DataView(new ArrayBuffer(12));
+      array.setUint32(0, value.halfSize, true);
+      array.setUint32(4, value.windowCount, true);
+      array.setFloat32(8, value.decibelFactor, true);
+
+      const buffer = device.createBuffer({
+        label: 'decibelify-params-buffer',
+        size: array.buffer.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
       device.queue.writeBuffer(buffer, 0, array.buffer);
+
+      return {
+        value,
+        buffer,
+      };
     },
-    destroy: () => {
-      buffer.destroy();
+    dispose: (params) => {
+      params.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.windowSize === next.windowSize &&
+      current.windowCount === next.windowCount &&
+      current.zeroPaddingFactor === next.zeroPaddingFactor &&
+      current.minDecibel === next.minDecibel,
+  });

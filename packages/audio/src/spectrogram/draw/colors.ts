@@ -1,3 +1,4 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { parseHexColor } from '../../common/colors.es.js';
 import { type SpectrogramDrawConfig } from './index.js';
 
@@ -8,31 +9,33 @@ const toVec4 = (hex: string): [number, number, number, number] => {
 
 export type StateColors = {
   buffer: GPUBuffer;
-  write: (config: SpectrogramDrawConfig) => void;
-  destroy: () => void;
 };
-export const createColors = (device: GPUDevice): StateColors => {
-  const array = new Float32Array(12);
-  const buffer = device.createBuffer({
-    label: 'draw-colors-buffer',
-    size: array.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-
-  const ref: StateColors = {
-    buffer,
-    write: (config: SpectrogramDrawConfig) => {
+export const createColorsCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (config: SpectrogramDrawConfig): StateColors => {
+      const array = new Float32Array(12);
       const { colors } = config;
       array.set([
         ...toVec4(colors.played),
         ...toVec4(colors.unplayed),
         ...toVec4(colors.background),
       ]);
+      const buffer = device.createBuffer({
+        label: 'draw-colors-buffer',
+        size: array.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
       device.queue.writeBuffer(buffer, 0, array);
+
+      return {
+        buffer,
+      };
     },
-    destroy: () => {
-      buffer.destroy();
+    dispose: (state) => {
+      state.buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) =>
+      current.colors.played === next.colors.played &&
+      current.colors.unplayed === next.colors.unplayed &&
+      current.colors.background === next.colors.background,
+  });

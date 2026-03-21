@@ -1,37 +1,45 @@
-import { createState, type State } from './state.js';
+import type { ResourceCell } from '@musetric/resource-utils';
+import { createPipeline } from './pipeline.js';
+import { createStateCell, type StateArg } from './state.js';
 
 const workgroupSize = 64;
 
 export type SpectrogramSliceWave = {
   run: (encoder: GPUCommandEncoder) => void;
-  configure: State['configure'];
-  write: State['write'];
-  destroy: () => void;
+  write: (waveArray: Float32Array, progress: number) => void;
 };
 
-export const createSpectrogramSliceWave = (
+export const createSpectrogramSliceWaveCell = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): SpectrogramSliceWave => {
-  const state = createState(device);
+): ResourceCell<StateArg, SpectrogramSliceWave> => {
+  const pipeline = createPipeline(device);
+  const stateCell = createStateCell(device, pipeline);
 
   return {
-    run: (encoder) => {
-      const { paddedWindowSize, windowCount } = state.params.value;
-      const xGroups = Math.ceil(paddedWindowSize / workgroupSize);
-      const pass = encoder.beginComputePass({
-        label: 'slice-wave-pass',
-        timestampWrites: marker,
-      });
-      pass.setPipeline(state.pipeline);
-      pass.setBindGroup(0, state.bindGroup);
-      pass.dispatchWorkgroups(xGroups, windowCount);
-      pass.end();
+    get: (arg) => {
+      const state = stateCell.get(arg);
+
+      return {
+        run: (encoder) => {
+          const { paddedWindowSize, windowCount } = state.params.value;
+          const xGroups = Math.ceil(paddedWindowSize / workgroupSize);
+          const pass = encoder.beginComputePass({
+            label: 'slice-wave-pass',
+            timestampWrites: marker,
+          });
+          pass.setPipeline(state.pipeline);
+          pass.setBindGroup(0, state.bindGroup);
+          pass.dispatchWorkgroups(xGroups, windowCount);
+          pass.end();
+        },
+        write: (waveArray, progress) => {
+          state.wave.write(waveArray, progress, state.config);
+        },
+      };
     },
-    configure: state.configure,
-    write: state.write,
-    destroy: () => {
-      state.destroy();
+    dispose: () => {
+      stateCell.dispose();
     },
   };
 };

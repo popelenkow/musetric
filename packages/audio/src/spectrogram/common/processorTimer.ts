@@ -49,10 +49,11 @@ const create = (device: GPUDevice) => ({
 
 type Timer = ReturnType<typeof create>;
 
-type Markers = Partial<Timer['gpu']['markers']> & Timer['cpu']['markers'];
+export type SpectrogramMarkers = Partial<Timer['gpu']['markers']> &
+  Timer['cpu']['markers'];
 
 export type SpectrogramProcessorTimer = {
-  markers: Markers;
+  markers: SpectrogramMarkers;
   resolve: (encoder: GPUCommandEncoder) => void;
   finish: () => Promise<void>;
   destroy: () => void;
@@ -70,7 +71,7 @@ export const createSpectrogramProcessorTimer = (
           return acc;
         },
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        {} as Markers,
+        {} as SpectrogramMarkers,
       ),
       resolve: () => {
         /** Nothing */
@@ -85,7 +86,7 @@ export const createSpectrogramProcessorTimer = (
   }
 
   const timer = create(device);
-  const markers: Markers = {
+  const markers: SpectrogramMarkers = {
     ...timer.gpu.markers,
     ...timer.cpu.markers,
   };

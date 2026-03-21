@@ -1,39 +1,48 @@
-import { createState, type State } from './state.js';
+import type { ResourceCell } from '@musetric/resource-utils';
+import { createPipelines } from './pipeline.js';
+import { createStateCell, type StateArg } from './state.js';
 
 const workgroupSize = 64;
 
 export type SpectrogramDecibelify = {
   run: (encoder: GPUCommandEncoder) => void;
-  configure: State['configure'];
-  destroy: State['destroy'];
 };
-export const createSpectrogramDecibelify = (
+
+export const createSpectrogramDecibelifyCell = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): SpectrogramDecibelify => {
-  const state = createState(device);
+): ResourceCell<StateArg, SpectrogramDecibelify> => {
+  const pipelines = createPipelines(device);
+  const stateCell = createStateCell(device, pipelines);
 
   return {
-    run: (encoder) => {
-      const { halfSize, windowCount } = state.params.value;
-      const xCount = Math.ceil(halfSize / workgroupSize);
+    get: (arg) => {
+      const state = stateCell.get(arg);
 
-      const pass = encoder.beginComputePass({
-        label: 'decibelify-pass',
-        timestampWrites: marker,
-      });
+      return {
+        run: (encoder) => {
+          const { halfSize, windowCount } = state.params.value;
+          const xCount = Math.ceil(halfSize / workgroupSize);
 
-      pass.setPipeline(state.pipelines.findMax);
-      pass.setBindGroup(0, state.bindGroup);
-      pass.dispatchWorkgroups(windowCount);
+          const pass = encoder.beginComputePass({
+            label: 'decibelify-pass',
+            timestampWrites: marker,
+          });
 
-      pass.setPipeline(state.pipelines.run);
-      pass.setBindGroup(0, state.bindGroup);
-      pass.dispatchWorkgroups(xCount, windowCount);
+          pass.setPipeline(state.pipelines.findMax);
+          pass.setBindGroup(0, state.bindGroup);
+          pass.dispatchWorkgroups(windowCount);
 
-      pass.end();
+          pass.setPipeline(state.pipelines.run);
+          pass.setBindGroup(0, state.bindGroup);
+          pass.dispatchWorkgroups(xCount, windowCount);
+
+          pass.end();
+        },
+      };
     },
-    configure: state.configure,
-    destroy: state.destroy,
+    dispose: () => {
+      stateCell.dispose();
+    },
   };
 };
