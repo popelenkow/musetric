@@ -3,7 +3,6 @@ import { applySpectrogramPatchConfig } from './common/patchConfig.js';
 import { type SpectrogramMarkers } from './common/processorTimer.js';
 import {
   buildSpectrogramConfig,
-  type FourierMode,
   type SpectrogramConfig,
 } from './config.cross.js';
 import {
@@ -14,7 +13,7 @@ import {
   createSpectrogramDrawCell,
   type SpectrogramDraw,
 } from './draw/index.js';
-import { fouriers } from './fourier/fouriers.js';
+import { createFourierCell } from './fourier/cell.js';
 import type { Fourier } from './fourier/types.js';
 import {
   createSpectrogramMagnitudifyCell,
@@ -53,18 +52,10 @@ export type SpectrogramConfigurator = {
   updateConfig: (config: Partial<SpectrogramConfig>) => void;
   dispose: () => void;
 };
-
-export type CreateSpectrogramConfiguratorOptions = {
-  device: GPUDevice;
-  fourierMode: FourierMode;
-  markers: SpectrogramMarkers;
-};
-
 export const createSpectrogramConfigurator = (
-  options: CreateSpectrogramConfiguratorOptions,
+  device: GPUDevice,
+  markers: SpectrogramMarkers,
 ): SpectrogramConfigurator => {
-  const { device, fourierMode, markers } = options;
-
   let draftConfig: Partial<SpectrogramConfig> = {};
   let config: ExtSpectrogramConfig | undefined = undefined;
   let runtime: SpectrogramRuntime | undefined = undefined;
@@ -73,7 +64,7 @@ export const createSpectrogramConfigurator = (
     state: createSpectrogramStateCell(device),
     sliceWave: createSpectrogramSliceWaveCell(device, markers.sliceWave),
     windowing: createSpectrogramWindowingCell(device, markers.windowing),
-    fourier: fouriers[fourierMode](device, {
+    fourier: createFourierCell(device, {
       reverse: markers.fourierReverse,
       transform: markers.fourierTransform,
     }),
@@ -110,10 +101,7 @@ export const createSpectrogramConfigurator = (
       const { signal, texture } = state;
       const sliceWave = cells.sliceWave.get({ out: signal.real, config });
       const windowing = cells.windowing.get({ signal: signal.real, config });
-      cells.fourier.configure(signal, {
-        ...config,
-        windowSize: config.windowSize * config.zeroPaddingFactor,
-      });
+      const fourier = cells.fourier.get({ signal, config });
       const magnitudify = cells.magnitudify.get({ signal, config });
       const decibelify = cells.decibelify.get({ signal: signal.real, config });
       const remap = cells.remap.get({
@@ -127,7 +115,7 @@ export const createSpectrogramConfigurator = (
         state,
         sliceWave,
         windowing,
-        fourier: cells.fourier,
+        fourier,
         magnitudify,
         decibelify,
         remap,
@@ -146,7 +134,7 @@ export const createSpectrogramConfigurator = (
       cells.state.dispose();
       cells.sliceWave.dispose();
       cells.windowing.dispose();
-      cells.fourier.destroy();
+      cells.fourier.dispose();
       cells.magnitudify.dispose();
       cells.decibelify.dispose();
       cells.remap.dispose();

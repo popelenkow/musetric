@@ -1,15 +1,9 @@
+import { createResourceCell } from '@musetric/resource-utils';
 import { utilsRadix4 } from '../utilsRadix4.js';
 
-export type StateReverseTable = {
-  buffer: GPUBuffer;
-  resize: (reverseWidth: number) => void;
-  destroy: () => void;
-};
-export const createReverseTable = (device: GPUDevice) => {
-  const ref: StateReverseTable = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    buffer: undefined!,
-    resize: (reverseWidth) => {
+export const createReverseTableCell = (device: GPUDevice) =>
+  createResourceCell({
+    create: (reverseWidth: number): GPUBuffer => {
       const array = utilsRadix4.createReverseTable(reverseWidth);
       const buffer = device.createBuffer({
         label: 'fft4-reverse-table',
@@ -17,13 +11,10 @@ export const createReverseTable = (device: GPUDevice) => {
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
       device.queue.writeBuffer(buffer, 0, array);
-
-      ref.buffer?.destroy();
-      ref.buffer = buffer;
+      return buffer;
     },
-    destroy: () => {
-      ref.buffer?.destroy();
+    dispose: (buffer) => {
+      buffer.destroy();
     },
-  };
-  return ref;
-};
+    equals: (current, next) => current === next,
+  });

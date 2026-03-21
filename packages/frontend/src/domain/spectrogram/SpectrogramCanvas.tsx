@@ -13,7 +13,6 @@ export const SpectrogramCanvas: FC = () => {
   const seek = usePlayerStore((s) => s.seek);
   const decoderStatus = useDecoderStore((s) => s.status);
   const spectrogramStatus = useSpectrogramStore((s) => s.status);
-  const fourierMode = useSettingsStore((s) => s.fourierMode);
   const init = useSpectrogramStore((s) => s.init);
 
   useEffect(() => {
@@ -32,7 +31,6 @@ export const SpectrogramCanvas: FC = () => {
   return (
     <canvas
       ref={setCanvas}
-      key={fourierMode}
       style={{ width: '100%', height: '100%', display: 'block' }}
       onClick={async (event) => {
         const { visibleTimeBefore, visibleTimeAfter, sampleRate } =

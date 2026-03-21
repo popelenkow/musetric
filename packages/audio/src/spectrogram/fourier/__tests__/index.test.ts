@@ -15,11 +15,14 @@ describe('fourier', async () => {
       for (const fixture of fourierFixtures) {
         describe(fixture.name, () => {
           const buffers = createBuffers(device, fixture.windowSize);
-          const createFourier = fouriers[mode];
-          const fourier = createFourier(device);
-          fourier.configure(buffers.signal, {
-            windowSize: fixture.windowSize,
-            windowCount,
+          const createFourierCell = fouriers[mode];
+          const fourierCell = createFourierCell(device);
+          const fourier = fourierCell.get({
+            signal: buffers.signal,
+            config: {
+              windowSize: fixture.windowSize,
+              windowCount,
+            },
           });
           const reader = createComplexGpuBufferReader({
             device,
@@ -43,7 +46,7 @@ describe('fourier', async () => {
           });
 
           afterAll(() => {
-            fourier.destroy();
+            fourierCell.dispose();
             reader.destroy();
             buffers.destroy();
           });

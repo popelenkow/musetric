@@ -23,6 +23,7 @@ export type SpectrogramWindowName = (typeof allSpectrogramWindowNames)[number];
 
 export type SpectrogramConfig = {
   canvas: OffscreenCanvas;
+  fourierMode: FourierMode;
   windowSize: number;
   sampleRate: number;
   visibleTimeBefore: number;
@@ -37,6 +38,7 @@ export type SpectrogramConfig = {
 };
 export const allSpectrogramConfigKeys = createConfigKeys<SpectrogramConfig>()([
   'canvas',
+  'fourierMode',
   'windowSize',
   'sampleRate',
   'visibleTimeBefore',

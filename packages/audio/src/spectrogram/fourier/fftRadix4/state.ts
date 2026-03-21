@@ -1,74 +1,74 @@
+import { type ResourceCell } from '@musetric/resource-utils';
 import { type ComplexGpuBuffer } from '../../common/complexArray.js';
 import { type FourierConfig } from '../config.js';
 import { assertWindowSizePowerOfTwo } from '../isPowerOfTwo.js';
-import { createParams, type StateParams } from './params.js';
-import { createReversePipeline, createTransformPipeline } from './pipeline.js';
-import { createReverseTable } from './reverseTable.js';
-import { createTrigTable } from './trigTable.js';
+import { createParamsCell, type StateParams } from './params.js';
+import { type Pipelines } from './pipeline.js';
+import { createReverseBindGroupCell } from './reverseBindGroup.js';
+import { createReverseTableCell } from './reverseTable.js';
+import { createTransformBindGroupCell } from './transformBindGroup.js';
+import { createTrigTableCell } from './trigTable.js';
 
-type Pipelines = {
-  reverse: GPUComputePipeline;
-  transform: GPUComputePipeline;
-};
 type BindGroups = {
   reverse: GPUBindGroup;
   transform: GPUBindGroup;
+};
+export type StateArg = {
+  signal: ComplexGpuBuffer;
+  config: FourierConfig;
 };
 export type State = {
   pipelines: Pipelines;
   bindGroups: BindGroups;
   params: StateParams;
-  configure: (signal: ComplexGpuBuffer, config: FourierConfig) => void;
-  destroy: () => void;
 };
-export const createState = (device: GPUDevice) => {
-  const pipelines: Pipelines = {
-    reverse: createReversePipeline(device),
-    transform: createTransformPipeline(device),
-  };
 
-  const params = createParams(device);
-  const reverseTable = createReverseTable(device);
-  const trigTable = createTrigTable(device);
-
-  const ref: State = {
+export const createStateCell = (
+  device: GPUDevice,
+  pipelines: Pipelines,
+): ResourceCell<StateArg, State> => {
+  const paramsCell = createParamsCell(device);
+  const reverseTableCell = createReverseTableCell(device);
+  const trigTableCell = createTrigTableCell(device);
+  const reverseBindGroupCell = createReverseBindGroupCell(device, pipelines);
+  const transformBindGroupCell = createTransformBindGroupCell(
+    device,
     pipelines,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    bindGroups: undefined!,
-    params,
-    configure: (signal, config) => {
-      const { windowSize } = config;
-      assertWindowSizePowerOfTwo(windowSize);
-      params.write(config);
-      reverseTable.resize(params.value.reverseWidth);
-      trigTable.resize(windowSize);
-      ref.bindGroups = {
-        reverse: device.createBindGroup({
-          label: 'fft4-reverse-bind-group',
-          layout: pipelines.reverse.getBindGroupLayout(0),
-          entries: [
-            { binding: 0, resource: { buffer: signal.real } },
-            { binding: 1, resource: { buffer: reverseTable.buffer } },
-            { binding: 2, resource: { buffer: params.buffer } },
-          ],
+  );
+
+  return {
+    get: (arg) => {
+      const { signal, config } = arg;
+      assertWindowSizePowerOfTwo(config.windowSize);
+      const params = paramsCell.get(config);
+      const reverseTable = reverseTableCell.get(params.value.reverseWidth);
+      const trigTable = trigTableCell.get(config.windowSize);
+      const bindGroups = {
+        reverse: reverseBindGroupCell.get({
+          signal: signal.real,
+          reverseTable,
+          params: params.buffer,
         }),
-        transform: device.createBindGroup({
-          label: 'fft4-transform-bind-group',
-          layout: pipelines.transform.getBindGroupLayout(0),
-          entries: [
-            { binding: 0, resource: { buffer: signal.real } },
-            { binding: 1, resource: { buffer: signal.imag } },
-            { binding: 2, resource: { buffer: trigTable.buffer } },
-            { binding: 3, resource: { buffer: params.buffer } },
-          ],
+        transform: transformBindGroupCell.get({
+          real: signal.real,
+          imag: signal.imag,
+          trigTable,
+          params: params.buffer,
         }),
       };
+
+      return {
+        pipelines,
+        bindGroups,
+        params,
+      };
     },
-    destroy: () => {
-      params.destroy();
-      reverseTable.destroy();
-      trigTable.destroy();
+    dispose: () => {
+      transformBindGroupCell.dispose();
+      reverseBindGroupCell.dispose();
+      trigTableCell.dispose();
+      reverseTableCell.dispose();
+      paramsCell.dispose();
     },
   };
-  return ref;
 };
