@@ -56,7 +56,7 @@ export type SpectrogramProcessorTimer = {
   markers: SpectrogramMarkers;
   resolve: (encoder: GPUCommandEncoder) => void;
   finish: () => Promise<void>;
-  destroy: () => void;
+  dispose: () => void;
 };
 
 export const createSpectrogramProcessorTimer = (
@@ -79,7 +79,7 @@ export const createSpectrogramProcessorTimer = (
       finish: async () => {
         /** Nothing */
       },
-      destroy: () => {
+      dispose: () => {
         /** Nothing */
       },
     };
@@ -119,7 +119,7 @@ export const createSpectrogramProcessorTimer = (
         );
       onMetrics(sortedMetrics);
     },
-    destroy: timer.gpu.destroy,
+    dispose: timer.gpu.dispose,
   };
 
   return processorTimer;

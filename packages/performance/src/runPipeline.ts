@@ -50,7 +50,7 @@ export const runPipeline = async (
     await processor.render(wave, progress);
     await waitNextFrame(15);
   }
-  processor.destroy();
+  processor.dispose();
 
   const first = metricsArray[0] ?? {};
   const average: Record<string, number> = {};
