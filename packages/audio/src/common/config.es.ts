@@ -6,13 +6,13 @@ export const createConfigKeys =
     keys;
 
 export const extractConfig = <Config>(
-  config: Config,
+  config: Partial<Config>,
   keys: readonly (keyof Config)[],
-): Config =>
+): Partial<Config> =>
   keys.reduce(
     (result, key) => ({ ...result, [key]: config[key] }),
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    {} as Config,
+    {} as Partial<Config>,
   );
 
 export const isCompleteConfig = <Config>(

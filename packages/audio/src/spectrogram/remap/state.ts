@@ -2,7 +2,7 @@ import {
   createResourceCell,
   type ResourceCell,
 } from '@musetric/resource-utils';
-import { type SpectrogramConfig } from '../config.es.js';
+import { type SpectrogramConfig } from '../config.cross.js';
 import { createParamsCell, type StateParams } from './params.js';
 
 export type Config = Pick<

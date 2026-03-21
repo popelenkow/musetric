@@ -22,6 +22,7 @@ export const allSpectrogramWindowNames = [
 export type SpectrogramWindowName = (typeof allSpectrogramWindowNames)[number];
 
 export type SpectrogramConfig = {
+  canvas: OffscreenCanvas;
   windowSize: number;
   sampleRate: number;
   visibleTimeBefore: number;
@@ -35,6 +36,7 @@ export type SpectrogramConfig = {
   colors: ViewColors;
 };
 export const allSpectrogramConfigKeys = createConfigKeys<SpectrogramConfig>()([
+  'canvas',
   'windowSize',
   'sampleRate',
   'visibleTimeBefore',
@@ -48,7 +50,7 @@ export const allSpectrogramConfigKeys = createConfigKeys<SpectrogramConfig>()([
   'colors',
 ]);
 
-export const extractSpectrogramConfig = (config: SpectrogramConfig) =>
+export const extractSpectrogramConfig = (config: Partial<SpectrogramConfig>) =>
   extractConfig<SpectrogramConfig>(config, allSpectrogramConfigKeys);
 
 const isConfigComplete = (

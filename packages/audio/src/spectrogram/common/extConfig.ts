@@ -1,4 +1,4 @@
-import type { SpectrogramConfig } from '../config.es.js';
+import type { SpectrogramConfig } from '../config.cross.js';
 
 export type ExtSpectrogramConfig = SpectrogramConfig & {
   windowCount: number;

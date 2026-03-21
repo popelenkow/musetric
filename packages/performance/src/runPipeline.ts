@@ -19,6 +19,7 @@ export const runPipeline = async (
 }> => {
   const metricsArray: Record<string, number>[] = [];
   const config: SpectrogramConfig = {
+    canvas,
     windowSize,
     sampleRate: defaultSampleRate,
     visibleTimeBefore: 2.0,
@@ -40,7 +41,6 @@ export const runPipeline = async (
   };
   const processor = createSpectrogramProcessor({
     device,
-    canvas,
     fourierMode,
     config,
     onMetrics: (metrics) => metricsArray.push(metrics),

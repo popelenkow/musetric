@@ -2,7 +2,7 @@ import {
   applyPatchConfig,
   type ApplyPatchConfigOptions,
 } from '../../common/patchConfig.es.js';
-import type { SpectrogramConfig } from '../config.es.js';
+import type { SpectrogramConfig } from '../config.cross.js';
 
 export const applySpectrogramPatchConfig = (
   options: ApplyPatchConfigOptions<SpectrogramConfig>,
