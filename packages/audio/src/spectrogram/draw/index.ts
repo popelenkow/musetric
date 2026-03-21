@@ -1,16 +1,14 @@
-import {
-  createResourceCell,
-  type ResourceCell,
-} from '@musetric/resource-utils';
+import { type ResourceCell } from '@musetric/resource-utils';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
-import { type SpectrogramConfig } from '../config.es.js';
+import { type SpectrogramConfig } from '../config.cross.js';
+import { createBindGroupCell } from './bindGroup.js';
+import { createCanvasCell } from './canvas.js';
 import { createColorsCell } from './colors.js';
-import { createPipeline } from './pipeline.js';
 import { createStateProgressCell } from './progress.js';
 
 export type SpectrogramDrawConfig = Pick<
   SpectrogramConfig,
-  'viewSize' | 'visibleTimeBefore' | 'visibleTimeAfter' | 'colors'
+  'canvas' | 'viewSize' | 'visibleTimeBefore' | 'visibleTimeAfter' | 'colors'
 >;
 
 export type SpectrogramDraw = {
@@ -24,15 +22,9 @@ export type SpectrogramDrawArg = {
 
 export const createSpectrogramDrawCell = (
   device: GPUDevice,
-  canvas: OffscreenCanvas,
   marker?: GPUComputePassTimestampWrites,
 ): ResourceCell<SpectrogramDrawArg, SpectrogramDraw> => {
-  const context = canvas.getContext('webgpu');
-  if (!context) {
-    throw new Error('WebGPU context not available on the canvas');
-  }
-
-  const pipeline = createPipeline(device, context);
+  const canvasCell = createCanvasCell(device);
   const progressCell = createStateProgressCell(device);
   const colorsCell = createColorsCell(device);
   const sampler = device.createSampler({
@@ -40,44 +32,25 @@ export const createSpectrogramDrawCell = (
     magFilter: 'nearest',
     minFilter: 'nearest',
   });
-  const bindGroupCell = createResourceCell({
-    create: (arg: {
-      view: GPUTextureView;
-      colors: GPUBuffer;
-      progress: GPUBuffer;
-    }): GPUBindGroup =>
-      device.createBindGroup({
-        label: 'draw-bind-group',
-        layout: pipeline.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: arg.colors } },
-          { binding: 1, resource: { buffer: arg.progress } },
-          { binding: 2, resource: sampler },
-          { binding: 3, resource: arg.view },
-        ],
-      }),
-    dispose: () => undefined,
-    equals: (current, next) =>
-      current.view === next.view &&
-      current.colors === next.colors &&
-      current.progress === next.progress,
-  });
+  const bindGroupCell = createBindGroupCell(device, sampler);
 
   return {
     get: (arg) => {
       const { view, config } = arg;
-      setOffscreenCanvasSize(canvas, config.viewSize);
+      const canvas = canvasCell.get(config.canvas);
+      setOffscreenCanvasSize(config.canvas, config.viewSize);
       const progress = progressCell.get(config);
       const colors = colorsCell.get(config);
       const bindGroup = bindGroupCell.get({
         view,
         colors: colors.buffer,
         progress: progress.buffer,
+        layout: canvas.pipeline.getBindGroupLayout(0),
       });
 
       return {
         run: (encoder) => {
-          const targetView = context.getCurrentTexture().createView({
+          const targetView = canvas.context.getCurrentTexture().createView({
             label: 'draw-view',
           });
           const pass = encoder.beginRenderPass({
@@ -92,7 +65,7 @@ export const createSpectrogramDrawCell = (
             ],
             timestampWrites: marker,
           });
-          pass.setPipeline(pipeline);
+          pass.setPipeline(canvas.pipeline);
           pass.setBindGroup(0, bindGroup);
           pass.draw(3);
           pass.end();
@@ -100,6 +73,7 @@ export const createSpectrogramDrawCell = (
       };
     },
     dispose: () => {
+      canvasCell.dispose();
       bindGroupCell.dispose();
       colorsCell.dispose();
       progressCell.dispose();

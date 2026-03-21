@@ -1,10 +1,9 @@
-import type { FourierMode, SpectrogramConfig } from './config.es.js';
+import type { FourierMode, SpectrogramConfig } from './config.cross.js';
 
 export type ToSpectrogramWorkerMessage =
   | {
       type: 'init';
-      canvas: OffscreenCanvas;
-      config: SpectrogramConfig;
+      config: Partial<SpectrogramConfig>;
       progress: number;
       waveBuffer?: SharedArrayBuffer;
       fourierMode: FourierMode;

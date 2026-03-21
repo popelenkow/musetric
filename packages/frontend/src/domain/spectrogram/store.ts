@@ -46,6 +46,15 @@ export const useSpectrogramStore = create<State>((set, get) => {
       });
     },
   );
+  useSettingsStore.subscribe(
+    (state) => state,
+    (state) => {
+      get().port?.postMessage({
+        type: 'config',
+        patch: extractSpectrogramConfig(state),
+      });
+    },
+  );
 
   return {
     status: 'pending',
@@ -75,9 +84,9 @@ export const useSpectrogramStore = create<State>((set, get) => {
       get().port?.postMessage(
         {
           type: 'init',
-          canvas: offscreenCanvas,
           config: extractSpectrogramConfig({
             ...settings,
+            canvas: offscreenCanvas,
             viewSize,
           }),
           progress,
@@ -86,7 +95,6 @@ export const useSpectrogramStore = create<State>((set, get) => {
         },
         [offscreenCanvas],
       );
-
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
         get().port?.postMessage({
           type: 'config',
@@ -94,26 +102,12 @@ export const useSpectrogramStore = create<State>((set, get) => {
         });
       });
 
-      const unsubscribeSettings = useSettingsStore.subscribe(
-        (state) => state,
-        (state) => {
-          get().port?.postMessage({
-            type: 'config',
-            patch: extractSpectrogramConfig({
-              ...state,
-              viewSize: getCanvasSize(canvas),
-            }),
-          });
-        },
-      );
-
       return () => {
-        unsubscribeSettings();
         unsubscribeResizeObserver();
         get().port?.postMessage({
           type: 'deinit',
         });
-        set({ port: undefined, status: 'pending' });
+        set({ status: 'pending' });
       };
     },
   };

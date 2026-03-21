@@ -12,7 +12,7 @@ import { usePlayerStore } from '../player/store.js';
 export type SettingsState = {
   fourierMode: FourierMode;
   open: boolean;
-} & Omit<SpectrogramConfig, 'viewSize'>;
+} & Omit<SpectrogramConfig, 'viewSize' | 'canvas'>;
 
 const initialState: SettingsState = {
   fourierMode: 'fftRadix4',

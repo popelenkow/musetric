@@ -7,7 +7,7 @@ export * from './common/patchConfig.js';
 export * from './common/processorTimer.js';
 export * from './common/timer/index.js';
 export * from './common/windowFunction.js';
-export * from './config.es.js';
+export * from './config.cross.js';
 export * from './decibelify/index.js';
 export * from './draw/index.js';
 export * from './fourier/config.js';

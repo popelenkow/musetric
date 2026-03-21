@@ -1,4 +1,4 @@
-import type { FourierMode } from '../config.es.js';
+import type { FourierMode } from '../config.cross.js';
 import { createFftRadix2 } from './fftRadix2/index.js';
 import { createFftRadix4 } from './fftRadix4/index.js';
 import type { CreateFourier } from './types.js';

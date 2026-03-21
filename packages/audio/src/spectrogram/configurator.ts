@@ -5,7 +5,7 @@ import {
   buildSpectrogramConfig,
   type FourierMode,
   type SpectrogramConfig,
-} from './config.es.js';
+} from './config.cross.js';
 import {
   createSpectrogramDecibelifyCell,
   type SpectrogramDecibelify,
@@ -57,14 +57,13 @@ export type SpectrogramConfigurator = {
 export type CreateSpectrogramConfiguratorOptions = {
   device: GPUDevice;
   fourierMode: FourierMode;
-  canvas: OffscreenCanvas;
   markers: SpectrogramMarkers;
 };
 
 export const createSpectrogramConfigurator = (
   options: CreateSpectrogramConfiguratorOptions,
 ): SpectrogramConfigurator => {
-  const { device, fourierMode, canvas, markers } = options;
+  const { device, fourierMode, markers } = options;
 
   let draftConfig: Partial<SpectrogramConfig> = {};
   let config: ExtSpectrogramConfig | undefined = undefined;
@@ -81,7 +80,7 @@ export const createSpectrogramConfigurator = (
     magnitudify: createSpectrogramMagnitudifyCell(device, markers.magnitudify),
     decibelify: createSpectrogramDecibelifyCell(device, markers.decibelify),
     remap: createSpectrogramRemapCell(device, markers.remap),
-    draw: createSpectrogramDrawCell(device, canvas, markers.draw),
+    draw: createSpectrogramDrawCell(device, markers.draw),
   };
 
   const buildConfig = (): ExtSpectrogramConfig => {

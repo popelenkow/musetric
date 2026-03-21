@@ -11,7 +11,7 @@ export * from './decoder/portMessage.cross.js';
 export * from './player/audioPlayer.js';
 export * from './player/port.js';
 export * from './player/portMessage.es.js';
-export * from './spectrogram/config.es.js';
+export * from './spectrogram/config.cross.js';
 export * from './spectrogram/port.js';
 export * from './spectrogram/portMessage.cross.js';
 export * from './waveform/port.js';

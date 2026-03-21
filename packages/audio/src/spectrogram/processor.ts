@@ -3,7 +3,7 @@ import {
   createSpectrogramProcessorTimer,
   type SpectrogramProcessorMetrics,
 } from './common/processorTimer.js';
-import { type FourierMode, type SpectrogramConfig } from './config.es.js';
+import { type FourierMode, type SpectrogramConfig } from './config.cross.js';
 import {
   createSpectrogramConfigurator,
   type SpectrogramRuntime,
@@ -19,7 +19,6 @@ export type SpectrogramProcessor = {
 export type CreateSpectrogramProcessorOptions = {
   device: GPUDevice;
   fourierMode: FourierMode;
-  canvas: OffscreenCanvas;
   config?: Partial<SpectrogramConfig>;
   onMetrics?: (metrics: SpectrogramProcessorMetrics) => void;
 };
@@ -27,7 +26,7 @@ export type CreateSpectrogramProcessorOptions = {
 export const createSpectrogramProcessor = (
   options: CreateSpectrogramProcessorOptions,
 ): SpectrogramProcessor => {
-  const { device, fourierMode, canvas, onMetrics } = options;
+  const { device, fourierMode, onMetrics } = options;
 
   const timer = createSpectrogramProcessorTimer(device, onMetrics);
   const { markers } = timer;
@@ -35,7 +34,6 @@ export const createSpectrogramProcessor = (
   const configurator = createSpectrogramConfigurator({
     device,
     fourierMode,
-    canvas,
     markers,
   });
   configurator.updateConfig(options.config ?? {});

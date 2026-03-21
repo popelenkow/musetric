@@ -39,7 +39,6 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
 
         const processor = createSpectrogramProcessor({
           device,
-          canvas: message.canvas,
           fourierMode: message.fourierMode,
           config: message.config,
           onMetrics: profiling
