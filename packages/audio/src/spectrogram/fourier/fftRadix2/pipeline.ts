@@ -1,6 +1,11 @@
 import reverseShader from './reverse.wgsl?raw';
 import transformShader from './transform.wgsl?raw';
 
+export type Pipelines = {
+  reverse: GPUComputePipeline;
+  transform: GPUComputePipeline;
+};
+
 export const createReversePipeline = (device: GPUDevice) => {
   const module = device.createShaderModule({
     label: 'fft2-reverse-shader',

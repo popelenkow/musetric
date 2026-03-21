@@ -91,7 +91,6 @@ export const useSpectrogramStore = create<State>((set, get) => {
           }),
           progress,
           waveBuffer: channels?.[0]?.buffer,
-          fourierMode: settings.fourierMode,
         },
         [offscreenCanvas],
       );

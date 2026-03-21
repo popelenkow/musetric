@@ -1,4 +1,4 @@
-import type { FourierMode, SpectrogramConfig } from './config.cross.js';
+import type { SpectrogramConfig } from './config.cross.js';
 
 export type ToSpectrogramWorkerMessage =
   | {
@@ -6,7 +6,6 @@ export type ToSpectrogramWorkerMessage =
       config: Partial<SpectrogramConfig>;
       progress: number;
       waveBuffer?: SharedArrayBuffer;
-      fourierMode: FourierMode;
     }
   | {
       type: 'deinit';

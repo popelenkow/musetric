@@ -10,7 +10,6 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import { usePlayerStore } from '../player/store.js';
 
 export type SettingsState = {
-  fourierMode: FourierMode;
   open: boolean;
 } & Omit<SpectrogramConfig, 'viewSize' | 'canvas'>;
 
