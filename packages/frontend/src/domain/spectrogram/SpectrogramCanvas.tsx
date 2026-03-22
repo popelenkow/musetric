@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewError } from '../../components/ViewError.js';
 import { ViewPending } from '../../components/ViewPending.js';
@@ -9,17 +9,16 @@ import { useSpectrogramStore } from './store.js';
 
 export const SpectrogramCanvas: FC = () => {
   const { t } = useTranslation();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
   const seek = usePlayerStore((s) => s.seek);
   const decoderStatus = useDecoderStore((s) => s.status);
   const spectrogramStatus = useSpectrogramStore((s) => s.status);
   const init = useSpectrogramStore((s) => s.init);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
     if (!canvas) return;
     return init(canvas);
-  }, [init]);
+  }, [canvas, init]);
 
   if (decoderStatus === 'error' || spectrogramStatus === 'error') {
     return <ViewError message={t('pages.project.progress.error.audioTrack')} />;
@@ -31,7 +30,7 @@ export const SpectrogramCanvas: FC = () => {
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={setCanvas}
       style={{ width: '100%', height: '100%', display: 'block' }}
       onClick={async (event) => {
         const { visibleTimeBefore, visibleTimeAfter, sampleRate } =
