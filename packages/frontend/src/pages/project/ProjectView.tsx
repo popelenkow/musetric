@@ -5,6 +5,7 @@ import { useDecoderStore } from '../../domain/decoder/store.js';
 import { Player } from '../../domain/player/Player.js';
 import { usePlayerStore } from '../../domain/player/store.js';
 import { ProjectSettings } from '../../domain/settings/field/ProjectSettings.js';
+import { SpectrogramAnalysis } from '../../domain/spectralAnalysis/SpectrogramAnalysis.js';
 import { SpectrogramCanvas } from '../../domain/spectrogram/SpectrogramCanvas.js';
 import { Subtitle } from '../../domain/subtitle/view.js';
 import { WaveformCanvas } from '../../domain/waveform/WaveformCanvas.js';
@@ -50,6 +51,7 @@ export const ProjectView: FC<ProjectViewProps> = (props) => {
           <WaveformCanvas projectId={project.id} type='lead' />
         </Box>
         <Subtitle projectId={project.id} />
+        <SpectrogramAnalysis />
         <Player />
       </Stack>
     </ProjectLayout>
