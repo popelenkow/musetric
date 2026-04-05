@@ -30,13 +30,13 @@ export const extractPathParams = (
 };
 
 export const makePath = (pattern: string, params: NativeParams): string => {
-  const path = pattern.replace(/:([^/]+)/g, (_, key) => {
+  const normalizedPattern = pattern.replace(/\/\*/g, '').replace(/\*/g, '');
+
+  return normalizedPattern.replace(/:([^/]+)/g, (_, key) => {
     const value = params[key];
     if (value === undefined) {
       throw new Error(`Missing value for parameter "${key}"`);
     }
     return value;
   });
-
-  return path.replace('/*', '').replace('*', '');
 };
