@@ -32,12 +32,12 @@ export const createDecoderWorkerRuntime = (
   };
 
   port.bindMethods({
-    init: async (message) => {
+    mount: async (message) => {
       state.projectId = message.projectId;
       state.sampleRate = message.sampleRate;
       await decodeAudioTrack(message.projectId, message.sampleRate);
     },
-    deinit: () => {
+    unmount: () => {
       state.projectId = undefined;
       state.sampleRate = 0;
     },

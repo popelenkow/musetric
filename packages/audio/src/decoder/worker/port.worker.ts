@@ -6,7 +6,7 @@ import {
 import {
   type DecoderCommandMethods,
   type DecoderEventMethods,
-} from '../portMessage.cross.js';
+} from '../protocol.cross.js';
 
 export type DecoderWorkerPort = TypedMessagePort<
   typeof self,

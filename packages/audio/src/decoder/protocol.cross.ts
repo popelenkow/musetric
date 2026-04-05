@@ -1,8 +1,8 @@
 import { type ChannelArrays } from '../common/channelBuffers.es.js';
 
 export type DecoderCommandMethods = {
-  init: (message: { projectId: number; sampleRate: number }) => void;
-  deinit: () => void;
+  mount: (message: { projectId: number; sampleRate: number }) => void;
+  unmount: () => void;
 };
 
 export type DecoderEventMethods = {

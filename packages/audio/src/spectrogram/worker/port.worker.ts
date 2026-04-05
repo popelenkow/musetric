@@ -6,7 +6,7 @@ import {
 import {
   type SpectrogramCommandMethods,
   type SpectrogramEventMethods,
-} from '../portMessage.cross.js';
+} from '../protocol.cross.js';
 
 export type SpectrogramWorkerPort = TypedMessagePort<
   typeof self,

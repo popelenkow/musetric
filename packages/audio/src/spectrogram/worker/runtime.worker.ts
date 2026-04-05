@@ -46,7 +46,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   };
 
   port.bindMethods({
-    init: async (message) => {
+    mount: async (message) => {
       state.processor.updateConfig(message.config);
       state.progress = message.progress;
       state.wave = message.waveBuffer
@@ -54,7 +54,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
         : undefined;
       await render();
     },
-    deinit: () => {
+    unmount: () => {
       state.processor.dispose();
       state.wave = undefined;
       state.progress = 0;

@@ -59,12 +59,12 @@ export const useDecoderStore = create<State>()(
         };
       },
       init: (projectId, sampleRate) => {
-        get().port?.methods.init({
+        get().port?.methods.mount({
           projectId,
           sampleRate,
         });
         return () => {
-          get().port?.methods.deinit();
+          get().port?.methods.unmount();
           set(initialState);
         };
       },

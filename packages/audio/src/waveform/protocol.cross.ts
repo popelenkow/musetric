@@ -4,7 +4,7 @@ import type { ViewSize } from '../common/viewSize.es.js';
 export type WaveType = 'lead' | 'backing' | 'instrumental';
 
 export type WaveformCommandMethods = {
-  init: (message: {
+  mount: (message: {
     projectId: number;
     waveType: WaveType;
     progress: number;
@@ -12,7 +12,7 @@ export type WaveformCommandMethods = {
     colors: ViewColors;
     viewSize: ViewSize;
   }) => void;
-  deinit: () => void;
+  unmount: () => void;
   progress: (message: { progress: number }) => void;
   colors: (message: { colors: ViewColors }) => void;
   resize: (message: { viewSize: ViewSize }) => void;

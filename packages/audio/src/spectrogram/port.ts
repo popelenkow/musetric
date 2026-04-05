@@ -6,7 +6,7 @@ import {
 import {
   type SpectrogramCommandMethods,
   type SpectrogramEventMethods,
-} from './portMessage.cross.js';
+} from './protocol.cross.js';
 
 export type SpectrogramMainPort = TypedMessagePort<
   Worker,
@@ -16,8 +16,8 @@ export type SpectrogramMainPort = TypedMessagePort<
 
 const spectrogramCommandMethodKeys =
   createObjectKeys<SpectrogramCommandMethods>()([
-    'init',
-    'deinit',
+    'mount',
+    'unmount',
     'wave',
     'progress',
     'config',
@@ -32,7 +32,7 @@ export const createSpectrogramMainPort = (
     SpectrogramCommandMethods,
     SpectrogramEventMethods
   >(worker, spectrogramCommandMethodKeys, {
-    init: (message) => (message.config.canvas ? [message.config.canvas] : []),
+    mount: (message) => (message.config.canvas ? [message.config.canvas] : []),
   });
   return port;
 };
