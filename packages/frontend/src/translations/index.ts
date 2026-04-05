@@ -13,6 +13,5 @@ export const initI18next = async () => {
   return i18next.init({
     resources,
     lng,
-    showSupportNotice: false,
   });
 };
