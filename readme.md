@@ -13,10 +13,12 @@ yarn dev:start
 
 ```bash
 yarn
-yarn check:deps
+yarn check:security
+yarn check:deps:fix
 yarn check:ts
-yarn check:lint
-yarn check:format
+yarn check:lint:fix
+yarn check:translations:fix
+yarn check:format:fix
 yarn test
 ```
 
