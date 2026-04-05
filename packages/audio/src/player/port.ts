@@ -1,11 +1,12 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
 import {
-  type FromPlayerWorkletMessage,
+  type PlayerCommandMethods,
+  type PlayerEventMethods,
   playerProcessorName,
-  type ToPlayerWorkletMessage,
 } from './portMessage.es.js';
 
 export const createPlayerNode = async (
@@ -23,11 +24,22 @@ export const createPlayerNode = async (
 
 export type PlayerMainPort = TypedMessagePort<
   MessagePort,
-  FromPlayerWorkletMessage,
-  ToPlayerWorkletMessage
+  PlayerCommandMethods,
+  PlayerEventMethods
 >;
-export const getPlayerPort = (node: AudioWorkletNode): PlayerMainPort =>
-  wrapMessagePort(node.port).typed<
-    FromPlayerWorkletMessage,
-    ToPlayerWorkletMessage
-  >();
+
+const playerCommandMethodKeys = createObjectKeys<PlayerCommandMethods>()([
+  'init',
+  'deinit',
+  'play',
+  'pause',
+]);
+
+export const getPlayerPort = (node: AudioWorkletNode): PlayerMainPort => {
+  const port = createTypedPort<
+    MessagePort,
+    PlayerCommandMethods,
+    PlayerEventMethods
+  >(node.port, playerCommandMethodKeys);
+  return port;
+};

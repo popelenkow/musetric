@@ -41,8 +41,7 @@ export const usePlayerStore = create<State>()(
       (state) => state.channels,
       (channels) => {
         if (!channels) return;
-        get().player?.port.postMessage({
-          type: 'init',
+        get().player?.port.methods.init({
           buffers: toChannelBuffers(channels),
         });
       },

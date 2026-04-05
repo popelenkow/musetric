@@ -1,29 +1,17 @@
 import type { SpectrogramConfig } from './config.cross.js';
 
-export type ToSpectrogramWorkerMessage =
-  | {
-      type: 'init';
-      config: Partial<SpectrogramConfig>;
-      progress: number;
-      waveBuffer?: SharedArrayBuffer;
-    }
-  | {
-      type: 'deinit';
-    }
-  | {
-      type: 'wave';
-      waveBuffer: SharedArrayBuffer;
-    }
-  | {
-      type: 'progress';
-      progress: number;
-    }
-  | {
-      type: 'config';
-      patch: Partial<SpectrogramConfig>;
-    };
+export type SpectrogramCommandMethods = {
+  init: (message: {
+    config: Partial<SpectrogramConfig>;
+    progress: number;
+    waveBuffer?: SharedArrayBuffer;
+  }) => void;
+  deinit: () => void;
+  wave: (message: { waveBuffer: SharedArrayBuffer }) => void;
+  progress: (message: { progress: number }) => void;
+  config: (message: { patch: Partial<SpectrogramConfig> }) => void;
+};
 
-export type FromSpectrogramWorkerMessage = {
-  type: 'state';
-  status: 'error' | 'success';
+export type SpectrogramEventMethods = {
+  state: (message: { status: 'error' | 'success' }) => void;
 };

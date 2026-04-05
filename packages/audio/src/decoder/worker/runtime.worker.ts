@@ -1,6 +1,4 @@
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { decodeMp4 } from '../mp4/index.js';
-import { type ToDecoderWorkerMessage } from '../portMessage.cross.js';
 import { createDecoderWorkerPort } from './port.worker.js';
 
 export type DecoderWorkerState = {
@@ -20,22 +18,20 @@ export const createDecoderWorkerRuntime = (
     try {
       const encodedBuffer = await getEncodedBuffer(projectId);
       const decoded = await decodeMp4(encodedBuffer, sampleRate);
-      port.postMessage({
-        type: 'decoded',
+      port.methods.decoded({
         channels: decoded.channels,
         frameCount: decoded.frameCount,
         duration: decoded.frameCount / sampleRate,
       });
     } catch (error) {
       console.error('Failed to load and decode project audio track', error);
-      port.postMessage({
-        type: 'state',
+      port.methods.state({
         status: 'error',
       });
     }
   };
 
-  port.onmessage = createPortMessageHandler<ToDecoderWorkerMessage>({
+  port.bindMethods({
     init: async (message) => {
       state.projectId = message.projectId;
       state.sampleRate = message.sampleRate;

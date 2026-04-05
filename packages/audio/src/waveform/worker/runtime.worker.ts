@@ -1,10 +1,6 @@
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import type { ViewColors } from '../../common/colors.es.js';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
-import {
-  type ToWaveformWorkerMessage,
-  type WaveType,
-} from '../portMessage.cross.js';
+import { type WaveType } from '../portMessage.cross.js';
 import {
   createWaveformProcessor,
   type WaveformProcessor,
@@ -34,7 +30,7 @@ export const createWaveformWorkerRuntime = (
     return true;
   };
 
-  port.onmessage = createPortMessageHandler<ToWaveformWorkerMessage>({
+  port.bindMethods({
     init: async (message) => {
       try {
         const { progress, projectId, waveType, canvas, colors, viewSize } =
@@ -48,14 +44,12 @@ export const createWaveformWorkerRuntime = (
         const wave = await getWave(projectId, waveType);
         state.wave = wave;
         render();
-        port.postMessage({
-          type: 'state',
+        port.methods.state({
           status: 'success',
         });
       } catch (error) {
         console.error('Failed to load project wave', error);
-        port.postMessage({
-          type: 'state',
+        port.methods.state({
           status: 'error',
         });
       }

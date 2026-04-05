@@ -1,12 +1,10 @@
 import {
   createSpectrogramMainPort,
   extractSpectrogramConfig,
-  type FromSpectrogramWorkerMessage,
   getCanvasSize,
   type SpectrogramMainPort,
   subscribeResizeObserver,
 } from '@musetric/audio';
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
@@ -30,8 +28,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
     (state) => state.channels?.[0]?.buffer,
     (waveBuffer) => {
       if (!waveBuffer) return;
-      get().port?.postMessage({
-        type: 'wave',
+      get().port?.methods.wave({
         waveBuffer,
       });
     },
@@ -40,8 +37,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
   usePlayerStore.subscribe(
     (state) => state.progress,
     (progress) => {
-      get().port?.postMessage({
-        type: 'progress',
+      get().port?.methods.progress({
         progress,
       });
     },
@@ -49,8 +45,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
   useSettingsStore.subscribe(
     (state) => state,
     (state) => {
-      get().port?.postMessage({
-        type: 'config',
+      get().port?.methods.config({
         patch: extractSpectrogramConfig(state),
       });
     },
@@ -61,17 +56,17 @@ export const useSpectrogramStore = create<State>((set, get) => {
     mount: () => {
       const port = createSpectrogramMainPort(spectrogramWorkerUrl);
       set({ port });
-      port.onerror = () => {
+      port.instance.onerror = () => {
         set({ status: 'error' });
       };
-      port.onmessage = createPortMessageHandler<FromSpectrogramWorkerMessage>({
+      port.bindMethods({
         state: (message) => {
           set({ status: message.status });
         },
       });
 
       return () => {
-        get().port?.terminate();
+        get().port?.instance.terminate();
         set({ port: undefined, status: 'pending' });
       };
     },
@@ -81,31 +76,24 @@ export const useSpectrogramStore = create<State>((set, get) => {
       const settings = useSettingsStore.getState();
       const { channels } = useDecoderStore.getState();
       const { progress } = usePlayerStore.getState();
-      get().port?.postMessage(
-        {
-          type: 'init',
-          config: extractSpectrogramConfig({
-            ...settings,
-            canvas: offscreenCanvas,
-            viewSize,
-          }),
-          progress,
-          waveBuffer: channels?.[0]?.buffer,
-        },
-        [offscreenCanvas],
-      );
+      get().port?.methods.init({
+        config: extractSpectrogramConfig({
+          ...settings,
+          canvas: offscreenCanvas,
+          viewSize,
+        }),
+        progress,
+        waveBuffer: channels?.[0]?.buffer,
+      });
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        get().port?.postMessage({
-          type: 'config',
+        get().port?.methods.config({
           patch: { viewSize: getCanvasSize(canvas) },
         });
       });
 
       return () => {
         unsubscribeResizeObserver();
-        get().port?.postMessage({
-          type: 'deinit',
-        });
+        get().port?.methods.deinit();
         set({ status: 'pending' });
       };
     },

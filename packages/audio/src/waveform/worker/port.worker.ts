@@ -1,31 +1,36 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
-import type {
-  FromWaveformWorkerMessage,
-  ToWaveformWorkerMessage,
+import {
+  type WaveformCommandMethods,
+  type WaveformEventMethods,
 } from '../portMessage.cross.js';
 
 export type WaveformWorkerPort = TypedMessagePort<
   typeof self,
-  ToWaveformWorkerMessage,
-  FromWaveformWorkerMessage
+  WaveformEventMethods,
+  WaveformCommandMethods
 >;
 
+const waveformEventMethodKeys = createObjectKeys<WaveformEventMethods>()([
+  'state',
+]);
+
 export const createWaveformWorkerPort = (): WaveformWorkerPort => {
-  const port = wrapMessagePort(self).typed<
-    ToWaveformWorkerMessage,
-    FromWaveformWorkerMessage
-  >();
+  const port = createTypedPort<
+    typeof self,
+    WaveformEventMethods,
+    WaveformCommandMethods
+  >(self, waveformEventMethodKeys);
   const onError = () => {
-    port.postMessage({
-      type: 'state',
+    port.methods.state({
       status: 'error',
     });
   };
-  port.addEventListener('error', onError);
-  port.addEventListener('unhandledrejection', onError);
-  port.addEventListener('messageerror', onError);
+  port.instance.addEventListener('error', onError);
+  port.instance.addEventListener('unhandledrejection', onError);
+  port.instance.addEventListener('messageerror', onError);
   return port;
 };

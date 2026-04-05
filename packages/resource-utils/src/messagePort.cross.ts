@@ -1,45 +1,78 @@
-import {
-  createMessageHandler,
-  type MessageHandlers,
-} from './messageHandler.js';
-
 type MessagePortLike = {
   // eslint-disable-next-line no-restricted-syntax
-  postMessage(message: unknown, transfer: Transferable[]): void;
-  // eslint-disable-next-line no-restricted-syntax
-  postMessage(message: unknown, options?: StructuredSerializeOptions): void;
+  postMessage(message: unknown, transfer?: Transferable[]): void;
   onmessage: ((event: MessageEvent<unknown>) => unknown) | null;
 };
 
-export type TypedMessagePort<Port extends MessagePortLike, In, Out> = Omit<
-  Port,
-  'postMessage' | 'onmessage'
-> & {
-  // eslint-disable-next-line no-restricted-syntax
-  postMessage(message: Out, transfer: Transferable[]): void;
-  // eslint-disable-next-line no-restricted-syntax
-  postMessage(message: Out, options?: StructuredSerializeOptions): void;
-  onmessage: ((this: Port, event: MessageEvent<In>) => unknown) | null;
+type PortMethods = Record<string, (...args: never[]) => unknown>;
+
+type PortMessage<Methods extends PortMethods> = {
+  [Type in keyof Methods]: {
+    type: Type;
+    payload: Parameters<Methods[Type]>[0];
+  };
+}[keyof Methods];
+
+type PortTransfers<Methods extends PortMethods> = Partial<{
+  [Type in keyof Methods]: (
+    payload: Parameters<Methods[Type]>[0],
+  ) => Transferable[];
+}>;
+
+const createPortMethods = <Methods extends PortMethods>(
+  instance: MessagePortLike,
+  methodKeys: readonly (keyof Methods)[],
+  transfers: PortTransfers<Methods>,
+): Methods => {
+  const methods: Partial<Record<keyof Methods, unknown>> = {};
+
+  for (const type of methodKeys) {
+    methods[type] = (...args: Parameters<Methods[typeof type]>) => {
+      const payload = args[0];
+      const transfer = transfers[type]?.(payload);
+      instance.postMessage({ type, payload }, transfer);
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return methods as Methods;
 };
 
-export const wrapMessagePort = <Port extends MessagePortLike>(port: Port) => ({
-  typed: <In, Out>(): TypedMessagePort<Port, In, Out> =>
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    port as TypedMessagePort<Port, In, Out>,
-});
+export type TypedMessagePort<
+  Port extends MessagePortLike,
+  Methods extends PortMethods,
+  HandlerMethods extends PortMethods,
+> = {
+  instance: Port;
+  methods: Methods;
+  bindMethods: (handlers: HandlerMethods) => void;
+};
 
-export const createPortMessageHandler = <Message extends { type: string }>(
-  handlers: MessageHandlers<Message>,
-) => {
-  const handle = createMessageHandler(handlers);
-  return async (event: MessageEvent<Message>): Promise<void> => {
-    const ok = await handle(event.data);
-    if (!ok) {
-      console.error('Unhandled port message type', {
-        type: event.data.type,
-        expectedTypes: Object.keys(handlers),
-        message: event.data,
-      });
-    }
+export const createTypedPort = <
+  Port extends MessagePortLike,
+  Methods extends PortMethods,
+  HandlerMethods extends PortMethods,
+>(
+  instance: Port,
+  methodKeys: readonly (keyof Methods)[],
+  methodTransfers: PortTransfers<Methods> = {},
+): TypedMessagePort<Port, Methods, HandlerMethods> => {
+  return {
+    instance,
+    methods: createPortMethods(instance, methodKeys, methodTransfers),
+    bindMethods: (handlers) => {
+      const onmessage = (event: MessageEvent<PortMessage<HandlerMethods>>) => {
+        const message = event.data;
+        const handler = handlers[message.type];
+        if (!handler) {
+          console.error('Unhandled port method', message);
+          return;
+        }
+        const { payload } = message;
+        handler(payload);
+      };
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      instance.onmessage = onmessage as MessagePortLike['onmessage'];
+    },
   };
 };

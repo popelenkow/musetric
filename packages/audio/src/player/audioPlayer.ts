@@ -1,5 +1,4 @@
 import { defaultSampleRate } from '@musetric/resource-utils';
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import {
   createPlayerNode,
   getPlayerPort,
@@ -28,7 +27,7 @@ export const createAudioPlayer = async (
   const node = await createPlayerNode(context, playerWorkletUrl);
   const port = getPlayerPort(node);
 
-  port.onmessage = createPortMessageHandler({
+  port.bindMethods({
     ended: () => options.end?.(),
   });
 
@@ -56,21 +55,20 @@ export const createAudioPlayer = async (
       if (context.state === 'suspended') {
         await context.resume();
       }
-      port.postMessage({ type: 'play', startFrame });
+      port.methods.play({ startFrame });
       startTime = context.currentTime;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
     },
     pause: () => {
-      port.postMessage({ type: 'pause' });
+      port.methods.pause();
       cancelAnimationFrame(raf);
     },
     destroy: async () => {
-      totalFrameCount = undefined;
-      cancelAnimationFrame(raf);
-      port.postMessage({ type: 'pause' });
-      port.onmessage = () => undefined;
-      node.port.close();
+      port.methods.pause();
+      port.methods.deinit();
+      port.instance.onmessage = () => undefined;
+      port.instance.close();
       node.disconnect();
       await context.close();
     },

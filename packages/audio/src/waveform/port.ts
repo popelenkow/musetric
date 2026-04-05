@@ -1,24 +1,37 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
 import {
-  type FromWaveformWorkerMessage,
-  type ToWaveformWorkerMessage,
+  type WaveformCommandMethods,
+  type WaveformEventMethods,
 } from './portMessage.cross.js';
 
 export type WaveformMainPort = TypedMessagePort<
   Worker,
-  FromWaveformWorkerMessage,
-  ToWaveformWorkerMessage
+  WaveformCommandMethods,
+  WaveformEventMethods
 >;
+
+const waveformCommandMethodKeys = createObjectKeys<WaveformCommandMethods>()([
+  'init',
+  'deinit',
+  'progress',
+  'colors',
+  'resize',
+]);
 
 export const createWaveformMainPort = (
   waveformWorkerUrl: string | URL,
 ): WaveformMainPort => {
   const worker = new Worker(waveformWorkerUrl, { type: 'module' });
-  return wrapMessagePort(worker).typed<
-    FromWaveformWorkerMessage,
-    ToWaveformWorkerMessage
-  >();
+  const port = createTypedPort<
+    Worker,
+    WaveformCommandMethods,
+    WaveformEventMethods
+  >(worker, waveformCommandMethodKeys, {
+    init: (message) => [message.canvas],
+  });
+  return port;
 };

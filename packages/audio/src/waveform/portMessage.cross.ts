@@ -3,33 +3,21 @@ import type { ViewSize } from '../common/viewSize.es.js';
 
 export type WaveType = 'lead' | 'backing' | 'instrumental';
 
-export type ToWaveformWorkerMessage =
-  | {
-      type: 'init';
-      projectId: number;
-      waveType: WaveType;
-      progress: number;
-      canvas: OffscreenCanvas;
-      colors: ViewColors;
-      viewSize: ViewSize;
-    }
-  | {
-      type: 'deinit';
-    }
-  | {
-      type: 'progress';
-      progress: number;
-    }
-  | {
-      type: 'colors';
-      colors: ViewColors;
-    }
-  | {
-      type: 'resize';
-      viewSize: ViewSize;
-    };
+export type WaveformCommandMethods = {
+  init: (message: {
+    projectId: number;
+    waveType: WaveType;
+    progress: number;
+    canvas: OffscreenCanvas;
+    colors: ViewColors;
+    viewSize: ViewSize;
+  }) => void;
+  deinit: () => void;
+  progress: (message: { progress: number }) => void;
+  colors: (message: { colors: ViewColors }) => void;
+  resize: (message: { viewSize: ViewSize }) => void;
+};
 
-export type FromWaveformWorkerMessage = {
-  type: 'state';
-  status: 'error' | 'success';
+export type WaveformEventMethods = {
+  state: (message: { status: 'error' | 'success' }) => void;
 };

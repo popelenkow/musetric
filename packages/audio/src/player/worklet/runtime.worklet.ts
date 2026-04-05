@@ -1,4 +1,3 @@
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import {
   type ChannelArrays,
   toChannelArrays,
@@ -16,7 +15,7 @@ export const createPlayerWorkletRuntime = (
   let frameOffset = 0;
   let playing = false;
 
-  port.onmessage = createPortMessageHandler({
+  port.bindMethods({
     init: (message) => {
       channels = toChannelArrays(message.buffers);
     },
@@ -55,7 +54,7 @@ export const createPlayerWorkletRuntime = (
       frameOffset += output[0].length;
       if (frameOffset >= frameCount) {
         playing = false;
-        port.postMessage({ type: 'ended' });
+        port.methods.ended();
       }
 
       return true;

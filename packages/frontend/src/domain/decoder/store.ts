@@ -2,9 +2,7 @@ import {
   type ChannelArrays,
   createDecoderMainPort,
   type DecoderMainPort,
-  type FromDecoderWorkerMessage,
 } from '@musetric/audio';
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import decoderWorkerUrl from './decoder.worker.ts?worker&url';
@@ -38,10 +36,10 @@ export const useDecoderStore = create<State>()(
       mount: () => {
         const port = createDecoderMainPort(decoderWorkerUrl);
         set({ port });
-        port.onerror = () => {
+        port.instance.onerror = () => {
           set({ status: 'error' });
         };
-        port.onmessage = createPortMessageHandler<FromDecoderWorkerMessage>({
+        port.bindMethods({
           state: (message) => {
             set({ status: message.status });
           },
@@ -56,21 +54,18 @@ export const useDecoderStore = create<State>()(
         });
 
         return () => {
-          get().port?.terminate();
-          set({ port: undefined, status: 'pending' });
+          get().port?.instance.terminate();
+          set({ port: undefined, ...initialState });
         };
       },
       init: (projectId, sampleRate) => {
-        get().port?.postMessage({
-          type: 'init',
+        get().port?.methods.init({
           projectId,
           sampleRate,
         });
         return () => {
-          get().port?.postMessage({
-            type: 'deinit',
-          });
-          set({ port: undefined, status: 'pending' });
+          get().port?.methods.deinit();
+          set(initialState);
         };
       },
     };

@@ -6,7 +6,6 @@ import {
   subscribeResizeObserver,
   type WaveformMainPort,
 } from '@musetric/audio';
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { create } from 'zustand';
 import { usePlayerStore } from '../player/store.js';
 import { useSettingsStore } from '../settings/store.js';
@@ -32,8 +31,7 @@ export const useWaveformStore = create<State>((set, get) => {
   usePlayerStore.subscribe(
     (state) => state.progress,
     (progress) => {
-      get().port?.postMessage({
-        type: 'progress',
+      get().port?.methods.progress({
         progress,
       });
     },
@@ -42,8 +40,7 @@ export const useWaveformStore = create<State>((set, get) => {
   useSettingsStore.subscribe(
     (state) => state.colors,
     (colors) => {
-      get().port?.postMessage({
-        type: 'colors',
+      get().port?.methods.colors({
         colors,
       });
     },
@@ -54,17 +51,17 @@ export const useWaveformStore = create<State>((set, get) => {
     mount: () => {
       const port = createWaveformMainPort(waveformWorkerUrl);
       set({ port });
-      port.onerror = () => {
+      port.instance.onerror = () => {
         set({ status: 'error' });
       };
-      port.onmessage = createPortMessageHandler({
+      port.bindMethods({
         state: (message) => {
           set({ status: message.status });
         },
       });
 
       return () => {
-        get().port?.terminate();
+        get().port?.instance.terminate();
         set({ port: undefined, status: 'pending' });
       };
     },
@@ -73,32 +70,24 @@ export const useWaveformStore = create<State>((set, get) => {
       const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      get().port?.postMessage(
-        {
-          type: 'init',
-          projectId,
-          waveType: type,
-          progress: usePlayerStore.getState().progress,
-          canvas: offscreenCanvas,
-          colors: useSettingsStore.getState().colors,
-          viewSize,
-        },
-        [offscreenCanvas],
-      );
+      get().port?.methods.init({
+        projectId,
+        waveType: type,
+        progress: usePlayerStore.getState().progress,
+        canvas: offscreenCanvas,
+        colors: useSettingsStore.getState().colors,
+        viewSize,
+      });
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        const nextViewSize = getCanvasSize(canvas);
-        get().port?.postMessage({
-          type: 'resize',
-          viewSize: nextViewSize,
+        get().port?.methods.resize({
+          viewSize: getCanvasSize(canvas),
         });
       });
 
       return () => {
         unsubscribeResizeObserver();
-        get().port?.postMessage({
-          type: 'deinit',
-        });
+        get().port?.methods.deinit();
         set({ status: 'pending' });
       };
     },
