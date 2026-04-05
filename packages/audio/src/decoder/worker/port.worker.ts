@@ -1,31 +1,37 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
 import {
-  type FromDecoderWorkerMessage,
-  type ToDecoderWorkerMessage,
+  type DecoderCommandMethods,
+  type DecoderEventMethods,
 } from '../portMessage.cross.js';
 
 export type DecoderWorkerPort = TypedMessagePort<
   typeof self,
-  ToDecoderWorkerMessage,
-  FromDecoderWorkerMessage
+  DecoderEventMethods,
+  DecoderCommandMethods
 >;
 
+const decoderEventMethodKeys = createObjectKeys<DecoderEventMethods>()([
+  'state',
+  'decoded',
+]);
+
 export const createDecoderWorkerPort = (): DecoderWorkerPort => {
-  const port = wrapMessagePort(self).typed<
-    ToDecoderWorkerMessage,
-    FromDecoderWorkerMessage
-  >();
+  const port = createTypedPort<
+    typeof self,
+    DecoderEventMethods,
+    DecoderCommandMethods
+  >(self, decoderEventMethodKeys);
   const onError = () => {
-    port.postMessage({
-      type: 'state',
+    port.methods.state({
       status: 'error',
     });
   };
-  port.addEventListener('error', onError);
-  port.addEventListener('unhandledrejection', onError);
-  port.addEventListener('messageerror', onError);
+  port.instance.addEventListener('error', onError);
+  port.instance.addEventListener('unhandledrejection', onError);
+  port.instance.addEventListener('messageerror', onError);
   return port;
 };

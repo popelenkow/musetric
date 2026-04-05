@@ -1,24 +1,28 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
-import type {
-  FromPlayerWorkletMessage,
-  ToPlayerWorkletMessage,
+import {
+  type PlayerCommandMethods,
+  type PlayerEventMethods,
 } from '../portMessage.es.js';
 
 export type PlayerWorkletPort = TypedMessagePort<
   MessagePort,
-  ToPlayerWorkletMessage,
-  FromPlayerWorkletMessage
+  PlayerEventMethods,
+  PlayerCommandMethods
 >;
+
+const playerEventMethodKeys = createObjectKeys<PlayerEventMethods>()(['ended']);
 
 export const createPlayerWorkletPort = (
   messagePort: MessagePort,
 ): PlayerWorkletPort => {
-  const port = wrapMessagePort(messagePort).typed<
-    ToPlayerWorkletMessage,
-    FromPlayerWorkletMessage
-  >();
+  const port = createTypedPort<
+    MessagePort,
+    PlayerEventMethods,
+    PlayerCommandMethods
+  >(messagePort, playerEventMethodKeys);
   return port;
 };

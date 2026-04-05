@@ -1,6 +1,4 @@
-import { createPortMessageHandler } from '@musetric/resource-utils/cross/messagePort';
 import { getGpuDevice } from '../common/gpuDevice.js';
-import { type ToSpectrogramWorkerMessage } from '../portMessage.cross.js';
 import {
   createSpectrogramProcessor,
   type SpectrogramProcessor,
@@ -41,14 +39,13 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
     const ok = await processor.render(wave, progress);
     if (ok && !state.initialized) {
       state.initialized = true;
-      port.postMessage({
-        type: 'state',
+      port.methods.state({
         status: 'success',
       });
     }
   };
 
-  port.onmessage = createPortMessageHandler<ToSpectrogramWorkerMessage>({
+  port.bindMethods({
     init: async (message) => {
       state.processor.updateConfig(message.config);
       state.progress = message.progress;
@@ -73,7 +70,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
       await render();
     },
     config: async (message) => {
-      state.processor?.updateConfig(message.patch);
+      state.processor.updateConfig(message.patch);
       await render();
     },
   });

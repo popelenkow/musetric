@@ -1,31 +1,36 @@
+import { createObjectKeys } from '@musetric/resource-utils';
 import {
+  createTypedPort,
   type TypedMessagePort,
-  wrapMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
 import {
-  type FromSpectrogramWorkerMessage,
-  type ToSpectrogramWorkerMessage,
+  type SpectrogramCommandMethods,
+  type SpectrogramEventMethods,
 } from '../portMessage.cross.js';
 
 export type SpectrogramWorkerPort = TypedMessagePort<
   typeof self,
-  ToSpectrogramWorkerMessage,
-  FromSpectrogramWorkerMessage
+  SpectrogramEventMethods,
+  SpectrogramCommandMethods
 >;
 
+const spectrogramEventMethodKeys = createObjectKeys<SpectrogramEventMethods>()([
+  'state',
+]);
+
 export const createSpectrogramWorkerPort = (): SpectrogramWorkerPort => {
-  const port = wrapMessagePort(self).typed<
-    ToSpectrogramWorkerMessage,
-    FromSpectrogramWorkerMessage
-  >();
+  const port = createTypedPort<
+    typeof self,
+    SpectrogramEventMethods,
+    SpectrogramCommandMethods
+  >(self, spectrogramEventMethodKeys);
   const onError = () => {
-    port.postMessage({
-      type: 'state',
+    port.methods.state({
       status: 'error',
     });
   };
-  port.addEventListener('error', onError);
-  port.addEventListener('unhandledrejection', onError);
-  port.addEventListener('messageerror', onError);
+  port.instance.addEventListener('error', onError);
+  port.instance.addEventListener('unhandledrejection', onError);
+  port.instance.addEventListener('messageerror', onError);
   return port;
 };
