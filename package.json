@@ -19,7 +19,7 @@
     "docker:build:cuda": "yarn workspace @musetric/backend docker:build:cuda",
     "docker:start:cpu": "yarn workspace @musetric/backend docker:start:cpu",
     "docker:start:cuda": "yarn workspace @musetric/backend docker:start:cuda",
-    "check:security": "yarn npm audit --all --recursive --severity critical",
+    "check:security": "yarn npm audit --all --recursive --severity moderate",
     "check:deps": "yarn constraints && yarn dedupe --check",
     "check:deps:fix": "yarn constraints --fix && yarn && yarn dedupe",
     "check:ts": "yarn workspaces foreach --all --parallel --interlaced run check:ts",
