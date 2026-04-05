@@ -10,8 +10,8 @@
     "check:ts": "tsc --build",
     "check:lint": "eslint . --cache",
     "check:lint:fix": "eslint . --fix --cache",
-    "check:translations": "i18next -c ./i18next.parser.config.ts --fail-on-update",
-    "check:translations:fix": "i18next -c ./i18next.parser.config.ts"
+    "check:translations": "i18next-cli extract --config ./i18next.config.ts --ci --dry-run",
+    "check:translations:fix": "i18next-cli extract --config ./i18next.config.ts"
   },
   "devDependencies": {
     "@alexanderolsen/libsamplerate-js": "catalog:",
@@ -39,7 +39,7 @@
     "framer-motion": "catalog:",
     "globals": "catalog:",
     "i18next": "catalog:",
-    "i18next-parser": "catalog:",
+    "i18next-cli": "catalog:",
     "mediabunny": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
