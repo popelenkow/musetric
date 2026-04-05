@@ -76,7 +76,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
       const settings = useSettingsStore.getState();
       const { channels } = useDecoderStore.getState();
       const { progress } = usePlayerStore.getState();
-      get().port?.methods.init({
+      get().port?.methods.mount({
         config: extractSpectrogramConfig({
           ...settings,
           canvas: offscreenCanvas,
@@ -93,7 +93,7 @@ export const useSpectrogramStore = create<State>((set, get) => {
 
       return () => {
         unsubscribeResizeObserver();
-        get().port?.methods.deinit();
+        get().port?.methods.unmount();
         set({ status: 'pending' });
       };
     },

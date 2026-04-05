@@ -6,7 +6,7 @@ import {
 import {
   type DecoderCommandMethods,
   type DecoderEventMethods,
-} from './portMessage.cross.js';
+} from './protocol.cross.js';
 
 export type DecoderMainPort = TypedMessagePort<
   Worker,
@@ -15,8 +15,8 @@ export type DecoderMainPort = TypedMessagePort<
 >;
 
 const decoderCommandMethodKeys = createObjectKeys<DecoderCommandMethods>()([
-  'init',
-  'deinit',
+  'mount',
+  'unmount',
 ]);
 
 export const createDecoderMainPort = (

@@ -1,10 +1,10 @@
 import type { ViewColors } from '../../common/colors.es.js';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
-import { type WaveType } from '../portMessage.cross.js';
 import {
   createWaveformProcessor,
   type WaveformProcessor,
 } from '../processor.js';
+import { type WaveType } from '../protocol.cross.js';
 import { createWaveformWorkerPort } from './port.worker.js';
 
 export type WaveformWorkerState = {
@@ -31,7 +31,7 @@ export const createWaveformWorkerRuntime = (
   };
 
   port.bindMethods({
-    init: async (message) => {
+    mount: async (message) => {
       try {
         const { progress, projectId, waveType, canvas, colors, viewSize } =
           message;
@@ -54,7 +54,7 @@ export const createWaveformWorkerRuntime = (
         });
       }
     },
-    deinit: () => {
+    unmount: () => {
       state.wave = undefined;
     },
     progress: (message) => {

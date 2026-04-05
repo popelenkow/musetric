@@ -70,7 +70,7 @@ export const useWaveformStore = create<State>((set, get) => {
       const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();
 
-      get().port?.methods.init({
+      get().port?.methods.mount({
         projectId,
         waveType: type,
         progress: usePlayerStore.getState().progress,
@@ -87,7 +87,7 @@ export const useWaveformStore = create<State>((set, get) => {
 
       return () => {
         unsubscribeResizeObserver();
-        get().port?.methods.deinit();
+        get().port?.methods.unmount();
         set({ status: 'pending' });
       };
     },

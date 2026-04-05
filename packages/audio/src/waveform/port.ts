@@ -6,7 +6,7 @@ import {
 import {
   type WaveformCommandMethods,
   type WaveformEventMethods,
-} from './portMessage.cross.js';
+} from './protocol.cross.js';
 
 export type WaveformMainPort = TypedMessagePort<
   Worker,
@@ -15,8 +15,8 @@ export type WaveformMainPort = TypedMessagePort<
 >;
 
 const waveformCommandMethodKeys = createObjectKeys<WaveformCommandMethods>()([
-  'init',
-  'deinit',
+  'mount',
+  'unmount',
   'progress',
   'colors',
   'resize',
@@ -31,7 +31,7 @@ export const createWaveformMainPort = (
     WaveformCommandMethods,
     WaveformEventMethods
   >(worker, waveformCommandMethodKeys, {
-    init: (message) => [message.canvas],
+    mount: (message) => [message.canvas],
   });
   return port;
 };

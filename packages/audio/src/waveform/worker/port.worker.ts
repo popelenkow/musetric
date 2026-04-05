@@ -6,7 +6,7 @@ import {
 import {
   type WaveformCommandMethods,
   type WaveformEventMethods,
-} from '../portMessage.cross.js';
+} from '../protocol.cross.js';
 
 export type WaveformWorkerPort = TypedMessagePort<
   typeof self,
