@@ -1,15 +1,15 @@
 import { Box, Stack } from '@mui/material';
 import { type api } from '@musetric/api';
 import { type FC, useEffect } from 'react';
-import { useDecoderStore } from '../../domain/decoder/store.js';
-import { Player } from '../../domain/player/Player.js';
-import { usePlayerStore } from '../../domain/player/store.js';
-import { ProjectSettings } from '../../domain/settings/field/ProjectSettings.js';
-import { SpectrogramCanvas } from '../../domain/spectrogram/SpectrogramCanvas.js';
-import { Subtitle } from '../../domain/subtitle/view.js';
-import { WaveformCanvas } from '../../domain/waveform/WaveformCanvas.js';
+import { useDecoderStore } from './decoder/store.js';
+import { Player } from './player/Player.js';
+import { usePlayerStore } from './player/store.js';
 import { ProjectBackButton } from './ProjectBackButton.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
+import { ProjectSettings } from './settings/field/ProjectSettings.js';
+import { SpectrogramCanvas } from './spectrogram/SpectrogramCanvas.js';
+import { Subtitle } from './subtitle/view.js';
+import { WaveformCanvas } from './waveform/WaveformCanvas.js';
 
 export type ProjectViewProps = {
   project: api.project.Item;

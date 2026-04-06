@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { useDecoderStore } from '../../domain/decoder/store.js';
-import { usePlayerStore } from '../../domain/player/store.js';
-import { useSpectrogramStore } from '../../domain/spectrogram/store.js';
-import { useWaveformStore } from '../../domain/waveform/store.js';
+import { useDecoderStore } from './decoder/store.js';
+import { usePlayerStore } from './player/store.js';
+import { useSpectrogramStore } from './spectrogram/store.js';
+import { useWaveformStore } from './waveform/store.js';
 
 type Unmount = () => void;
 export type WorkersActions = {

@@ -1,7 +1,7 @@
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewError } from '../../components/ViewError.js';
-import { ViewPending } from '../../components/ViewPending.js';
+import { ViewError } from '../../../components/ViewError.js';
+import { ViewPending } from '../../../components/ViewPending.js';
 import { useDecoderStore } from '../decoder/store.js';
 import { usePlayerStore } from '../player/store.js';
 import { useSettingsStore } from '../settings/store.js';

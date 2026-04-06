@@ -6,10 +6,10 @@ import { endpoints } from '../../api/index.js';
 import { routes } from '../../app/router/routes.js';
 import { ViewError } from '../../components/ViewError.js';
 import { ViewPending } from '../../components/ViewPending.js';
-import { useThemeViewColors } from '../../domain/settings/theme.js';
 import { ProjectProgressFlow } from './Flow/ProjectProgressFlow.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
 import { ProjectView } from './ProjectView.js';
+import { useThemeViewColors } from './settings/theme.js';
 import { useWorkersStore } from './workersStore.js';
 
 export const ProjectPage: FC = () => {

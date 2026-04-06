@@ -7,7 +7,7 @@ import {
   type PlayerCommandMethods,
   type PlayerEventMethods,
   playerProcessorName,
-} from './portMessage.es.js';
+} from './protocol.es.js';
 
 export const createPlayerNode = async (
   context: AudioContext,
