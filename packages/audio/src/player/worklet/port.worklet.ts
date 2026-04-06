@@ -6,7 +6,7 @@ import {
 import {
   type PlayerCommandMethods,
   type PlayerEventMethods,
-} from '../portMessage.es.js';
+} from '../protocol.es.js';
 
 export type PlayerWorkletPort = TypedMessagePort<
   MessagePort,

@@ -2,8 +2,8 @@ import { Box } from '@mui/material';
 import { type api } from '@musetric/api';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewError } from '../../components/ViewError.js';
-import { ViewPending } from '../../components/ViewPending.js';
+import { ViewError } from '../../../components/ViewError.js';
+import { ViewPending } from '../../../components/ViewPending.js';
 import { usePlayerStore } from '../player/store.js';
 import { useWaveformStore } from './store.js';
 

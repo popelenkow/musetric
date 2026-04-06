@@ -10,7 +10,7 @@ export * from './decoder/port.js';
 export * from './decoder/protocol.cross.js';
 export * from './player/audioPlayer.js';
 export * from './player/port.js';
-export * from './player/portMessage.es.js';
+export * from './player/protocol.es.js';
 export * from './spectrogram/config.cross.js';
 export * from './spectrogram/port.js';
 export * from './spectrogram/protocol.cross.js';
