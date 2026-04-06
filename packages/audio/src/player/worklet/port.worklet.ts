@@ -14,7 +14,10 @@ export type PlayerWorkletPort = TypedMessagePort<
   PlayerCommandMethods
 >;
 
-const playerEventMethodKeys = createObjectKeys<PlayerEventMethods>()(['ended']);
+const playerEventMethodKeys = createObjectKeys<PlayerEventMethods>()([
+  'playing',
+  'frameIndex',
+]);
 
 export const createPlayerWorkletPort = (
   messagePort: MessagePort,

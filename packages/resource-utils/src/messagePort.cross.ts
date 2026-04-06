@@ -1,3 +1,5 @@
+import { createCallEvery } from './callEvery.js';
+
 type MessagePortLike = {
   // eslint-disable-next-line no-restricted-syntax
   postMessage(message: unknown, transfer?: Transferable[]): void;
@@ -61,7 +63,9 @@ export const createTypedPort = <
     instance,
     methods: createPortMethods(instance, methodKeys, methodTransfers),
     bindMethods: (handlers) => {
-      const onmessage = (event: MessageEvent<PortMessage<HandlerMethods>>) => {
+      const onmessage = async (
+        event: MessageEvent<PortMessage<HandlerMethods>>,
+      ) => {
         const message = event.data;
         const handler = handlers[message.type];
         if (!handler) {
@@ -69,10 +73,12 @@ export const createTypedPort = <
           return;
         }
         const { payload } = message;
-        handler(payload);
+        await handler(payload);
       };
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      instance.onmessage = onmessage as MessagePortLike['onmessage'];
+      instance.onmessage = createCallEvery(
+        onmessage,
+      ) as MessagePortLike['onmessage'];
     },
   };
 };

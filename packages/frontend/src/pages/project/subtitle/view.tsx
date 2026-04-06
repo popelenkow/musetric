@@ -5,8 +5,8 @@ import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoints } from '../../../api/index.js';
 import { ViewError } from '../../../components/ViewError.js';
-import { useDecoderStore } from '../decoder/store.js';
-import { usePlayerStore } from '../player/store.js';
+import { getTrackProgress } from '../../../engine/state.js';
+import { useEngineStore } from '../../../engine/useEngineStore.js';
 import { SegmentLCurrent } from './current.js';
 import { SegmentNext } from './next.js';
 
@@ -26,8 +26,7 @@ const getSegmentEnd = (segment: api.subtitle.Segment) => {
 
 const getSubtitleLines = (
   subtitle: api.subtitle.Segment[],
-  duration: number,
-  trackProgress: number,
+  playbackTime: number,
 ): SubtitleLines => {
   if (subtitle.length === 0) {
     return {
@@ -37,7 +36,6 @@ const getSubtitleLines = (
     };
   }
 
-  const playbackTime = duration * trackProgress;
   const currentIndex = subtitle.findIndex(
     (segment) => playbackTime < getSegmentEnd(segment),
   );
@@ -55,13 +53,13 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
   const { t } = useTranslation();
   const subtitleQuery = useQuery(endpoints.subtitle.get(projectId));
 
-  const duration = useDecoderStore((s) => s.duration);
-  const trackProgress = usePlayerStore((s) => s.trackProgress);
+  const duration = useEngineStore((state) => state.duration);
+  const trackProgress = useEngineStore(getTrackProgress);
+  const playbackTime = duration * trackProgress;
 
-  const { current, next, playbackTime } = getSubtitleLines(
+  const { current, next } = getSubtitleLines(
     subtitleQuery.data ?? [],
-    duration,
-    trackProgress,
+    playbackTime,
   );
 
   const getContent = () => {

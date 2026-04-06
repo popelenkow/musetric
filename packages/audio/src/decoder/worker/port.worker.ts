@@ -16,7 +16,8 @@ export type DecoderWorkerPort = TypedMessagePort<
 
 const decoderEventMethodKeys = createObjectKeys<DecoderEventMethods>()([
   'state',
-  'decoded',
+  'mounted',
+  'unmounted',
 ]);
 
 export const createDecoderWorkerPort = (): DecoderWorkerPort => {

@@ -4,8 +4,8 @@ import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewError } from '../../../components/ViewError.js';
 import { ViewPending } from '../../../components/ViewPending.js';
-import { usePlayerStore } from '../player/store.js';
-import { useWaveformStore } from './store.js';
+import { engine } from '../../../engine/engine.js';
+import { useEngineStore } from '../../../engine/useEngineStore.js';
 
 export type WaveformCanvasProps = {
   projectId: number;
@@ -16,14 +16,16 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
   const { t } = useTranslation();
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
-  const seek = usePlayerStore((s) => s.seek);
-  const init = useWaveformStore((s) => s.init);
-  const status = useWaveformStore((s) => s.status);
+  const status = useEngineStore((state) => state.statuses.waveform);
 
   useEffect(() => {
     if (!canvas) return;
-    return init(projectId, type, canvas);
-  }, [canvas, init, projectId, type]);
+    return engine.waveform.mount({
+      projectId,
+      type,
+      canvas,
+    });
+  }, [canvas, projectId, type]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -36,11 +38,19 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
           display: 'block',
           visibility: status === 'success' ? 'visible' : 'hidden',
         }}
-        onClick={async (event) => {
+        onClick={(event) => {
+          const { frameCount } = engine.store.get();
+          if (!frameCount) {
+            return;
+          }
+
           const targetCanvas = event.currentTarget;
           const rect = targetCanvas.getBoundingClientRect();
           const x = event.clientX - rect.left;
-          await seek(x / targetCanvas.clientWidth);
+          const frameIndex = Math.floor(
+            (x / targetCanvas.clientWidth) * frameCount,
+          );
+          engine.player.seek(frameIndex);
         }}
       />
       {status === 'pending' && (

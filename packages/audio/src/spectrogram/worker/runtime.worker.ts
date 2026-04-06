@@ -9,12 +9,10 @@ export type SpectrogramWorkerState = {
   processor: SpectrogramProcessor;
   wave?: Float32Array<SharedArrayBuffer>;
   trackProgress: number;
-  initialized: boolean;
 };
 
 export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   const device = await getGpuDevice(profiling);
-
   const createProcessor = () =>
     createSpectrogramProcessor({
       device,
@@ -28,38 +26,47 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   const state: SpectrogramWorkerState = {
     processor: createProcessor(),
     trackProgress: 0,
-    initialized: false,
   };
-
   const port = createSpectrogramWorkerPort();
 
   const render = async () => {
     const { processor, wave, trackProgress } = state;
-    if (!wave) return;
-    const ok = await processor.render(wave, trackProgress);
-    if (ok && !state.initialized) {
-      state.initialized = true;
-      port.methods.state({
-        status: 'success',
-      });
+    if (!wave) {
+      return;
     }
+
+    const ok = await processor.render(wave, trackProgress);
+    if (!ok) {
+      return;
+    }
+    port.methods.state({
+      status: 'success',
+    });
   };
 
   port.bindMethods({
     mount: async (message) => {
-      state.processor.updateConfig(message.config);
-      state.trackProgress = message.trackProgress;
-      state.wave = message.waveBuffer
-        ? new Float32Array(message.waveBuffer)
-        : undefined;
-      await render();
+      try {
+        state.trackProgress = message.trackProgress;
+        state.wave = message.waveBuffer
+          ? new Float32Array(message.waveBuffer)
+          : undefined;
+
+        state.processor = createProcessor();
+        state.processor.updateConfig(message.config);
+        await render();
+      } catch (error) {
+        console.error('Failed to render spectrogram', error);
+        port.methods.state({
+          status: 'error',
+        });
+      }
     },
     unmount: () => {
       state.processor.dispose();
+      state.processor = createProcessor();
       state.wave = undefined;
       state.trackProgress = 0;
-      state.initialized = false;
-      state.processor = createProcessor();
     },
     wave: async (message) => {
       state.wave = new Float32Array(message.waveBuffer);
@@ -74,9 +81,4 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
       await render();
     },
   });
-
-  return {
-    state,
-    port,
-  };
 };

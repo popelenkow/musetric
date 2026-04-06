@@ -1,22 +1,21 @@
 import {
+  extractSpectrogramConfig,
   type FourierMode,
   type SpectrogramConfig,
   type SpectrogramWindowName,
   type SpectrogramZeroPaddingFactor,
-  type ViewColors,
 } from '@musetric/audio';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { usePlayerStore } from '../player/store.js';
+import { engine } from '../../../engine/engine.js';
 
 export type SettingsState = {
   open: boolean;
-} & Omit<SpectrogramConfig, 'viewSize' | 'canvas'>;
+} & Omit<SpectrogramConfig, 'viewSize' | 'canvas' | 'sampleRate' | 'colors'>;
 
 const initialState: SettingsState = {
   fourierMode: 'fftRadix4',
   windowSize: 1024 * 4,
-  sampleRate: 44100,
   visibleTimeBefore: 2.0,
   visibleTimeAfter: 2.0,
   zeroPaddingFactor: 2,
@@ -24,11 +23,6 @@ const initialState: SettingsState = {
   minDecibel: -40,
   minFrequency: 120,
   maxFrequency: 4000,
-  colors: {
-    background: '#000000',
-    played: '#ffffff',
-    unplayed: '#888888',
-  },
   open: false,
 };
 
@@ -42,21 +36,12 @@ export type SettingsActions = {
   setVisibleTimeBefore: (value: number) => void;
   setVisibleTimeAfter: (value: number) => void;
   setZeroPaddingFactor: (value: SpectrogramZeroPaddingFactor) => void;
-  setColors: (value: ViewColors) => void;
   setOpen: (value: boolean) => void;
 };
 
 type State = SettingsState & SettingsActions;
 export const useSettingsStore = create<State>()(
   subscribeWithSelector((set) => {
-    usePlayerStore.subscribe(
-      (state) => state.player,
-      (player) => {
-        if (!player) return;
-        set({ sampleRate: player.context.sampleRate });
-      },
-    );
-
     return {
       ...initialState,
       setFourierMode: (fourierMode) => set({ fourierMode }),
@@ -68,8 +53,15 @@ export const useSettingsStore = create<State>()(
       setVisibleTimeBefore: (visibleTimeBefore) => set({ visibleTimeBefore }),
       setVisibleTimeAfter: (visibleTimeAfter) => set({ visibleTimeAfter }),
       setZeroPaddingFactor: (zeroPaddingFactor) => set({ zeroPaddingFactor }),
-      setColors: (colors) => set({ colors }),
       setOpen: (open) => set({ open }),
     };
   }),
 );
+
+export const subscribeSettingsStore = () =>
+  useSettingsStore.subscribe(
+    (state) => state,
+    (state) => {
+      engine.spectrogram.setConfig(extractSpectrogramConfig(state));
+    },
+  );
