@@ -35,10 +35,10 @@ export const useSpectrogramStore = create<State>((set, get) => {
   );
 
   usePlayerStore.subscribe(
-    (state) => state.progress,
-    (progress) => {
-      get().port?.methods.progress({
-        progress,
+    (state) => state.trackProgress,
+    (trackProgress) => {
+      get().port?.methods.trackProgress({
+        trackProgress,
       });
     },
   );
@@ -75,14 +75,14 @@ export const useSpectrogramStore = create<State>((set, get) => {
       const offscreenCanvas = canvas.transferControlToOffscreen();
       const settings = useSettingsStore.getState();
       const { channels } = useDecoderStore.getState();
-      const { progress } = usePlayerStore.getState();
+      const { trackProgress } = usePlayerStore.getState();
       get().port?.methods.mount({
         config: extractSpectrogramConfig({
           ...settings,
           canvas: offscreenCanvas,
           viewSize,
         }),
-        progress,
+        trackProgress,
         waveBuffer: channels?.[0]?.buffer,
       });
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {

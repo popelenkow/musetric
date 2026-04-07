@@ -6,7 +6,7 @@ const workgroupSize = 64;
 
 export type SpectrogramSliceWave = {
   run: (encoder: GPUCommandEncoder) => void;
-  write: (waveArray: Float32Array, progress: number) => void;
+  write: (waveArray: Float32Array, trackProgress: number) => void;
 };
 
 export const createSpectrogramSliceWaveCell = (
@@ -33,8 +33,8 @@ export const createSpectrogramSliceWaveCell = (
           pass.dispatchWorkgroups(xGroups, windowCount);
           pass.end();
         },
-        write: (waveArray, progress) => {
-          state.wave.write(waveArray, progress, state.config);
+        write: (waveArray, trackProgress) => {
+          state.wave.write(waveArray, trackProgress, state.config);
         },
       };
     },

@@ -2,11 +2,11 @@ import { Box, Typography } from '@mui/material';
 import { type api } from '@musetric/api';
 import { type FC } from 'react';
 
-const getWordColor = (word: api.subtitle.Word, currentTime: number) => {
-  if (currentTime >= word.start && currentTime < word.end) {
+const getWordColor = (word: api.subtitle.Word, playbackTime: number) => {
+  if (playbackTime >= word.start && playbackTime < word.end) {
     return 'primary.main';
   }
-  if (currentTime >= word.end) {
+  if (playbackTime >= word.end) {
     return 'text.secondary';
   }
   return 'text.primary';
@@ -14,11 +14,11 @@ const getWordColor = (word: api.subtitle.Word, currentTime: number) => {
 
 export type SegmentLCurrentProps = {
   segment?: api.subtitle.Segment;
-  currentTime: number;
+  playbackTime: number;
 };
 
 export const SegmentLCurrent: FC<SegmentLCurrentProps> = (props) => {
-  const { segment, currentTime } = props;
+  const { segment, playbackTime } = props;
   if (!segment) {
     return;
   }
@@ -35,7 +35,7 @@ export const SegmentLCurrent: FC<SegmentLCurrentProps> = (props) => {
             component='span'
             key={`${word.start}-${index}`}
             sx={{
-              color: getWordColor(word, currentTime),
+              color: getWordColor(word, playbackTime),
               transition: 'color 120ms linear',
             }}
           >

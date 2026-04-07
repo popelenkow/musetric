@@ -11,7 +11,7 @@ import {
 import { type SpectrogramSliceWave } from './sliceWave/index.js';
 
 export type SpectrogramProcessor = {
-  render: (wave: Float32Array, progress: number) => Promise<boolean>;
+  render: (wave: Float32Array, trackProgress: number) => Promise<boolean>;
   updateConfig: (config: Partial<SpectrogramConfig>) => void;
   dispose: () => void;
 };
@@ -34,8 +34,12 @@ export const createSpectrogramProcessor = (
   configurator.updateConfig(config);
 
   const writeBuffers = markers.writeBuffers(
-    (sliceWave: SpectrogramSliceWave, wave: Float32Array, progress: number) => {
-      sliceWave.write(wave, progress);
+    (
+      sliceWave: SpectrogramSliceWave,
+      wave: Float32Array,
+      trackProgress: number,
+    ) => {
+      sliceWave.write(wave, trackProgress);
     },
   );
   const createCommand = markers.createCommand((runtime: SpectrogramRuntime) => {
@@ -61,20 +65,22 @@ export const createSpectrogramProcessor = (
     },
   );
 
-  const render = markers.total(async (wave: Float32Array, progress: number) => {
-    const runtime = configurator.configure();
-    if (!runtime) {
-      return false;
-    }
-    writeBuffers(runtime.sliceWave, wave, progress);
-    const command = createCommand(runtime);
-    await submitCommand(command);
-    return true;
-  });
+  const render = markers.total(
+    async (wave: Float32Array, trackProgress: number) => {
+      const runtime = configurator.configure();
+      if (!runtime) {
+        return false;
+      }
+      writeBuffers(runtime.sliceWave, wave, trackProgress);
+      const command = createCommand(runtime);
+      await submitCommand(command);
+      return true;
+    },
+  );
 
   return {
-    render: createCallLatest(async (wave, progress) => {
-      const ok = await render(wave, progress);
+    render: createCallLatest(async (wave, trackProgress) => {
+      const ok = await render(wave, trackProgress);
       if (!ok) {
         return false;
       }

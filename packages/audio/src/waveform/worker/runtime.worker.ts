@@ -11,7 +11,7 @@ export type WaveformWorkerState = {
   canvas?: OffscreenCanvas;
   wave?: Float32Array;
   processor?: WaveformProcessor;
-  progress: number;
+  trackProgress: number;
   colors?: ViewColors;
 };
 
@@ -19,23 +19,23 @@ export const createWaveformWorkerRuntime = (
   getWave: (projectId: number, waveType: WaveType) => Promise<Float32Array>,
 ) => {
   const state: WaveformWorkerState = {
-    progress: 0,
+    trackProgress: 0,
   };
   const port = createWaveformWorkerPort();
 
   const render = (): boolean => {
-    const { wave, processor, progress } = state;
+    const { wave, processor, trackProgress } = state;
     if (!wave || !processor) return false;
-    processor.render(wave, progress);
+    processor.render(wave, trackProgress);
     return true;
   };
 
   port.bindMethods({
     mount: async (message) => {
       try {
-        const { progress, projectId, waveType, canvas, colors, viewSize } =
+        const { trackProgress, projectId, waveType, canvas, colors, viewSize } =
           message;
-        state.progress = progress;
+        state.trackProgress = trackProgress;
         state.canvas = canvas;
         state.colors = colors;
         setOffscreenCanvasSize(state.canvas, viewSize);
@@ -57,8 +57,8 @@ export const createWaveformWorkerRuntime = (
     unmount: () => {
       state.wave = undefined;
     },
-    progress: (message) => {
-      state.progress = message.progress;
+    trackProgress: (message) => {
+      state.trackProgress = message.trackProgress;
       render();
     },
     colors: (message) => {

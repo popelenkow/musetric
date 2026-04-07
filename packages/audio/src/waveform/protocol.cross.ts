@@ -7,13 +7,13 @@ export type WaveformCommandMethods = {
   mount: (message: {
     projectId: number;
     waveType: WaveType;
-    progress: number;
+    trackProgress: number;
     canvas: OffscreenCanvas;
     colors: ViewColors;
     viewSize: ViewSize;
   }) => void;
   unmount: () => void;
-  progress: (message: { progress: number }) => void;
+  trackProgress: (message: { trackProgress: number }) => void;
   colors: (message: { colors: ViewColors }) => void;
   resize: (message: { viewSize: ViewSize }) => void;
 };

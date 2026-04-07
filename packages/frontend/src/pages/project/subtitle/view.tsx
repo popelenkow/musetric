@@ -13,7 +13,7 @@ import { SegmentNext } from './next.js';
 type SubtitleLines = {
   current?: api.subtitle.Segment;
   next?: api.subtitle.Segment;
-  currentTime: number;
+  playbackTime: number;
 };
 
 const getSegmentEnd = (segment: api.subtitle.Segment) => {
@@ -27,24 +27,24 @@ const getSegmentEnd = (segment: api.subtitle.Segment) => {
 const getSubtitleLines = (
   subtitle: api.subtitle.Segment[],
   duration: number,
-  progress: number,
+  trackProgress: number,
 ): SubtitleLines => {
   if (subtitle.length === 0) {
     return {
       current: undefined,
       next: undefined,
-      currentTime: 0,
+      playbackTime: 0,
     };
   }
 
-  const currentTime = duration * progress;
+  const playbackTime = duration * trackProgress;
   const currentIndex = subtitle.findIndex(
-    (segment) => currentTime < getSegmentEnd(segment),
+    (segment) => playbackTime < getSegmentEnd(segment),
   );
   const current = currentIndex === -1 ? undefined : subtitle[currentIndex];
   const next = currentIndex === -1 ? undefined : subtitle[currentIndex + 1];
 
-  return { current, next, currentTime };
+  return { current, next, playbackTime };
 };
 
 export type SubtitleProps = {
@@ -56,12 +56,12 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
   const subtitleQuery = useQuery(endpoints.subtitle.get(projectId));
 
   const duration = useDecoderStore((s) => s.duration);
-  const progress = usePlayerStore((s) => s.progress);
+  const trackProgress = usePlayerStore((s) => s.trackProgress);
 
-  const { current, next, currentTime } = getSubtitleLines(
+  const { current, next, playbackTime } = getSubtitleLines(
     subtitleQuery.data ?? [],
     duration,
-    progress,
+    trackProgress,
   );
 
   const getContent = () => {
@@ -80,7 +80,7 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
 
     return (
       <>
-        <SegmentLCurrent segment={current} currentTime={currentTime} />
+        <SegmentLCurrent segment={current} playbackTime={playbackTime} />
         <SegmentNext segment={next} />
       </>
     );

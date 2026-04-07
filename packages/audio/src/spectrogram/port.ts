@@ -19,7 +19,7 @@ const spectrogramCommandMethodKeys =
     'mount',
     'unmount',
     'wave',
-    'progress',
+    'trackProgress',
     'config',
   ]);
 
