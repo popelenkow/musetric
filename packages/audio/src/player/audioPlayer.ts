@@ -8,14 +8,14 @@ import {
 export type AudioPlayer = {
   context: AudioContext;
   port: PlayerMainPort;
-  play: (frameCount: number, startFrame: number) => Promise<void>;
+  play: (frameCount: number, frameIndex: number) => Promise<void>;
   pause: () => void;
   destroy: () => Promise<void>;
 };
 
 export type AudioPlayerOptions = {
   playerWorkletUrl: string;
-  progress?: (progress: number) => void;
+  trackProgress?: (trackProgress: number) => void;
   end?: () => void;
 };
 
@@ -32,31 +32,33 @@ export const createAudioPlayer = async (
   });
 
   let totalFrameCount: number | undefined = undefined;
-  let playStartFrame = 0;
-  let startTime = 0;
+  let playStartFrameIndex = 0;
+  let playbackStartTime = 0;
   let raf = 0;
 
   const tick = () => {
     if (!totalFrameCount) return;
-    const frame =
-      playStartFrame +
-      Math.floor((context.currentTime - startTime) * context.sampleRate);
-    const progress = Math.min(frame / totalFrameCount, 1);
-    options.progress?.(progress);
+    const currentFrameIndex =
+      playStartFrameIndex +
+      Math.floor(
+        (context.currentTime - playbackStartTime) * context.sampleRate,
+      );
+    const trackProgress = Math.min(currentFrameIndex / totalFrameCount, 1);
+    options.trackProgress?.(trackProgress);
     raf = requestAnimationFrame(tick);
   };
 
   return {
     context,
     port,
-    play: async (frameCount, startFrame) => {
+    play: async (frameCount, frameIndex) => {
       totalFrameCount = frameCount;
-      playStartFrame = startFrame;
+      playStartFrameIndex = frameIndex;
       if (context.state === 'suspended') {
         await context.resume();
       }
-      port.methods.play({ startFrame });
-      startTime = context.currentTime;
+      port.methods.play({ frameIndex });
+      playbackStartTime = context.currentTime;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
     },

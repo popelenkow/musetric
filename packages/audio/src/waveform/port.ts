@@ -17,7 +17,7 @@ export type WaveformMainPort = TypedMessagePort<
 const waveformCommandMethodKeys = createObjectKeys<WaveformCommandMethods>()([
   'mount',
   'unmount',
-  'progress',
+  'trackProgress',
   'colors',
   'resize',
 ]);

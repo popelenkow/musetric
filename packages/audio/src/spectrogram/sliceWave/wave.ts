@@ -4,7 +4,7 @@ import { type Config } from './state.js';
 export type StateWave = {
   buffer: GPUBuffer;
   array: Float32Array;
-  write: (wave: Float32Array, progress: number, config: Config) => void;
+  write: (wave: Float32Array, trackProgress: number, config: Config) => void;
 };
 
 export const createStateWaveCell = (device: GPUDevice) =>
@@ -20,7 +20,7 @@ export const createStateWaveCell = (device: GPUDevice) =>
       return {
         buffer,
         array,
-        write: (wave, progress, config) => {
+        write: (wave, trackProgress, config) => {
           const {
             windowSize,
             sampleRate,
@@ -30,7 +30,9 @@ export const createStateWaveCell = (device: GPUDevice) =>
           const beforeSamples = visibleTimeBefore * sampleRate + windowSize;
           const afterSamples = visibleTimeAfter * sampleRate;
           const totalVisibleSamples = beforeSamples + afterSamples;
-          const startIndex = Math.floor(progress * wave.length - beforeSamples);
+          const startIndex = Math.floor(
+            trackProgress * wave.length - beforeSamples,
+          );
 
           const from = Math.max(0, -startIndex);
           const to = Math.min(totalVisibleSamples, wave.length - startIndex);

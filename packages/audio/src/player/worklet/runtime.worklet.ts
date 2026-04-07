@@ -12,7 +12,7 @@ export const createPlayerWorkletRuntime = (
   port: PlayerWorkletPort,
 ): PlayerWorkletRuntime => {
   let channels: ChannelArrays | undefined = undefined;
-  let frameOffset = 0;
+  let frameIndex = 0;
   let playing = false;
 
   port.bindMethods({
@@ -23,7 +23,7 @@ export const createPlayerWorkletRuntime = (
       channels = undefined;
     },
     play: (message) => {
-      frameOffset = message.startFrame;
+      frameIndex = message.frameIndex;
       playing = true;
     },
     pause: () => {
@@ -45,14 +45,14 @@ export const createPlayerWorkletRuntime = (
         const out = output[channel];
         const data = channels[channel] ?? new Float32Array(0);
         for (let i = 0; i < out.length; i++) {
-          const index = frameOffset + i;
+          const index = frameIndex + i;
           out[i] = index < data.length ? data[index] : 0;
         }
       }
 
       const frameCount = channels[0].length;
-      frameOffset += output[0].length;
-      if (frameOffset >= frameCount) {
+      frameIndex += output[0].length;
+      if (frameIndex >= frameCount) {
         playing = false;
         port.methods.ended();
       }

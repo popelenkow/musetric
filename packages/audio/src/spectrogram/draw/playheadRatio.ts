@@ -1,20 +1,20 @@
 import { createResourceCell } from '@musetric/resource-utils';
 import { type SpectrogramDrawConfig } from './index.js';
 
-export type StateProgress = {
+export type StatePlayheadRatio = {
   buffer: GPUBuffer;
 };
 
-export const createStateProgressCell = (device: GPUDevice) =>
+export const createStatePlayheadRatioCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: SpectrogramDrawConfig): StateProgress => {
+    create: (config: SpectrogramDrawConfig): StatePlayheadRatio => {
       const array = new Float32Array([1]);
       const { visibleTimeBefore, visibleTimeAfter } = config;
-      const progress =
+      const playheadRatio =
         visibleTimeBefore / (visibleTimeBefore + visibleTimeAfter);
-      array[0] = progress;
+      array[0] = playheadRatio;
       const buffer = device.createBuffer({
-        label: 'pipeline-progress-buffer',
+        label: 'pipeline-playhead-ratio-buffer',
         size: array.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });

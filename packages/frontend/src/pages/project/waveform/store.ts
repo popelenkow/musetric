@@ -29,10 +29,10 @@ export type WaveformActions = {
 type State = WaveformState & WaveformActions;
 export const useWaveformStore = create<State>((set, get) => {
   usePlayerStore.subscribe(
-    (state) => state.progress,
-    (progress) => {
-      get().port?.methods.progress({
-        progress,
+    (state) => state.trackProgress,
+    (trackProgress) => {
+      get().port?.methods.trackProgress({
+        trackProgress,
       });
     },
   );
@@ -73,7 +73,7 @@ export const useWaveformStore = create<State>((set, get) => {
       get().port?.methods.mount({
         projectId,
         waveType: type,
-        progress: usePlayerStore.getState().progress,
+        trackProgress: usePlayerStore.getState().trackProgress,
         canvas: offscreenCanvas,
         colors: useSettingsStore.getState().colors,
         viewSize,

@@ -10,7 +10,7 @@ export const SongPlayer: FC<SongPlayerProps> = (props) => {
   const { url } = props;
   const audioRef = useRef<HTMLAudioElement>(undefined);
   const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progressPercent, setProgressPercent] = useState(0);
 
   useEffect(() => {
     const audio = new Audio(url);
@@ -18,7 +18,7 @@ export const SongPlayer: FC<SongPlayerProps> = (props) => {
 
     const onTimeUpdate = () => {
       const duration = audio.duration || 1;
-      setProgress((audio.currentTime / duration) * 100);
+      setProgressPercent((audio.currentTime / duration) * 100);
     };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
@@ -33,7 +33,7 @@ export const SongPlayer: FC<SongPlayerProps> = (props) => {
       <Slider
         size='small'
         sx={{ flex: 1 }}
-        value={progress}
+        value={progressPercent}
         onChange={(_, value) => {
           if (!audioRef.current) return;
           const duration = audioRef.current.duration || 1;

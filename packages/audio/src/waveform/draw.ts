@@ -4,7 +4,7 @@ import { type WaveformSegment } from './generateSegments.js';
 export type WaveformDraw = {
   run: (
     segments: WaveformSegment[],
-    progress: number,
+    trackProgress: number,
     colors: ViewColors,
   ) => void;
 };
@@ -15,14 +15,14 @@ export const createWaveformDraw = (canvas: OffscreenCanvas): WaveformDraw => {
   }
 
   const ref: WaveformDraw = {
-    run: (segments, progress, colors) => {
+    run: (segments, trackProgress, colors) => {
       const width = canvas.width;
       const height = canvas.height;
 
       context.clearRect(0, 0, width, height);
 
-      const clampedProgress = Math.max(0, Math.min(progress, 1));
-      const playedCount = Math.floor(clampedProgress * segments.length);
+      const clampedTrackProgress = Math.max(0, Math.min(trackProgress, 1));
+      const playedCount = Math.floor(clampedTrackProgress * segments.length);
 
       const segmentWidth = width / segments.length;
       const barWidth = segmentWidth * 0.9;

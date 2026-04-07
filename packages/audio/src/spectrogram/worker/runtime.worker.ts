@@ -8,7 +8,7 @@ import { createSpectrogramWorkerPort } from './port.worker.js';
 export type SpectrogramWorkerState = {
   processor: SpectrogramProcessor;
   wave?: Float32Array<SharedArrayBuffer>;
-  progress: number;
+  trackProgress: number;
   initialized: boolean;
 };
 
@@ -27,16 +27,16 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
 
   const state: SpectrogramWorkerState = {
     processor: createProcessor(),
-    progress: 0,
+    trackProgress: 0,
     initialized: false,
   };
 
   const port = createSpectrogramWorkerPort();
 
   const render = async () => {
-    const { processor, wave, progress } = state;
+    const { processor, wave, trackProgress } = state;
     if (!wave) return;
-    const ok = await processor.render(wave, progress);
+    const ok = await processor.render(wave, trackProgress);
     if (ok && !state.initialized) {
       state.initialized = true;
       port.methods.state({
@@ -48,7 +48,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
   port.bindMethods({
     mount: async (message) => {
       state.processor.updateConfig(message.config);
-      state.progress = message.progress;
+      state.trackProgress = message.trackProgress;
       state.wave = message.waveBuffer
         ? new Float32Array(message.waveBuffer)
         : undefined;
@@ -57,7 +57,7 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
     unmount: () => {
       state.processor.dispose();
       state.wave = undefined;
-      state.progress = 0;
+      state.trackProgress = 0;
       state.initialized = false;
       state.processor = createProcessor();
     },
@@ -65,8 +65,8 @@ export const createSpectrogramWorkerRuntime = async (profiling?: boolean) => {
       state.wave = new Float32Array(message.waveBuffer);
       await render();
     },
-    progress: async (message) => {
-      state.progress = message.progress;
+    trackProgress: async (message) => {
+      state.trackProgress = message.trackProgress;
       await render();
     },
     config: async (message) => {

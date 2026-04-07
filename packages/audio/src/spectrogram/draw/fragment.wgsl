@@ -5,7 +5,7 @@ struct Colors {
 };
 
 struct Params {
-  progress : f32,
+  playheadRatio : f32,
 };
 
 @group(0) @binding(0) var<uniform> colors : Colors;
@@ -15,11 +15,11 @@ struct Params {
 
 @fragment
 fn main(@location(0) uv: vec2f) -> @location(0) vec4f {
-  let progress = params.progress;
+  let playheadRatio = params.playheadRatio;
   
   let intensity = textureSample(columnTexture, valueSampler, vec2f(uv.x, 1.0 - uv.y)).r;
   var displayColor = colors.unplayed.xyz;
-  if (uv.x < progress) {
+  if (uv.x < playheadRatio) {
     displayColor = colors.played.xyz;
   }
   let color = mix(colors.background.xyz, displayColor, intensity);

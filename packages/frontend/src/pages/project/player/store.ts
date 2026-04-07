@@ -12,17 +12,17 @@ import playerWorkletUrl from './player.worklet.ts?worker&url';
 export type PlayerState = {
   player?: AudioPlayer;
   playing: boolean;
-  progress: number;
-  startFrame: number;
-  startTime: number;
+  trackProgress: number;
+  frameIndex: number;
+  playbackStartTime: number;
 };
 
 export const initialState: PlayerState = {
   player: undefined,
   playing: false,
-  progress: 0,
-  startFrame: 0,
-  startTime: 0,
+  trackProgress: 0,
+  frameIndex: 0,
+  playbackStartTime: 0,
 };
 
 type Unmount = () => void;
@@ -31,7 +31,7 @@ export type PlayerActions = {
   mount: () => Unmount;
   play: () => Promise<void>;
   pause: () => void;
-  seek: (fraction: number) => Promise<void>;
+  seek: (trackProgress: number) => Promise<void>;
 };
 
 type State = PlayerState & PlayerActions;
@@ -51,11 +51,16 @@ export const usePlayerStore = create<State>()(
       async () => {
         const player = await createAudioPlayer({
           playerWorkletUrl,
-          progress: (progress) => {
-            set({ progress });
+          trackProgress: (trackProgress) => {
+            set({ trackProgress });
           },
           end: () => {
-            set({ playing: false, progress: 0, startFrame: 0, startTime: 0 });
+            set({
+              playing: false,
+              trackProgress: 0,
+              frameIndex: 0,
+              playbackStartTime: 0,
+            });
           },
         });
         set({ player });
@@ -76,32 +81,34 @@ export const usePlayerStore = create<State>()(
         };
       },
       play: async () => {
-        const { player, startFrame } = get();
+        const { player, frameIndex } = get();
         const { frameCount } = useDecoderStore.getState();
         if (!player || !frameCount) return;
-        await player.play(frameCount, startFrame);
-        set({ playing: true, startTime: player.context.currentTime });
+        await player.play(frameCount, frameIndex);
+        set({ playing: true, playbackStartTime: player.context.currentTime });
       },
       pause: () => {
-        const { player, startTime, startFrame } = get();
+        const { player, playbackStartTime, frameIndex } = get();
         if (!player) return;
         player.pause();
         const context = player.context;
-        const newStartFrame =
-          startFrame +
-          Math.floor((context.currentTime - startTime) * context.sampleRate);
-        set({ playing: false, startFrame: newStartFrame });
+        const newFrameIndex =
+          frameIndex +
+          Math.floor(
+            (context.currentTime - playbackStartTime) * context.sampleRate,
+          );
+        set({ playing: false, frameIndex: newFrameIndex });
       },
-      seek: async (fraction) => {
+      seek: async (trackProgress) => {
         const { player, playing } = get();
         const { frameCount } = useDecoderStore.getState();
         if (!frameCount || !player) return;
         const context = player.context;
-        const newStartFrame = Math.floor(frameCount * fraction);
-        set({ startFrame: newStartFrame, progress: fraction });
+        const newFrameIndex = Math.floor(frameCount * trackProgress);
+        set({ frameIndex: newFrameIndex, trackProgress });
         if (playing) {
-          await player.play(frameCount, newStartFrame);
-          set({ startTime: context.currentTime });
+          await player.play(frameCount, newFrameIndex);
+          set({ playbackStartTime: context.currentTime });
         }
       },
     };
