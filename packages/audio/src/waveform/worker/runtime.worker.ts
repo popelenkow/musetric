@@ -1,4 +1,3 @@
-import type { ViewColors } from '../../common/colors.es.js';
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
 import {
   createWaveformProcessor,
@@ -12,7 +11,6 @@ export type WaveformWorkerState = {
   wave?: Float32Array;
   processor?: WaveformProcessor;
   trackProgress: number;
-  colors?: ViewColors;
 };
 
 export const createWaveformWorkerRuntime = (
@@ -32,17 +30,17 @@ export const createWaveformWorkerRuntime = (
 
   port.bindMethods({
     mount: async (message) => {
-      try {
-        const { trackProgress, projectId, waveType, canvas, colors, viewSize } =
-          message;
-        state.trackProgress = trackProgress;
-        state.canvas = canvas;
-        state.colors = colors;
-        setOffscreenCanvasSize(state.canvas, viewSize);
-        state.processor = createWaveformProcessor(canvas, colors);
+      state.trackProgress = message.trackProgress;
+      state.canvas = message.canvas;
 
-        const wave = await getWave(projectId, waveType);
-        state.wave = wave;
+      try {
+        setOffscreenCanvasSize(message.canvas, message.viewSize);
+        state.processor = createWaveformProcessor(
+          message.canvas,
+          message.colors,
+        );
+
+        state.wave = await getWave(message.projectId, message.waveType);
         render();
         port.methods.state({
           status: 'success',
@@ -55,26 +53,26 @@ export const createWaveformWorkerRuntime = (
       }
     },
     unmount: () => {
+      state.canvas = undefined;
       state.wave = undefined;
+      state.processor = undefined;
+      state.trackProgress = 0;
     },
     trackProgress: (message) => {
       state.trackProgress = message.trackProgress;
       render();
     },
     colors: (message) => {
-      state.colors = message.colors;
       state.processor?.setColors(message.colors);
       render();
     },
     resize: (message) => {
-      if (!state.canvas) return;
+      if (!state.canvas) {
+        return;
+      }
+
       setOffscreenCanvasSize(state.canvas, message.viewSize);
       render();
     },
   });
-
-  return {
-    state,
-    port,
-  };
 };

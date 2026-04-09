@@ -1,3 +1,4 @@
+export * from './callEvery.js';
 export * from './callLatest.js';
 export * from './controlledPromise.js';
 export * from './eventEmitter.js';

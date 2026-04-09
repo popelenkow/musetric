@@ -1,12 +1,12 @@
 import { Box, Stack } from '@mui/material';
 import { type api } from '@musetric/api';
 import { type FC, useEffect } from 'react';
-import { useDecoderStore } from './decoder/store.js';
+import { engine } from '../../engine/engine.js';
 import { Player } from './player/Player.js';
-import { usePlayerStore } from './player/store.js';
 import { ProjectBackButton } from './ProjectBackButton.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
 import { ProjectSettings } from './settings/field/ProjectSettings.js';
+import { subscribeSettingsStore } from './settings/store.js';
 import { SpectrogramCanvas } from './spectrogram/SpectrogramCanvas.js';
 import { Subtitle } from './subtitle/view.js';
 import { WaveformCanvas } from './waveform/WaveformCanvas.js';
@@ -17,13 +17,9 @@ export type ProjectViewProps = {
 export const ProjectView: FC<ProjectViewProps> = (props) => {
   const { project } = props;
 
-  const player = usePlayerStore((s) => s.player);
-  const initDecoder = useDecoderStore((s) => s.init);
+  useEffect(() => subscribeSettingsStore(), []);
 
-  useEffect(() => {
-    if (!player) return;
-    return initDecoder(project.id, player.context.sampleRate);
-  }, [initDecoder, project.id, player]);
+  useEffect(() => engine.decoder.mount(project.id), [project.id]);
 
   return (
     <ProjectLayout

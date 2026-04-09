@@ -8,7 +8,6 @@ export * from './common/resizeObserver.js';
 export * from './common/viewSize.es.js';
 export * from './decoder/port.js';
 export * from './decoder/protocol.cross.js';
-export * from './player/audioPlayer.js';
 export * from './player/port.js';
 export * from './player/protocol.es.js';
 export * from './spectrogram/config.cross.js';

@@ -29,9 +29,10 @@ export type PlayerMainPort = TypedMessagePort<
 >;
 
 const playerCommandMethodKeys = createObjectKeys<PlayerCommandMethods>()([
-  'init',
-  'deinit',
+  'mount',
+  'unmount',
   'play',
+  'seek',
   'pause',
 ]);
 

@@ -7,9 +7,9 @@ export type DecoderCommandMethods = {
 
 export type DecoderEventMethods = {
   state: (message: { status: 'error' }) => void;
-  decoded: (message: {
+  mounted: (message: {
     channels: ChannelArrays<SharedArrayBuffer>;
     frameCount: number;
-    duration: number;
   }) => void;
+  unmounted: () => void;
 };
