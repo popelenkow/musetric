@@ -1,9 +1,6 @@
 import react from '@vitejs/plugin-react';
 import { defaultClientConditions, defineConfig } from 'vite';
-import mkcertRaw from 'vite-plugin-mkcert';
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const mkcert = mkcertRaw as unknown as typeof mkcertRaw.default;
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
   base: '/',
