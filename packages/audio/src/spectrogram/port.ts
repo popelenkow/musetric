@@ -16,9 +16,9 @@ export type SpectrogramMainPort = TypedMessagePort<
 
 const spectrogramCommandMethodKeys =
   createObjectKeys<SpectrogramCommandMethods>()([
+    'boot',
     'mount',
     'unmount',
-    'wave',
     'trackProgress',
     'config',
   ]);
@@ -32,6 +32,7 @@ export const createSpectrogramMainPort = (
     SpectrogramCommandMethods,
     SpectrogramEventMethods
   >(worker, spectrogramCommandMethodKeys, {
+    boot: (message) => [message.decoderPort],
     mount: (message) => (message.config.canvas ? [message.config.canvas] : []),
   });
   return port;

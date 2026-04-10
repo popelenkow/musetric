@@ -1,15 +1,21 @@
+import { toChannelBuffers } from '../../common/channelBuffers.es.js';
 import { decodeMp4 } from '../mp4/index.js';
-import { createDecoderWorkerPort } from './port.worker.js';
+import type {
+  DecoderWorkerPort,
+  PlayerDataPort,
+  SpectrogramDataPort,
+} from './port.worker.js';
 
 export type CreateDecoderWorkerRuntimeOptions = {
   getEncodedBuffer: (projectId: number) => Promise<ArrayBuffer>;
+  port: DecoderWorkerPort;
+  playerPort: PlayerDataPort;
+  spectrogramPort: SpectrogramDataPort;
 };
 export const createDecoderWorkerRuntime = (
   options: CreateDecoderWorkerRuntimeOptions,
 ) => {
-  const { getEncodedBuffer } = options;
-
-  const port = createDecoderWorkerPort();
+  const { getEncodedBuffer, port, playerPort, spectrogramPort } = options;
 
   port.bindMethods({
     mount: async (message) => {
@@ -17,8 +23,14 @@ export const createDecoderWorkerRuntime = (
         const { projectId, sampleRate } = message;
         const encodedBuffer = await getEncodedBuffer(projectId);
         const decoded = await decodeMp4(encodedBuffer, sampleRate);
+
+        playerPort.methods.mount({
+          buffers: toChannelBuffers(decoded.channels),
+        });
+        spectrogramPort.methods.wave({
+          waveBuffer: decoded.channels[0].buffer,
+        });
         port.methods.mounted({
-          channels: decoded.channels,
           frameCount: decoded.frameCount,
         });
       } catch (error) {
@@ -29,6 +41,8 @@ export const createDecoderWorkerRuntime = (
       }
     },
     unmount: () => {
+      playerPort.methods.unmount();
+      spectrogramPort.methods.clear();
       port.methods.unmounted();
     },
   });

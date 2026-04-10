@@ -1,4 +1,16 @@
-import { createSpectrogramWorkerRuntime } from '@musetric/audio/spectrogram/worker';
+import {
+  createSpectrogramDecoderDataPort,
+  createSpectrogramRuntime,
+  createSpectrogramWorkerPort,
+} from '@musetric/audio/spectrogram/worker';
 
 const profiling = import.meta.env.frontendSpectrogramProfiling === 'true';
-await createSpectrogramWorkerRuntime(profiling);
+const port = createSpectrogramWorkerPort();
+
+port.bindBoot(async (message) =>
+  createSpectrogramRuntime({
+    port,
+    dataPort: createSpectrogramDecoderDataPort(message.decoderPort),
+    profiling,
+  }),
+);

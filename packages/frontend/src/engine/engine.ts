@@ -41,17 +41,32 @@ export type Engine = {
 export const createEngine = (): Engine => {
   const context = new AudioContext({ sampleRate: defaultSampleRate });
   const store = createStore(initialState);
+  const playerChannel = new MessageChannel();
+  const spectrogramChannel = new MessageChannel();
 
   const ref: Engine = {
     context,
     store,
-    spectrogram: createEngineSpectrogram(store, context.sampleRate),
+    spectrogram: createEngineSpectrogram({
+      store,
+      sampleRate: context.sampleRate,
+      decoderPort: spectrogramChannel.port2,
+    }),
     waveform: createEngineWaveform(store),
-    decoder: createEngineDecoder(store, context.sampleRate),
+    decoder: createEngineDecoder({
+      store,
+      sampleRate: context.sampleRate,
+      playerPort: playerChannel.port1,
+      spectrogramPort: spectrogramChannel.port1,
+    }),
     player: createEngineStubPlayer(),
   };
 
-  void createEnginePlayer(context, store).then((player) => {
+  void createEnginePlayer({
+    context,
+    store,
+    decoderPort: playerChannel.port2,
+  }).then((player) => {
     ref.player = player;
   });
 

@@ -1,11 +1,10 @@
-import { type ChannelArrays, type ViewColors } from '@musetric/audio';
+import { type ViewColors } from '@musetric/audio';
 
 export type PortStatus = 'pending' | 'success' | 'error';
 export type EngineStatusKey = 'decoder' | 'spectrogram' | 'waveform';
 
 export type EngineState = {
   statuses: Record<EngineStatusKey, PortStatus>;
-  channels?: ChannelArrays<SharedArrayBuffer>;
   frameCount?: number;
   colors: ViewColors;
   duration: number;

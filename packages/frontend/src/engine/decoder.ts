@@ -10,10 +10,17 @@ export type EngineDecoder = {
   mount: (projectId: number) => Unmount;
 };
 
+export type CreateEngineDecoderOptions = {
+  store: Store<EngineState>;
+  sampleRate: number;
+  playerPort: MessagePort;
+  spectrogramPort: MessagePort;
+};
+
 export const createEngineDecoder = (
-  store: Store<EngineState>,
-  sampleRate: number,
+  options: CreateEngineDecoderOptions,
 ): EngineDecoder => {
+  const { store, sampleRate, playerPort, spectrogramPort } = options;
   const port = createDecoderMainPort(decoderWorkerUrl);
 
   port.instance.onerror = () => {
@@ -31,7 +38,6 @@ export const createEngineDecoder = (
     mounted: (message) => {
       store.update((state) => {
         state.statuses.decoder = 'success';
-        state.channels = message.channels;
         state.frameCount = message.frameCount;
         state.duration = message.frameCount / sampleRate;
       });
@@ -39,11 +45,15 @@ export const createEngineDecoder = (
     unmounted: () => {
       store.update((state) => {
         state.statuses.decoder = 'pending';
-        state.channels = undefined;
         state.frameCount = undefined;
         state.duration = 0;
       });
     },
+  });
+
+  port.methods.boot({
+    playerPort,
+    spectrogramPort,
   });
 
   return {

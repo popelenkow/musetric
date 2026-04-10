@@ -1,15 +1,14 @@
-import { type ChannelArrays } from '../common/channelBuffers.es.js';
-
 export type DecoderCommandMethods = {
+  boot: (message: {
+    playerPort: MessagePort;
+    spectrogramPort: MessagePort;
+  }) => void;
   mount: (message: { projectId: number; sampleRate: number }) => void;
   unmount: () => void;
 };
 
 export type DecoderEventMethods = {
   state: (message: { status: 'error' }) => void;
-  mounted: (message: {
-    channels: ChannelArrays<SharedArrayBuffer>;
-    frameCount: number;
-  }) => void;
+  mounted: (message: { frameCount: number }) => void;
   unmounted: () => void;
 };
