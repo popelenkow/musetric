@@ -1,13 +1,13 @@
 import { createCallEvery } from './callEvery.js';
 
-type MessagePortLike = {
+export type MessagePortLike = {
   // eslint-disable-next-line no-restricted-syntax
   postMessage(message: unknown, transfer?: Transferable[]): void;
   onmessage: ((event: MessageEvent<unknown>) => unknown) | null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PortMethods = Record<string, (message: any) => unknown>;
+export type PortMethods = Record<string, (message: any) => unknown>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type EmptyPortMethods = {};
@@ -19,13 +19,13 @@ type PortMessage<Methods extends PortMethods> = {
   };
 }[keyof Methods];
 
-type PortTransfers<Methods extends PortMethods> = Partial<{
+export type PortTransfers<Methods extends PortMethods> = Partial<{
   [Type in keyof Methods]: (
     payload: Parameters<Methods[Type]>[0],
   ) => Transferable[];
 }>;
 
-const createPortMethods = <Methods extends PortMethods>(
+const createMethods = <Methods extends PortMethods>(
   instance: MessagePortLike,
   methodKeys: readonly (keyof Methods)[],
   transfers: PortTransfers<Methods>,
@@ -44,11 +44,11 @@ const createPortMethods = <Methods extends PortMethods>(
   return methods as Methods;
 };
 
-const bindMethods = <Methods extends PortMethods>(
+const bindHandlers = <Handlers extends PortMethods>(
   instance: MessagePortLike,
-  handlers: Methods,
+  handlers: Handlers,
 ) => {
-  const onmessage = async (event: MessageEvent<PortMessage<Methods>>) => {
+  const onmessage = async (event: MessageEvent<PortMessage<Handlers>>) => {
     const message = event.data;
     const handler = handlers[message.type];
     if (!handler) {
@@ -66,28 +66,28 @@ const bindMethods = <Methods extends PortMethods>(
 
 export type TypedMessagePort<
   Port extends MessagePortLike,
+  Handlers extends PortMethods,
   Methods extends PortMethods,
-  HandlerMethods extends PortMethods,
 > = {
   instance: Port;
   methods: Methods;
-  bindBoot: (boot: HandlerMethods['boot']) => void;
-  bindMethods: (handlers: Omit<HandlerMethods, 'boot'>) => void;
+  bindBoot: (boot: Handlers['boot']) => void;
+  bindHandlers: (handlers: Omit<Handlers, 'boot'>) => void;
 };
 
-export const createTypedPort = <
+export const createMessagePort = <
   Port extends MessagePortLike,
+  Handlers extends PortMethods,
   Methods extends PortMethods,
-  HandlerMethods extends PortMethods,
 >(
   instance: Port,
   methodKeys: readonly (keyof Methods)[],
   methodTransfers: PortTransfers<Methods> = {},
-): TypedMessagePort<Port, Methods, HandlerMethods> => {
+): TypedMessagePort<Port, Handlers, Methods> => {
   return {
     instance,
-    methods: createPortMethods(instance, methodKeys, methodTransfers),
-    bindBoot: (boot) => bindMethods(instance, { boot }),
-    bindMethods: (handlers) => bindMethods(instance, handlers),
+    methods: createMethods(instance, methodKeys, methodTransfers),
+    bindBoot: (boot) => bindHandlers(instance, { boot }),
+    bindHandlers: (handlers) => bindHandlers(instance, handlers),
   };
 };

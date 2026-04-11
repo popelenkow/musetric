@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import { playerProcessorName } from '@musetric/audio/player';
 import {
-  createPlayerDecoderDataPort,
-  createPlayerRuntime,
-  createPlayerWorkletPort,
-} from '@musetric/audio/player/worklet';
+  playerChannel,
+  playerDataChannel,
+  playerProcessorName,
+} from '@musetric/audio/player';
+import { createPlayerRuntime } from '@musetric/audio/player/worklet';
 
 export class PlayerProcessor
   extends AudioWorkletProcessor
@@ -12,11 +12,11 @@ export class PlayerProcessor
 {
   constructor() {
     super();
-    const port = createPlayerWorkletPort(this.port);
+    const port = playerChannel.inbound(this.port);
     port.bindBoot((message) => {
       const runtime = createPlayerRuntime({
         port,
-        dataPort: createPlayerDecoderDataPort(message.decoderPort),
+        dataPort: playerDataChannel.inbound(message.dataPort),
       });
       this.handleProcess = (output: Float32Array[]) => {
         runtime.process(output);

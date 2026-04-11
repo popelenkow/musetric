@@ -1,4 +1,6 @@
-export type DecoderCommandMethods = {
+import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
+
+export type DecoderOutboundMethods = {
   boot: (message: {
     playerPort: MessagePort;
     spectrogramPort: MessagePort;
@@ -7,8 +9,23 @@ export type DecoderCommandMethods = {
   unmount: () => void;
 };
 
-export type DecoderEventMethods = {
+export type DecoderInboundMethods = {
   state: (message: { status: 'error' }) => void;
   mounted: (message: { frameCount: number }) => void;
   unmounted: () => void;
 };
+
+export const decoderChannel = createMessageChannel<
+  DecoderInboundMethods,
+  DecoderOutboundMethods
+>({
+  inbound: {
+    keys: ['state', 'mounted', 'unmounted'],
+  },
+  outbound: {
+    keys: ['boot', 'mount', 'unmount'],
+    transfers: {
+      boot: (message) => [message.playerPort, message.spectrogramPort],
+    },
+  },
+});

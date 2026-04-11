@@ -1,23 +1,21 @@
 import { toChannelBuffers } from '../../common/channelBuffers.es.js';
+import { type playerDataChannel } from '../../player/protocol.cross.js';
+import { type spectrogramDataChannel } from '../../spectrogram/protocol.cross.js';
 import { decodeMp4 } from '../mp4/index.js';
-import type {
-  DecoderWorkerPort,
-  PlayerDataPort,
-  SpectrogramDataPort,
-} from './port.worker.js';
+import { type decoderChannel } from '../protocol.cross.js';
 
-export type CreateDecoderWorkerRuntimeOptions = {
+export type CreateDecoderRuntimeOptions = {
   getEncodedBuffer: (projectId: number) => Promise<ArrayBuffer>;
-  port: DecoderWorkerPort;
-  playerPort: PlayerDataPort;
-  spectrogramPort: SpectrogramDataPort;
+  port: ReturnType<typeof decoderChannel.inbound<DedicatedWorkerGlobalScope>>;
+  playerPort: ReturnType<typeof playerDataChannel.outbound<MessagePort>>;
+  spectrogramPort: ReturnType<
+    typeof spectrogramDataChannel.outbound<MessagePort>
+  >;
 };
-export const createDecoderWorkerRuntime = (
-  options: CreateDecoderWorkerRuntimeOptions,
-) => {
+export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
   const { getEncodedBuffer, port, playerPort, spectrogramPort } = options;
 
-  port.bindMethods({
+  port.bindHandlers({
     mount: async (message) => {
       try {
         const { projectId, sampleRate } = message;
