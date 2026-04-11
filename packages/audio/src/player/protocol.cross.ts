@@ -1,20 +1,49 @@
+import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
+import { type EmptyPortMethods } from '@musetric/resource-utils/cross/messagePort';
 import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 
 export const playerProcessorName = 'player-processor';
 
-export type PlayerCommandMethods = {
-  boot: (message: { decoderPort: MessagePort }) => void;
+export type PlayerOutboundMethods = {
+  boot: (message: { dataPort: MessagePort }) => void;
   play: () => void;
   pause: () => void;
   seek: (message: { frameIndex: number }) => void;
 };
+
+export type PlayerInboundMethods = {
+  playing: (message: { playing: boolean; frameIndex: number }) => void;
+  frameIndex: (message: { frameIndex: number }) => void;
+};
+
+export const playerChannel = createMessageChannel<
+  PlayerInboundMethods,
+  PlayerOutboundMethods
+>({
+  inbound: {
+    keys: ['playing', 'frameIndex'],
+  },
+  outbound: {
+    keys: ['boot', 'play', 'seek', 'pause'],
+    transfers: {
+      boot: (message) => [message.dataPort],
+    },
+  },
+});
 
 export type PlayerDataMethods = {
   mount: (message: { buffers: ChannelBuffers }) => void;
   unmount: () => void;
 };
 
-export type PlayerEventMethods = {
-  playing: (message: { playing: boolean; frameIndex: number }) => void;
-  frameIndex: (message: { frameIndex: number }) => void;
-};
+export const playerDataChannel = createMessageChannel<
+  EmptyPortMethods,
+  PlayerDataMethods
+>({
+  inbound: {
+    keys: [],
+  },
+  outbound: {
+    keys: ['mount', 'unmount'],
+  },
+});

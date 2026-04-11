@@ -1,4 +1,4 @@
-import { createDecoderMainPort, type DecoderMainPort } from '@musetric/audio';
+import { decoderChannel } from '@musetric/audio';
 import type { Store } from '../common/store.js';
 import decoderWorkerUrl from './decoder.worker.ts?worker&url';
 import type { EngineState } from './state.js';
@@ -6,7 +6,7 @@ import type { EngineState } from './state.js';
 type Unmount = () => void;
 
 export type EngineDecoder = {
-  port: DecoderMainPort;
+  port: ReturnType<typeof decoderChannel.outbound<Worker>>;
   mount: (projectId: number) => Unmount;
 };
 
@@ -21,7 +21,8 @@ export const createEngineDecoder = (
   options: CreateEngineDecoderOptions,
 ): EngineDecoder => {
   const { store, sampleRate, playerPort, spectrogramPort } = options;
-  const port = createDecoderMainPort(decoderWorkerUrl);
+  const worker = new Worker(decoderWorkerUrl, { type: 'module' });
+  const port = decoderChannel.outbound(worker);
 
   port.instance.onerror = () => {
     store.update((state) => {
@@ -29,7 +30,7 @@ export const createEngineDecoder = (
     });
   };
 
-  port.bindMethods({
+  port.bindHandlers({
     state: (message) => {
       store.update((state) => {
         state.statuses.decoder = message.status;

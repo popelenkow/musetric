@@ -2,25 +2,25 @@ import {
   type ChannelArrays,
   toChannelArrays,
 } from '../../common/channelBuffers.es.js';
-import type {
-  PlayerDecoderDataPort,
-  PlayerWorkletPort,
-} from './port.worklet.js';
+import {
+  type playerChannel,
+  type playerDataChannel,
+} from '../protocol.cross.js';
 import { createFrameIndexTracker } from './trackFrameIndex.worklet.js';
 
 export type CreatePlayerRuntimeOptions = {
-  port: PlayerWorkletPort;
-  dataPort: PlayerDecoderDataPort;
+  port: ReturnType<typeof playerChannel.inbound<MessagePort>>;
+  dataPort: ReturnType<typeof playerDataChannel.inbound<MessagePort>>;
 };
 
-export type PlayerWorkletInternalRuntime = {
-  port: PlayerWorkletPort;
+export type PlayerRuntime = {
+  port: ReturnType<typeof playerChannel.inbound<MessagePort>>;
   process: (output: Float32Array[]) => void;
 };
 
 export const createPlayerRuntime = (
   options: CreatePlayerRuntimeOptions,
-): PlayerWorkletInternalRuntime => {
+): PlayerRuntime => {
   const { port, dataPort } = options;
 
   let channels: ChannelArrays | undefined = undefined;
@@ -28,7 +28,7 @@ export const createPlayerRuntime = (
   let playing = false;
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
-  dataPort.bindMethods({
+  dataPort.bindHandlers({
     mount: (message) => {
       channels = toChannelArrays(message.buffers);
       frameIndex = 0;
@@ -45,7 +45,7 @@ export const createPlayerRuntime = (
     },
   });
 
-  port.bindMethods({
+  port.bindHandlers({
     play: () => {
       if (!channels) {
         return;

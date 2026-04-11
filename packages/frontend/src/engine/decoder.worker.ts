@@ -1,20 +1,27 @@
 import { api } from '@musetric/api';
 import { requestWithAxios } from '@musetric/api/dom';
-import {
-  createDecoderWorkerPort,
-  createDecoderWorkerRuntime,
-  createPlayerDataPort,
-  createSpectrogramDataPort,
-} from '@musetric/audio/decoder/worker';
+import { decoderChannel } from '@musetric/audio/decoder';
+import { createDecoderRuntime } from '@musetric/audio/decoder/worker';
+import { playerDataChannel } from '@musetric/audio/player';
+import { spectrogramDataChannel } from '@musetric/audio/spectrogram';
 import axios from 'axios';
 
-const port = createDecoderWorkerPort();
+const port = decoderChannel.inbound(self);
+
+const reportError = () => {
+  port.methods.state({
+    status: 'error',
+  });
+};
+self.addEventListener('error', reportError);
+self.addEventListener('unhandledrejection', reportError);
+self.addEventListener('messageerror', reportError);
 
 port.bindBoot((message) =>
-  createDecoderWorkerRuntime({
+  createDecoderRuntime({
     port,
-    playerPort: createPlayerDataPort(message.playerPort),
-    spectrogramPort: createSpectrogramDataPort(message.spectrogramPort),
+    playerPort: playerDataChannel.outbound(message.playerPort),
+    spectrogramPort: spectrogramDataChannel.outbound(message.spectrogramPort),
     getEncodedBuffer: async (projectId) => {
       const encodedBuffer = await requestWithAxios(
         axios,

@@ -18,7 +18,6 @@ export * from './fourier/isPowerOfTwo.js';
 export * from './fourier/types.js';
 export * from './fourier/utilsRadix4.js';
 export * from './magnitudify/index.js';
-export * from './port.js';
 export * from './processor.js';
 export * from './protocol.cross.js';
 export * from './remap/index.js';

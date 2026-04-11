@@ -1,8 +1,7 @@
 import {
-  createSpectrogramMainPort,
   getCanvasSize,
+  spectrogramChannel,
   type SpectrogramConfig,
-  type SpectrogramMainPort,
   subscribeResizeObserver,
 } from '@musetric/audio';
 import type { Store } from '../common/store.js';
@@ -12,7 +11,7 @@ import { type EngineState, getTrackProgress } from './state.js';
 type Unmount = () => void;
 
 export type EngineSpectrogram = {
-  port: SpectrogramMainPort;
+  port: ReturnType<typeof spectrogramChannel.outbound<Worker>>;
   mount: (
     canvas: HTMLCanvasElement,
     config: Partial<SpectrogramConfig>,
@@ -30,14 +29,15 @@ export const createEngineSpectrogram = (
   options: CreateEngineSpectrogramOptions,
 ): EngineSpectrogram => {
   const { store, sampleRate, decoderPort } = options;
-  const port = createSpectrogramMainPort(spectrogramWorkerUrl);
+  const worker = new Worker(spectrogramWorkerUrl, { type: 'module' });
+  const port = spectrogramChannel.outbound(worker);
   port.instance.onerror = () => {
     store.update((state) => {
       state.statuses.spectrogram = 'error';
     });
   };
 
-  port.bindMethods({
+  port.bindHandlers({
     state: (message) => {
       store.update((state) => {
         state.statuses.spectrogram = message.status;
@@ -61,7 +61,7 @@ export const createEngineSpectrogram = (
   );
 
   port.methods.boot({
-    decoderPort,
+    dataPort: decoderPort,
   });
 
   return {

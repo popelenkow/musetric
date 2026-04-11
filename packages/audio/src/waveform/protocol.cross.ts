@@ -1,9 +1,10 @@
+import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
 import type { ViewColors } from '../common/colors.es.js';
 import type { ViewSize } from '../common/viewSize.es.js';
 
 export type WaveType = 'lead' | 'backing' | 'instrumental';
 
-export type WaveformCommandMethods = {
+export type WaveformOutboundMethods = {
   mount: (message: {
     projectId: number;
     waveType: WaveType;
@@ -18,6 +19,21 @@ export type WaveformCommandMethods = {
   resize: (message: { viewSize: ViewSize }) => void;
 };
 
-export type WaveformEventMethods = {
+export type WaveformInboundMethods = {
   state: (message: { status: 'error' | 'success' }) => void;
 };
+
+export const waveformChannel = createMessageChannel<
+  WaveformInboundMethods,
+  WaveformOutboundMethods
+>({
+  inbound: {
+    keys: ['state'],
+  },
+  outbound: {
+    keys: ['mount', 'unmount', 'trackProgress', 'colors', 'resize'],
+    transfers: {
+      mount: (message) => [message.canvas],
+    },
+  },
+});

@@ -1,9 +1,8 @@
 import {
-  createWaveformMainPort,
   getCanvasSize,
   resizeCanvas,
   subscribeResizeObserver,
-  type WaveformMainPort,
+  waveformChannel,
   type WaveType,
 } from '@musetric/audio';
 import type { Store } from '../common/store.js';
@@ -13,7 +12,7 @@ import waveformWorkerUrl from './waveform.worker.ts?worker&url';
 type Unmount = () => void;
 
 export type EngineWaveform = {
-  port: WaveformMainPort;
+  port: ReturnType<typeof waveformChannel.outbound<Worker>>;
   mount: (options: {
     projectId: number;
     type: WaveType;
@@ -24,7 +23,8 @@ export type EngineWaveform = {
 export const createEngineWaveform = (
   store: Store<EngineState>,
 ): EngineWaveform => {
-  const port = createWaveformMainPort(waveformWorkerUrl);
+  const worker = new Worker(waveformWorkerUrl, { type: 'module' });
+  const port = waveformChannel.outbound(worker);
 
   port.instance.onerror = () => {
     store.update((state) => {
@@ -32,7 +32,7 @@ export const createEngineWaveform = (
     });
   };
 
-  port.bindMethods({
+  port.bindHandlers({
     state: (message) => {
       store.update((state) => {
         state.statuses.waveform = message.status;

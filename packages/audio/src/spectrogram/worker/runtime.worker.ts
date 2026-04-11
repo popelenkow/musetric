@@ -1,22 +1,15 @@
 import { getGpuDevice } from '../common/gpuDevice.js';
+import { createSpectrogramProcessor } from '../processor.js';
 import {
-  createSpectrogramProcessor,
-  type SpectrogramProcessor,
-} from '../processor.js';
-import type {
-  SpectrogramDecoderDataPort,
-  SpectrogramWorkerPort,
-} from './port.worker.js';
-
-export type SpectrogramWorkerState = {
-  processor: SpectrogramProcessor;
-  wave?: Float32Array<SharedArrayBuffer>;
-  trackProgress: number;
-};
+  type spectrogramChannel,
+  type spectrogramDataChannel,
+} from '../protocol.cross.js';
 
 export type CreateSpectrogramRuntimeOptions = {
-  port: SpectrogramWorkerPort;
-  dataPort: SpectrogramDecoderDataPort;
+  port: ReturnType<
+    typeof spectrogramChannel.inbound<DedicatedWorkerGlobalScope>
+  >;
+  dataPort: ReturnType<typeof spectrogramDataChannel.inbound<MessagePort>>;
   profiling?: boolean;
 };
 
@@ -36,13 +29,11 @@ export const createSpectrogramRuntime = async (
         : undefined,
     });
 
-  const state: SpectrogramWorkerState = {
-    processor: createProcessor(),
-    trackProgress: 0,
-  };
+  let processor = createProcessor();
+  let wave: Float32Array<SharedArrayBuffer> | undefined = undefined;
+  let trackProgress = 0;
 
   const render = async () => {
-    const { processor, wave, trackProgress } = state;
     if (!wave) {
       return;
     }
@@ -56,25 +47,25 @@ export const createSpectrogramRuntime = async (
     });
   };
 
-  dataPort.bindMethods({
+  dataPort.bindHandlers({
     wave: async (message) => {
-      state.wave = new Float32Array(message.waveBuffer);
+      wave = new Float32Array(message.waveBuffer);
       await render();
     },
     clear: () => {
-      state.wave = undefined;
+      wave = undefined;
       port.methods.state({
         status: 'pending',
       });
     },
   });
 
-  port.bindMethods({
+  port.bindHandlers({
     mount: async (message) => {
       try {
-        state.trackProgress = message.trackProgress;
-        state.processor = createProcessor();
-        state.processor.updateConfig(message.config);
+        trackProgress = message.trackProgress;
+        processor = createProcessor();
+        processor.updateConfig(message.config);
         await render();
       } catch (error) {
         console.error('Failed to render spectrogram', error);
@@ -84,20 +75,20 @@ export const createSpectrogramRuntime = async (
       }
     },
     unmount: () => {
-      state.processor.dispose();
-      state.processor = createProcessor();
-      state.wave = undefined;
-      state.trackProgress = 0;
+      processor.dispose();
+      processor = createProcessor();
+      wave = undefined;
+      trackProgress = 0;
       port.methods.state({
         status: 'pending',
       });
     },
     trackProgress: async (message) => {
-      state.trackProgress = message.trackProgress;
+      trackProgress = message.trackProgress;
       await render();
     },
     config: async (message) => {
-      state.processor.updateConfig(message.patch);
+      processor.updateConfig(message.patch);
       await render();
     },
   });
