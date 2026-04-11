@@ -20,10 +20,16 @@ export type EngineSpectrogram = {
   setConfig: (patch: Partial<SpectrogramConfig>) => void;
 };
 
+export type CreateEngineSpectrogramOptions = {
+  store: Store<EngineState>;
+  sampleRate: number;
+  decoderPort: MessagePort;
+};
+
 export const createEngineSpectrogram = (
-  store: Store<EngineState>,
-  sampleRate: number,
+  options: CreateEngineSpectrogramOptions,
 ): EngineSpectrogram => {
+  const { store, sampleRate, decoderPort } = options;
   const port = createSpectrogramMainPort(spectrogramWorkerUrl);
   port.instance.onerror = () => {
     store.update((state) => {
@@ -46,16 +52,6 @@ export const createEngineSpectrogram = (
   });
 
   store.subscribe(
-    (state) => state.channels?.[0]?.buffer,
-    (waveBuffer) => {
-      if (!waveBuffer) return;
-      port.methods.wave({
-        waveBuffer,
-      });
-    },
-  );
-
-  store.subscribe(
     (state) => state.colors,
     (colors) => {
       port.methods.config({
@@ -63,6 +59,10 @@ export const createEngineSpectrogram = (
       });
     },
   );
+
+  port.methods.boot({
+    decoderPort,
+  });
 
   return {
     port,
@@ -79,7 +79,6 @@ export const createEngineSpectrogram = (
           sampleRate,
         },
         trackProgress: getTrackProgress(store.get()),
-        waveBuffer: store.get().channels?.[0]?.buffer,
       });
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {

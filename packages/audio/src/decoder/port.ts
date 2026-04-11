@@ -15,6 +15,7 @@ export type DecoderMainPort = TypedMessagePort<
 >;
 
 const decoderCommandMethodKeys = createObjectKeys<DecoderCommandMethods>()([
+  'boot',
   'mount',
   'unmount',
 ]);
@@ -27,6 +28,8 @@ export const createDecoderMainPort = (
     Worker,
     DecoderCommandMethods,
     DecoderEventMethods
-  >(worker, decoderCommandMethodKeys);
+  >(worker, decoderCommandMethodKeys, {
+    boot: (message) => [message.playerPort, message.spectrogramPort],
+  });
   return port;
 };

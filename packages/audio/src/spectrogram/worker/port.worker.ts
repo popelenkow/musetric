@@ -1,10 +1,12 @@
 import { createObjectKeys } from '@musetric/resource-utils';
 import {
   createTypedPort,
+  type EmptyPortMethods,
   type TypedMessagePort,
 } from '@musetric/resource-utils/cross/messagePort';
 import {
   type SpectrogramCommandMethods,
+  type SpectrogramDataMethods,
   type SpectrogramEventMethods,
 } from '../protocol.cross.js';
 
@@ -34,3 +36,21 @@ export const createSpectrogramWorkerPort = (): SpectrogramWorkerPort => {
   port.instance.addEventListener('messageerror', onError);
   return port;
 };
+
+export type SpectrogramDecoderDataPort = TypedMessagePort<
+  MessagePort,
+  EmptyPortMethods,
+  SpectrogramDataMethods
+>;
+
+const spectrogramDecoderDataMethodKeys = createObjectKeys<EmptyPortMethods>()(
+  [],
+);
+
+export const createSpectrogramDecoderDataPort = (
+  messagePort: MessagePort,
+): SpectrogramDecoderDataPort =>
+  createTypedPort<MessagePort, EmptyPortMethods, SpectrogramDataMethods>(
+    messagePort,
+    spectrogramDecoderDataMethodKeys,
+  );

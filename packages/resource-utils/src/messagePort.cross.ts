@@ -6,7 +6,11 @@ type MessagePortLike = {
   onmessage: ((event: MessageEvent<unknown>) => unknown) | null;
 };
 
-type PortMethods = Record<string, (...args: never[]) => unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PortMethods = Record<string, (message: any) => unknown>;
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type EmptyPortMethods = {};
 
 type PortMessage<Methods extends PortMethods> = {
   [Type in keyof Methods]: {
@@ -40,6 +44,26 @@ const createPortMethods = <Methods extends PortMethods>(
   return methods as Methods;
 };
 
+const bindMethods = <Methods extends PortMethods>(
+  instance: MessagePortLike,
+  handlers: Methods,
+) => {
+  const onmessage = async (event: MessageEvent<PortMessage<Methods>>) => {
+    const message = event.data;
+    const handler = handlers[message.type];
+    if (!handler) {
+      console.error('Unhandled port method', message);
+      return;
+    }
+    const { payload } = message;
+    await handler(payload);
+  };
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  instance.onmessage = createCallEvery(
+    onmessage,
+  ) as MessagePortLike['onmessage'];
+};
+
 export type TypedMessagePort<
   Port extends MessagePortLike,
   Methods extends PortMethods,
@@ -47,7 +71,8 @@ export type TypedMessagePort<
 > = {
   instance: Port;
   methods: Methods;
-  bindMethods: (handlers: HandlerMethods) => void;
+  bindBoot: (boot: HandlerMethods['boot']) => void;
+  bindMethods: (handlers: Omit<HandlerMethods, 'boot'>) => void;
 };
 
 export const createTypedPort = <
@@ -62,23 +87,7 @@ export const createTypedPort = <
   return {
     instance,
     methods: createPortMethods(instance, methodKeys, methodTransfers),
-    bindMethods: (handlers) => {
-      const onmessage = async (
-        event: MessageEvent<PortMessage<HandlerMethods>>,
-      ) => {
-        const message = event.data;
-        const handler = handlers[message.type];
-        if (!handler) {
-          console.error('Unhandled port method', message);
-          return;
-        }
-        const { payload } = message;
-        await handler(payload);
-      };
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      instance.onmessage = createCallEvery(
-        onmessage,
-      ) as MessagePortLike['onmessage'];
-    },
+    bindBoot: (boot) => bindMethods(instance, { boot }),
+    bindMethods: (handlers) => bindMethods(instance, handlers),
   };
 };

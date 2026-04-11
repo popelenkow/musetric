@@ -7,7 +7,7 @@ import {
   type PlayerCommandMethods,
   type PlayerEventMethods,
   playerProcessorName,
-} from './protocol.es.js';
+} from './protocol.cross.js';
 
 export const createPlayerNode = async (
   context: AudioContext,
@@ -29,8 +29,7 @@ export type PlayerMainPort = TypedMessagePort<
 >;
 
 const playerCommandMethodKeys = createObjectKeys<PlayerCommandMethods>()([
-  'mount',
-  'unmount',
+  'boot',
   'play',
   'seek',
   'pause',
@@ -41,6 +40,8 @@ export const getPlayerPort = (node: AudioWorkletNode): PlayerMainPort => {
     MessagePort,
     PlayerCommandMethods,
     PlayerEventMethods
-  >(node.port, playerCommandMethodKeys);
+  >(node.port, playerCommandMethodKeys, {
+    boot: (message) => [message.decoderPort],
+  });
   return port;
 };

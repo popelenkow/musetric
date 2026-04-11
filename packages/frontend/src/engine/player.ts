@@ -1,8 +1,4 @@
-import {
-  createPlayerNode,
-  getPlayerPort,
-  toChannelBuffers,
-} from '@musetric/audio';
+import { createPlayerNode, getPlayerPort } from '@musetric/audio';
 import type { Store } from '../common/store.js';
 import playerWorkletUrl from './player.worklet.ts?worker&url';
 import { type EngineState } from './state.js';
@@ -25,10 +21,16 @@ export const createEngineStubPlayer = (): EnginePlayer => ({
   },
 });
 
+export type CreateEnginePlayerOptions = {
+  context: AudioContext;
+  store: Store<EngineState>;
+  decoderPort: MessagePort;
+};
+
 export const createEnginePlayer = async (
-  context: AudioContext,
-  store: Store<EngineState>,
+  options: CreateEnginePlayerOptions,
 ): Promise<EnginePlayer> => {
+  const { context, store, decoderPort } = options;
   const node = await createPlayerNode(context, playerWorkletUrl);
   const port = getPlayerPort(node);
 
@@ -45,28 +47,9 @@ export const createEnginePlayer = async (
       });
     },
   });
-
-  {
-    const { channels } = store.get();
-    if (channels) {
-      port.methods.mount({
-        buffers: toChannelBuffers(channels),
-      });
-    }
-  }
-  store.subscribe(
-    (state) => state.channels,
-    (channels) => {
-      if (!channels) {
-        port.methods.unmount();
-        return;
-      }
-
-      port.methods.mount({
-        buffers: toChannelBuffers(channels),
-      });
-    },
-  );
+  port.methods.boot({
+    decoderPort,
+  });
 
   const ref: EnginePlayer = {
     play: async () => {

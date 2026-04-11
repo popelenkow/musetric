@@ -2,22 +2,33 @@ import {
   type ChannelArrays,
   toChannelArrays,
 } from '../../common/channelBuffers.es.js';
-import type { PlayerWorkletPort } from './port.worklet.js';
+import type {
+  PlayerDecoderDataPort,
+  PlayerWorkletPort,
+} from './port.worklet.js';
 import { createFrameIndexTracker } from './trackFrameIndex.worklet.js';
 
-export type PlayerWorkletRuntime = {
+export type CreatePlayerRuntimeOptions = {
   port: PlayerWorkletPort;
-  process: (output: Float32Array[]) => boolean;
+  dataPort: PlayerDecoderDataPort;
 };
-export const createPlayerWorkletRuntime = (
-  port: PlayerWorkletPort,
-): PlayerWorkletRuntime => {
+
+export type PlayerWorkletInternalRuntime = {
+  port: PlayerWorkletPort;
+  process: (output: Float32Array[]) => void;
+};
+
+export const createPlayerRuntime = (
+  options: CreatePlayerRuntimeOptions,
+): PlayerWorkletInternalRuntime => {
+  const { port, dataPort } = options;
+
   let channels: ChannelArrays | undefined = undefined;
   let frameIndex = 0;
   let playing = false;
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
-  port.bindMethods({
+  dataPort.bindMethods({
     mount: (message) => {
       channels = toChannelArrays(message.buffers);
       frameIndex = 0;
@@ -32,6 +43,9 @@ export const createPlayerWorkletRuntime = (
       frameIndexTracker.reset(frameIndex);
       port.methods.playing({ playing, frameIndex });
     },
+  });
+
+  port.bindMethods({
     play: () => {
       if (!channels) {
         return;
@@ -69,7 +83,7 @@ export const createPlayerWorkletRuntime = (
         for (const out of output) {
           out.fill(0);
         }
-        return true;
+        return;
       }
 
       for (let channel = 0; channel < output.length; channel++) {
@@ -88,14 +102,12 @@ export const createPlayerWorkletRuntime = (
         playing = false;
         frameIndexTracker.reset(frameIndex);
         port.methods.playing({ playing, frameIndex });
-        return true;
+        return;
       }
 
       if (frameIndexTracker.advance(frameIndex)) {
         port.methods.frameIndex({ frameIndex });
       }
-
-      return true;
     },
   };
 };

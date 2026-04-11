@@ -1,1 +1,1 @@
-export * from './protocol.es.js';
+export * from './protocol.cross.js';
