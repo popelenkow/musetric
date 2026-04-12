@@ -8,7 +8,7 @@ const profiling = import.meta.env.frontendSpectrogramProfiling === 'true';
 const port = spectrogramChannel.inbound(self);
 
 const reportError = () => {
-  port.methods.state({
+  port.methods.setState({
     status: 'error',
   });
 };

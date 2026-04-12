@@ -12,8 +12,8 @@ export type PlayerOutboundMethods = {
 };
 
 export type PlayerInboundMethods = {
-  playing: (message: { playing: boolean; frameIndex: number }) => void;
-  frameIndex: (message: { frameIndex: number }) => void;
+  setPlaying: (message: { playing: boolean; frameIndex: number }) => void;
+  setFrameIndex: (message: { frameIndex: number }) => void;
 };
 
 export const playerChannel = createMessageChannel<
@@ -21,7 +21,7 @@ export const playerChannel = createMessageChannel<
   PlayerOutboundMethods
 >({
   inbound: {
-    keys: ['playing', 'frameIndex'],
+    keys: ['setPlaying', 'setFrameIndex'],
   },
   outbound: {
     keys: ['boot', 'play', 'seek', 'pause'],
@@ -32,7 +32,7 @@ export const playerChannel = createMessageChannel<
 });
 
 export type PlayerDataMethods = {
-  mount: (message: { buffers: ChannelBuffers }) => void;
+  setWave: (message: { buffers: ChannelBuffers }) => void;
   unmount: () => void;
 };
 
@@ -44,6 +44,6 @@ export const playerDataChannel = createMessageChannel<
     keys: [],
   },
   outbound: {
-    keys: ['mount', 'unmount'],
+    keys: ['setWave', 'unmount'],
   },
 });

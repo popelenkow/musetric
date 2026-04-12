@@ -38,7 +38,7 @@ export const createEngineSpectrogram = (
   };
 
   port.bindHandlers({
-    state: (message) => {
+    setState: (message) => {
       store.update((state) => {
         state.statuses.spectrogram = message.status;
       });
@@ -46,7 +46,7 @@ export const createEngineSpectrogram = (
   });
 
   store.subscribe(getTrackProgress, (trackProgress) => {
-    port.methods.trackProgress({
+    port.methods.setTrackProgress({
       trackProgress,
     });
   });
@@ -54,7 +54,7 @@ export const createEngineSpectrogram = (
   store.subscribe(
     (state) => state.colors,
     (colors) => {
-      port.methods.config({
+      port.methods.updateConfig({
         patch: { colors },
       });
     },
@@ -82,7 +82,7 @@ export const createEngineSpectrogram = (
       });
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
-        port.methods.config({
+        port.methods.updateConfig({
           patch: { viewSize: getCanvasSize(canvas) },
         });
       });
@@ -96,7 +96,7 @@ export const createEngineSpectrogram = (
       };
     },
     setConfig: (patch) => {
-      port.methods.config({
+      port.methods.updateConfig({
         patch,
       });
     },

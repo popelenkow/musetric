@@ -9,7 +9,7 @@ import axios from 'axios';
 const port = decoderChannel.inbound(self);
 
 const reportError = () => {
-  port.methods.state({
+  port.methods.setState({
     status: 'error',
   });
 };

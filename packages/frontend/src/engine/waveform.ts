@@ -33,7 +33,7 @@ export const createEngineWaveform = (
   };
 
   port.bindHandlers({
-    state: (message) => {
+    setState: (message) => {
       store.update((state) => {
         state.statuses.waveform = message.status;
       });
@@ -41,7 +41,7 @@ export const createEngineWaveform = (
   });
 
   store.subscribe(getTrackProgress, (trackProgress) => {
-    port.methods.trackProgress({
+    port.methods.setTrackProgress({
       trackProgress,
     });
   });
@@ -49,7 +49,7 @@ export const createEngineWaveform = (
   store.subscribe(
     (state) => state.colors,
     (colors) => {
-      port.methods.colors({
+      port.methods.setColors({
         colors,
       });
     },

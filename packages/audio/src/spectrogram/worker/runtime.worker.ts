@@ -42,19 +42,19 @@ export const createSpectrogramRuntime = async (
     if (!ok) {
       return;
     }
-    port.methods.state({
+    port.methods.setState({
       status: 'success',
     });
   };
 
   dataPort.bindHandlers({
-    wave: async (message) => {
+    setWave: async (message) => {
       wave = new Float32Array(message.waveBuffer);
       await render();
     },
     clear: () => {
       wave = undefined;
-      port.methods.state({
+      port.methods.setState({
         status: 'pending',
       });
     },
@@ -69,7 +69,7 @@ export const createSpectrogramRuntime = async (
         await render();
       } catch (error) {
         console.error('Failed to render spectrogram', error);
-        port.methods.state({
+        port.methods.setState({
           status: 'error',
         });
       }
@@ -79,15 +79,15 @@ export const createSpectrogramRuntime = async (
       processor = createProcessor();
       wave = undefined;
       trackProgress = 0;
-      port.methods.state({
+      port.methods.setState({
         status: 'pending',
       });
     },
-    trackProgress: async (message) => {
+    setTrackProgress: async (message) => {
       trackProgress = message.trackProgress;
       await render();
     },
-    config: async (message) => {
+    updateConfig: async (message) => {
       processor.updateConfig(message.patch);
       await render();
     },
