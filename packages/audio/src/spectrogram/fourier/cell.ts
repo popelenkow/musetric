@@ -4,6 +4,7 @@ import {
 } from '@musetric/resource-utils';
 import { type ComplexGpuBuffer } from '../common/complexArray.js';
 import { type ExtSpectrogramConfig } from '../common/extConfig.js';
+import { type FourierMode } from '../config.cross.js';
 import { fouriers } from './fouriers.js';
 import {
   type Fourier,
@@ -11,14 +12,9 @@ import {
   type FourierTimestampWrites,
 } from './types.js';
 
-export type Config = Pick<
-  ExtSpectrogramConfig,
-  'fourierMode' | 'windowSize' | 'windowCount' | 'zeroPaddingFactor'
->;
-
 export type StateArg = {
   signal: ComplexGpuBuffer;
-  config: Config;
+  config: ExtSpectrogramConfig;
 };
 
 export const createFourierCell = (
@@ -26,7 +22,7 @@ export const createFourierCell = (
   markers?: FourierTimestampWrites,
 ): ResourceCell<StateArg, Fourier> => {
   const modeCell = createResourceCell({
-    create: (mode: Config['fourierMode']) => fouriers[mode](device, markers),
+    create: (mode: FourierMode) => fouriers[mode](device, markers),
     dispose: (cell) => {
       cell.dispose();
     },

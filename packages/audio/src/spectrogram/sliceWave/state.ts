@@ -6,24 +6,14 @@ import { type ExtSpectrogramConfig } from '../common/extConfig.js';
 import { createParamsCell, type StateParams } from './params.js';
 import { createStateWaveCell, type StateWave } from './wave.js';
 
-export type Config = Pick<
-  ExtSpectrogramConfig,
-  | 'windowSize'
-  | 'windowCount'
-  | 'sampleRate'
-  | 'visibleTimeBefore'
-  | 'visibleTimeAfter'
-  | 'zeroPaddingFactor'
->;
-
 export type StateArg = {
   out: GPUBuffer;
-  config: Config;
+  config: ExtSpectrogramConfig;
 };
 
 export type State = {
   pipeline: GPUComputePipeline;
-  config: Config;
+  config: ExtSpectrogramConfig;
   params: StateParams;
   wave: StateWave;
   bindGroup: GPUBindGroup;

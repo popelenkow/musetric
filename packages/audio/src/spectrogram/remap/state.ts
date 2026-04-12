@@ -5,25 +5,15 @@ import {
 import { type SpectrogramConfig } from '../config.cross.js';
 import { createParamsCell, type StateParams } from './params.js';
 
-export type Config = Pick<
-  SpectrogramConfig,
-  | 'windowSize'
-  | 'sampleRate'
-  | 'zeroPaddingFactor'
-  | 'minFrequency'
-  | 'maxFrequency'
-  | 'viewSize'
->;
-
 export type StateArg = {
   signal: GPUBuffer;
   texture: GPUTextureView;
-  config: Config;
+  config: SpectrogramConfig;
 };
 
 export type State = {
   pipeline: GPUComputePipeline;
-  config: Config;
+  config: SpectrogramConfig;
   params: StateParams;
   bindGroup: GPUBindGroup;
 };

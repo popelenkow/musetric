@@ -9,19 +9,14 @@ import {
   type StateWindowFunction,
 } from './windowFunction.js';
 
-export type Config = Pick<
-  ExtSpectrogramConfig,
-  'windowSize' | 'windowCount' | 'zeroPaddingFactor' | 'windowName'
->;
-
 export type StateArg = {
   signal: GPUBuffer;
-  config: Config;
+  config: ExtSpectrogramConfig;
 };
 
 export type State = {
   pipeline: GPUComputePipeline;
-  config: Config;
+  config: ExtSpectrogramConfig;
   params: StateParams;
   windowFunction: StateWindowFunction;
   bindGroup: GPUBindGroup;

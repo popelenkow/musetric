@@ -9,9 +9,20 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { engine } from '../../../engine/engine.js';
 
-export type SettingsState = {
+export type SettingsState = Pick<
+  SpectrogramConfig,
+  | 'fourierMode'
+  | 'windowSize'
+  | 'visibleTimeBefore'
+  | 'visibleTimeAfter'
+  | 'zeroPaddingFactor'
+  | 'windowName'
+  | 'minDecibel'
+  | 'minFrequency'
+  | 'maxFrequency'
+> & {
   open: boolean;
-} & Omit<SpectrogramConfig, 'viewSize' | 'canvas' | 'sampleRate' | 'colors'>;
+};
 
 const initialState: SettingsState = {
   fourierMode: 'fftRadix4',

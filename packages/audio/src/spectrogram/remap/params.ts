@@ -1,5 +1,5 @@
 import { createResourceCell } from '@musetric/resource-utils';
-import { type Config } from './state.js';
+import type { SpectrogramConfig } from '../config.cross.js';
 
 export type RemapParams = {
   halfSize: number;
@@ -11,7 +11,7 @@ export type RemapParams = {
   logRange: number;
 };
 
-const toParams = (config: Config): RemapParams => {
+const toParams = (config: SpectrogramConfig): RemapParams => {
   const {
     sampleRate,
     zeroPaddingFactor,
@@ -50,7 +50,7 @@ export type StateParams = {
 
 export const createParamsCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: Config): StateParams => {
+    create: (config: SpectrogramConfig): StateParams => {
       const value = toParams(config);
       const array = new DataView(new ArrayBuffer(28));
       array.setUint32(0, value.halfSize, true);
