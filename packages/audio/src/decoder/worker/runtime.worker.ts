@@ -22,10 +22,10 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
         const encodedBuffer = await getEncodedBuffer(projectId);
         const decoded = await decodeMp4(encodedBuffer, sampleRate);
 
-        playerPort.methods.setWave({
+        playerPort.methods.mount({
           buffers: toChannelBuffers(decoded.channels),
         });
-        spectrogramPort.methods.setWave({
+        spectrogramPort.methods.mount({
           waveBuffer: decoded.channels[0].buffer,
         });
         port.methods.mounted({
@@ -40,7 +40,7 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
     },
     unmount: () => {
       playerPort.methods.unmount();
-      spectrogramPort.methods.clear();
+      spectrogramPort.methods.unmount();
       port.methods.unmounted();
     },
   });

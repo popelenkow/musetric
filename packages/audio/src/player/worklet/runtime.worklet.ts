@@ -29,7 +29,7 @@ export const createPlayerRuntime = (
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
   dataPort.bindHandlers({
-    setWave: (message) => {
+    mount: (message) => {
       channels = toChannelArrays(message.buffers);
       frameIndex = 0;
       playing = false;
