@@ -37,12 +37,12 @@ export const createWaveformRuntime = (
 
         wave = await getWave(message.projectId, message.waveType);
         render();
-        port.methods.state({
+        port.methods.setState({
           status: 'success',
         });
       } catch (error) {
         console.error('Failed to load project wave', error);
-        port.methods.state({
+        port.methods.setState({
           status: 'error',
         });
       }
@@ -53,11 +53,11 @@ export const createWaveformRuntime = (
       processor = undefined;
       trackProgress = 0;
     },
-    trackProgress: (message) => {
+    setTrackProgress: (message) => {
       trackProgress = message.trackProgress;
       render();
     },
-    colors: (message) => {
+    setColors: (message) => {
       processor?.setColors(message.colors);
       render();
     },

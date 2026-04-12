@@ -31,7 +31,7 @@ export const createEngineDecoder = (
   };
 
   port.bindHandlers({
-    state: (message) => {
+    setState: (message) => {
       store.update((state) => {
         state.statuses.decoder = message.status;
       });

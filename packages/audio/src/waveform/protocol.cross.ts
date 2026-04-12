@@ -14,13 +14,13 @@ export type WaveformOutboundMethods = {
     viewSize: ViewSize;
   }) => void;
   unmount: () => void;
-  trackProgress: (message: { trackProgress: number }) => void;
-  colors: (message: { colors: ViewColors }) => void;
+  setTrackProgress: (message: { trackProgress: number }) => void;
+  setColors: (message: { colors: ViewColors }) => void;
   resize: (message: { viewSize: ViewSize }) => void;
 };
 
 export type WaveformInboundMethods = {
-  state: (message: { status: 'error' | 'success' }) => void;
+  setState: (message: { status: 'error' | 'success' }) => void;
 };
 
 export const waveformChannel = createMessageChannel<
@@ -28,10 +28,10 @@ export const waveformChannel = createMessageChannel<
   WaveformOutboundMethods
 >({
   inbound: {
-    keys: ['state'],
+    keys: ['setState'],
   },
   outbound: {
-    keys: ['mount', 'unmount', 'trackProgress', 'colors', 'resize'],
+    keys: ['mount', 'unmount', 'setTrackProgress', 'setColors', 'resize'],
     transfers: {
       mount: (message) => [message.canvas],
     },

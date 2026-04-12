@@ -7,7 +7,7 @@ import axios from 'axios';
 const port = waveformChannel.inbound(self);
 
 const reportError = () => {
-  port.methods.state({
+  port.methods.setState({
     status: 'error',
   });
 };

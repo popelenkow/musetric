@@ -22,10 +22,10 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
         const encodedBuffer = await getEncodedBuffer(projectId);
         const decoded = await decodeMp4(encodedBuffer, sampleRate);
 
-        playerPort.methods.mount({
+        playerPort.methods.setWave({
           buffers: toChannelBuffers(decoded.channels),
         });
-        spectrogramPort.methods.wave({
+        spectrogramPort.methods.setWave({
           waveBuffer: decoded.channels[0].buffer,
         });
         port.methods.mounted({
@@ -33,7 +33,7 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
         });
       } catch (error) {
         console.error('Failed to load and decode project audio track', error);
-        port.methods.state({
+        port.methods.setState({
           status: 'error',
         });
       }

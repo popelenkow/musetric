@@ -9,12 +9,12 @@ export type SpectrogramOutboundMethods = {
     trackProgress: number;
   }) => void;
   unmount: () => void;
-  trackProgress: (message: { trackProgress: number }) => void;
-  config: (message: { patch: Partial<SpectrogramConfig> }) => void;
+  setTrackProgress: (message: { trackProgress: number }) => void;
+  updateConfig: (message: { patch: Partial<SpectrogramConfig> }) => void;
 };
 
 export type SpectrogramInboundMethods = {
-  state: (message: { status: 'pending' | 'error' | 'success' }) => void;
+  setState: (message: { status: 'pending' | 'error' | 'success' }) => void;
 };
 
 export const spectrogramChannel = createMessageChannel<
@@ -22,10 +22,10 @@ export const spectrogramChannel = createMessageChannel<
   SpectrogramOutboundMethods
 >({
   inbound: {
-    keys: ['state'],
+    keys: ['setState'],
   },
   outbound: {
-    keys: ['boot', 'mount', 'unmount', 'trackProgress', 'config'],
+    keys: ['boot', 'mount', 'unmount', 'setTrackProgress', 'updateConfig'],
     transfers: {
       boot: (message) => [message.dataPort],
       mount: (message) =>
@@ -35,7 +35,7 @@ export const spectrogramChannel = createMessageChannel<
 });
 
 export type SpectrogramDataMethods = {
-  wave: (message: { waveBuffer: SharedArrayBuffer }) => void;
+  setWave: (message: { waveBuffer: SharedArrayBuffer }) => void;
   clear: () => void;
 };
 
@@ -47,6 +47,6 @@ export const spectrogramDataChannel = createMessageChannel<
     keys: [],
   },
   outbound: {
-    keys: ['wave', 'clear'],
+    keys: ['setWave', 'clear'],
   },
 });

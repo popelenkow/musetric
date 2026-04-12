@@ -10,7 +10,7 @@ export type DecoderOutboundMethods = {
 };
 
 export type DecoderInboundMethods = {
-  state: (message: { status: 'error' }) => void;
+  setState: (message: { status: 'error' }) => void;
   mounted: (message: { frameCount: number }) => void;
   unmounted: () => void;
 };
@@ -20,7 +20,7 @@ export const decoderChannel = createMessageChannel<
   DecoderOutboundMethods
 >({
   inbound: {
-    keys: ['state', 'mounted', 'unmounted'],
+    keys: ['setState', 'mounted', 'unmounted'],
   },
   outbound: {
     keys: ['boot', 'mount', 'unmount'],

@@ -29,19 +29,19 @@ export const createPlayerRuntime = (
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
   dataPort.bindHandlers({
-    mount: (message) => {
+    setWave: (message) => {
       channels = toChannelArrays(message.buffers);
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset(frameIndex);
-      port.methods.playing({ playing, frameIndex });
+      port.methods.setPlaying({ playing, frameIndex });
     },
     unmount: () => {
       channels = undefined;
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset(frameIndex);
-      port.methods.playing({ playing, frameIndex });
+      port.methods.setPlaying({ playing, frameIndex });
     },
   });
 
@@ -56,12 +56,12 @@ export const createPlayerRuntime = (
         frameIndex = 0;
       }
       playing = true;
-      port.methods.playing({ playing, frameIndex });
+      port.methods.setPlaying({ playing, frameIndex });
     },
     pause: () => {
       playing = false;
       frameIndexTracker.reset(frameIndex);
-      port.methods.playing({ playing, frameIndex });
+      port.methods.setPlaying({ playing, frameIndex });
     },
     seek: (message) => {
       if (!channels) {
@@ -72,7 +72,7 @@ export const createPlayerRuntime = (
         Math.min(message.frameIndex, channels[0].length),
       );
       frameIndexTracker.reset(frameIndex);
-      port.methods.frameIndex({ frameIndex });
+      port.methods.setFrameIndex({ frameIndex });
     },
   });
 
@@ -101,12 +101,12 @@ export const createPlayerRuntime = (
         frameIndex = 0;
         playing = false;
         frameIndexTracker.reset(frameIndex);
-        port.methods.playing({ playing, frameIndex });
+        port.methods.setPlaying({ playing, frameIndex });
         return;
       }
 
       if (frameIndexTracker.advance(frameIndex)) {
-        port.methods.frameIndex({ frameIndex });
+        port.methods.setFrameIndex({ frameIndex });
       }
     },
   };

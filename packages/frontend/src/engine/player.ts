@@ -40,13 +40,13 @@ export const createEnginePlayer = async (
   const port = playerChannel.outbound(node.port);
 
   port.bindHandlers({
-    playing: (message) => {
+    setPlaying: (message) => {
       store.update((state) => {
         state.playing = message.playing;
         state.frameIndex = message.frameIndex;
       });
     },
-    frameIndex: (message) => {
+    setFrameIndex: (message) => {
       store.update((state) => {
         state.frameIndex = message.frameIndex;
       });
