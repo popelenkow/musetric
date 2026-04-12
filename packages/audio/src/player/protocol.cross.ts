@@ -32,7 +32,7 @@ export const playerChannel = createMessageChannel<
 });
 
 export type PlayerDataMethods = {
-  setWave: (message: { buffers: ChannelBuffers }) => void;
+  mount: (message: { buffers: ChannelBuffers }) => void;
   unmount: () => void;
 };
 
@@ -44,6 +44,6 @@ export const playerDataChannel = createMessageChannel<
     keys: [],
   },
   outbound: {
-    keys: ['setWave', 'unmount'],
+    keys: ['mount', 'unmount'],
   },
 });

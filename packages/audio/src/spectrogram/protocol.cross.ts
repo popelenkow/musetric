@@ -35,8 +35,8 @@ export const spectrogramChannel = createMessageChannel<
 });
 
 export type SpectrogramDataMethods = {
-  setWave: (message: { waveBuffer: SharedArrayBuffer }) => void;
-  clear: () => void;
+  mount: (message: { waveBuffer: SharedArrayBuffer }) => void;
+  unmount: () => void;
 };
 
 export const spectrogramDataChannel = createMessageChannel<
@@ -47,6 +47,6 @@ export const spectrogramDataChannel = createMessageChannel<
     keys: [],
   },
   outbound: {
-    keys: ['setWave', 'clear'],
+    keys: ['mount', 'unmount'],
   },
 });
