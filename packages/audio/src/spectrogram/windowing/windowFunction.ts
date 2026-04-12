@@ -1,6 +1,6 @@
 import { createResourceCell } from '@musetric/resource-utils';
+import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 import { windowFunctions } from '../common/windowFunction.js';
-import { type Config } from './state.js';
 
 export type StateWindowFunction = {
   buffer: GPUBuffer;
@@ -8,7 +8,7 @@ export type StateWindowFunction = {
 
 export const createWindowFunctionCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: Config): StateWindowFunction => {
+    create: (config: ExtSpectrogramConfig): StateWindowFunction => {
       const array = windowFunctions[config.windowName](config.windowSize);
       const buffer = device.createBuffer({
         label: 'windowing-window-function-buffer',

@@ -1,10 +1,14 @@
 import { createResourceCell } from '@musetric/resource-utils';
-import { type Config } from './state.js';
+import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
 export type StateWave = {
   buffer: GPUBuffer;
   array: Float32Array;
-  write: (wave: Float32Array, trackProgress: number, config: Config) => void;
+  write: (
+    wave: Float32Array,
+    trackProgress: number,
+    config: ExtSpectrogramConfig,
+  ) => void;
 };
 
 export const createStateWaveCell = (device: GPUDevice) =>

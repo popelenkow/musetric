@@ -1,5 +1,5 @@
 import { createResourceCell } from '@musetric/resource-utils';
-import { type Config } from './state.js';
+import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
 export type DecibelifyParams = {
   halfSize: number;
@@ -7,7 +7,7 @@ export type DecibelifyParams = {
   decibelFactor: number;
 };
 
-const toParams = (config: Config): DecibelifyParams => ({
+const toParams = (config: ExtSpectrogramConfig): DecibelifyParams => ({
   halfSize: (config.windowSize * config.zeroPaddingFactor) / 2,
   windowCount: config.windowCount,
   decibelFactor: (20 * Math.LOG10E) / -config.minDecibel,
@@ -20,7 +20,7 @@ export type StateParams = {
 
 export const createParamsCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: Config): StateParams => {
+    create: (config: ExtSpectrogramConfig): StateParams => {
       const value = toParams(config);
       const array = new DataView(new ArrayBuffer(12));
       array.setUint32(0, value.halfSize, true);

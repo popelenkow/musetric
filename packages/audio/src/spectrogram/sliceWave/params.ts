@@ -1,5 +1,5 @@
 import { createResourceCell } from '@musetric/resource-utils';
-import { type Config } from './state.js';
+import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
 export type SliceWaveParams = {
   windowSize: number;
@@ -9,7 +9,7 @@ export type SliceWaveParams = {
   step: number;
 };
 
-const toParams = (config: Config): SliceWaveParams => {
+const toParams = (config: ExtSpectrogramConfig): SliceWaveParams => {
   const {
     windowSize,
     windowCount,
@@ -39,7 +39,7 @@ export type StateParams = {
 
 export const createParamsCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: Config): StateParams => {
+    create: (config: ExtSpectrogramConfig): StateParams => {
       const value = toParams(config);
       const array = new DataView(new ArrayBuffer(20));
       array.setUint32(0, value.windowSize, true);

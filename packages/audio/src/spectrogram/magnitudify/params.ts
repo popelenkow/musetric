@@ -1,12 +1,12 @@
 import { createResourceCell } from '@musetric/resource-utils';
-import { type Config } from './state.js';
+import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
 export type MagnitudifyParams = {
   windowSize: number;
   windowCount: number;
 };
 
-const toParams = (config: Config): MagnitudifyParams => ({
+const toParams = (config: ExtSpectrogramConfig): MagnitudifyParams => ({
   windowSize: config.windowSize * config.zeroPaddingFactor,
   windowCount: config.windowCount,
 });
@@ -18,7 +18,7 @@ export type StateParams = {
 
 export const createParamsCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (config: Config): StateParams => {
+    create: (config: ExtSpectrogramConfig): StateParams => {
       const value = toParams(config);
       const array = new Uint32Array(2);
       array[0] = value.windowSize;
