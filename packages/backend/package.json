@@ -4,10 +4,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev:start": "yarn project:init && node --import tsx --conditions=monorepo --watch src/index.ts -- musetric-backend",
+    "dev:start": "yarn project:init && node --import tsx --watch src/index.ts -- musetric-backend",
     "dev:stop": "kill-process musetric-backend",
     "project:build": "tsc --build",
-    "project:init": "node --import tsx --conditions=monorepo ./scripts/init.js",
+    "project:init": "node --import tsx ./scripts/init.js",
     "project:start": "node dist/index.js",
     "docker:build:cpu": "docker build --progress=plain -f Dockerfile.runtime --build-arg variant=cpu -t musetric-runtime-cpu ../.. && docker build --progress=plain -f Dockerfile --build-arg RUNTIME_IMAGE=musetric-runtime-cpu -t musetric-cpu ../..",
     "docker:build:cuda": "docker build --progress=plain -f Dockerfile.runtime --build-arg variant=cuda -t musetric-runtime-cuda ../.. && docker build --progress=plain -f Dockerfile --build-arg RUNTIME_IMAGE=musetric-runtime-cuda -t musetric-cuda ../..",
