@@ -1,6 +1,7 @@
 import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
 import { type EmptyPortMethods } from '@musetric/resource-utils/cross/messagePort';
 import { type ChannelBuffers } from '../common/channelBuffers.es.js';
+import type { WaveType } from '../common/waveType.es.js';
 
 export const playerProcessorName = 'player-processor';
 
@@ -9,6 +10,7 @@ export type PlayerOutboundMethods = {
   play: () => void;
   pause: () => void;
   seek: (message: { frameIndex: number }) => void;
+  setTrackVolume: (message: { waveType: WaveType; volume: number }) => void;
 };
 
 export type PlayerInboundMethods = {
@@ -24,7 +26,7 @@ export const playerChannel = createMessageChannel<
     keys: ['setPlaying', 'setFrameIndex'],
   },
   outbound: {
-    keys: ['boot', 'play', 'seek', 'pause'],
+    keys: ['boot', 'play', 'seek', 'pause', 'setTrackVolume'],
     transfers: {
       boot: (message) => [message.dataPort],
     },
@@ -32,7 +34,7 @@ export const playerChannel = createMessageChannel<
 });
 
 export type PlayerDataMethods = {
-  mount: (message: { buffers: ChannelBuffers }) => void;
+  mount: (message: { tracks: Record<WaveType, ChannelBuffers> }) => void;
   unmount: () => void;
 };
 

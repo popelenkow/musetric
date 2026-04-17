@@ -1,4 +1,8 @@
-import { playerChannel, playerProcessorName } from '@musetric/audio';
+import {
+  playerChannel,
+  playerProcessorName,
+  type WaveType,
+} from '@musetric/audio';
 import type { Store } from '../common/store.js';
 import playerWorkletUrl from './player.worklet.ts?worker&url';
 import { type EngineState } from './state.js';
@@ -7,6 +11,7 @@ export type EnginePlayer = {
   play: () => Promise<void>;
   pause: () => void;
   seek: (frameIndex: number) => void;
+  setTrackVolume: (waveType: WaveType, volume: number) => void;
 };
 
 export const createEngineStubPlayer = (): EnginePlayer => ({
@@ -17,6 +22,9 @@ export const createEngineStubPlayer = (): EnginePlayer => ({
     // nothing
   },
   seek: () => {
+    // nothing
+  },
+  setTrackVolume: () => {
     // nothing
   },
 });
@@ -69,6 +77,12 @@ export const createEnginePlayer = async (
     seek: (nextFrameIndex) => {
       port.methods.seek({
         frameIndex: nextFrameIndex,
+      });
+    },
+    setTrackVolume: (waveType, volume) => {
+      port.methods.setTrackVolume({
+        waveType,
+        volume,
       });
     },
   };

@@ -2,22 +2,30 @@ import { Box, Stack } from '@mui/material';
 import { type api } from '@musetric/api';
 import { type FC, useEffect } from 'react';
 import { engine } from '../../engine/engine.js';
-import { Player } from './player/Player.js';
+import { PlaybackPanel } from './player/PlaybackPanel.js';
 import { ProjectBackButton } from './ProjectBackButton.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
 import { ProjectSettings } from './settings/field/ProjectSettings.js';
 import { subscribeSettingsStore } from './settings/store.js';
-import { SpectrogramCanvas } from './spectrogram/SpectrogramCanvas.js';
-import { Subtitle } from './subtitle/view.js';
-import { WaveformCanvas } from './waveform/WaveformCanvas.js';
+import { subscribeProjectStore } from './store.js';
+import { Subtitle } from './subtitle/Subtitle.js';
+import { ProjectMainContent } from './waveform/ProjectMainContent.js';
 
-export type ProjectViewProps = {
+export type ProjectAppProps = {
   project: api.project.Item;
 };
-export const ProjectView: FC<ProjectViewProps> = (props) => {
+export const ProjectApp: FC<ProjectAppProps> = (props) => {
   const { project } = props;
 
-  useEffect(() => subscribeSettingsStore(), []);
+  useEffect(() => {
+    const unsubscribeSettingsStore = subscribeSettingsStore();
+    const unsubscribeProjectStore = subscribeProjectStore();
+
+    return () => {
+      unsubscribeSettingsStore();
+      unsubscribeProjectStore();
+    };
+  }, []);
 
   useEffect(() => engine.decoder.mount(project.id), [project.id]);
 
@@ -32,21 +40,17 @@ export const ProjectView: FC<ProjectViewProps> = (props) => {
       }
     >
       <Stack
-        padding={4}
         width='100%'
         flexGrow={1}
+        minHeight={0}
+        gap={2}
         sx={{
           scrollbarGutter: 'stable',
         }}
       >
-        <Box width='100%' flexGrow={1} flexBasis={0} minHeight={0}>
-          <SpectrogramCanvas />
-        </Box>
-        <Box height='80px' width='100%'>
-          <WaveformCanvas projectId={project.id} type='lead' />
-        </Box>
+        <ProjectMainContent projectId={project.id} />
         <Subtitle projectId={project.id} />
-        <Player />
+        <PlaybackPanel />
       </Stack>
     </ProjectLayout>
   );

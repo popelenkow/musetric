@@ -1,11 +1,15 @@
 import { toChannelBuffers } from '../../common/channelBuffers.es.js';
+import type { WaveType } from '../../common/waveType.es.js';
 import { type playerDataChannel } from '../../player/protocol.cross.js';
 import { type spectrogramDataChannel } from '../../spectrogram/protocol.cross.js';
 import { decodeMp4 } from '../mp4/index.js';
 import { type decoderChannel } from '../protocol.cross.js';
 
 export type CreateDecoderRuntimeOptions = {
-  getEncodedBuffer: (projectId: number) => Promise<ArrayBuffer>;
+  getEncodedBuffer: (
+    projectId: number,
+    waveType: WaveType,
+  ) => Promise<ArrayBuffer>;
   port: ReturnType<typeof decoderChannel.inbound<DedicatedWorkerGlobalScope>>;
   playerPort: ReturnType<typeof playerDataChannel.outbound<MessagePort>>;
   spectrogramPort: ReturnType<
@@ -19,17 +23,35 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
     mount: async (message) => {
       try {
         const { projectId, sampleRate } = message;
-        const encodedBuffer = await getEncodedBuffer(projectId);
-        const decoded = await decodeMp4(encodedBuffer, sampleRate);
+        const [leadBuffer, backingBuffer, instrumentalBuffer] =
+          await Promise.all([
+            getEncodedBuffer(projectId, 'lead'),
+            getEncodedBuffer(projectId, 'backing'),
+            getEncodedBuffer(projectId, 'instrumental'),
+          ]);
+        const [leadDecoded, backingDecoded, instrumentalDecoded] =
+          await Promise.all([
+            decodeMp4(leadBuffer, sampleRate),
+            decodeMp4(backingBuffer, sampleRate),
+            decodeMp4(instrumentalBuffer, sampleRate),
+          ]);
 
         playerPort.methods.mount({
-          buffers: toChannelBuffers(decoded.channels),
+          tracks: {
+            lead: toChannelBuffers(leadDecoded.channels),
+            backing: toChannelBuffers(backingDecoded.channels),
+            instrumental: toChannelBuffers(instrumentalDecoded.channels),
+          },
         });
         spectrogramPort.methods.mount({
-          waveBuffer: decoded.channels[0].buffer,
+          waveBuffer: leadDecoded.channels[0].buffer,
         });
         port.methods.mounted({
-          frameCount: decoded.frameCount,
+          frameCount: Math.max(
+            leadDecoded.frameCount,
+            backingDecoded.frameCount,
+            instrumentalDecoded.frameCount,
+          ),
         });
       } catch (error) {
         console.error('Failed to load and decode project audio track', error);

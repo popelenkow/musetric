@@ -7,8 +7,8 @@ import { endpoints } from '../../../api/index.js';
 import { ViewError } from '../../../components/ViewError.js';
 import { getTrackProgress } from '../../../engine/state.js';
 import { useEngineStore } from '../../../engine/useEngineStore.js';
-import { SegmentLCurrent } from './current.js';
-import { SegmentNext } from './next.js';
+import { SegmentLCurrent } from './SegmentLCurrent.js';
+import { SegmentNext } from './SegmentNext.js';
 
 type SubtitleLines = {
   current?: api.subtitle.Segment;
@@ -86,13 +86,11 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
 
   return (
     <Stack
-      sx={{
-        alignItems: 'center',
-        gap: 0,
-        width: '100%',
-        minHeight: '3em',
-        maxHeight: '3em',
-      }}
+      alignItems='center'
+      gap={0}
+      width='100%'
+      minHeight='3em'
+      maxHeight='3em'
     >
       {getContent()}
     </Stack>

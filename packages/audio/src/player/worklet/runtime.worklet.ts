@@ -2,6 +2,7 @@ import {
   type ChannelArrays,
   toChannelArrays,
 } from '../../common/channelBuffers.es.js';
+import { type WaveType, waveTypes } from '../../common/waveType.es.js';
 import {
   type playerChannel,
   type playerDataChannel,
@@ -23,21 +24,26 @@ export const createPlayerRuntime = (
 ): PlayerRuntime => {
   const { port, dataPort } = options;
 
-  let channels: ChannelArrays | undefined = undefined;
+  let tracks: Record<WaveType, ChannelArrays> | undefined = undefined;
   let frameIndex = 0;
   let playing = false;
+  const trackVolumes: Partial<Record<WaveType, number>> = {};
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
   dataPort.bindHandlers({
     mount: (message) => {
-      channels = toChannelArrays(message.buffers);
+      tracks = {
+        lead: toChannelArrays(message.tracks.lead),
+        backing: toChannelArrays(message.tracks.backing),
+        instrumental: toChannelArrays(message.tracks.instrumental),
+      };
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset(frameIndex);
       port.methods.setPlaying({ playing, frameIndex });
     },
     unmount: () => {
-      channels = undefined;
+      tracks = undefined;
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset(frameIndex);
@@ -47,11 +53,15 @@ export const createPlayerRuntime = (
 
   port.bindHandlers({
     play: () => {
-      if (!channels) {
+      if (!tracks) {
         return;
       }
 
-      const frameCount = channels[0].length;
+      const frameCount = Math.max(
+        tracks.lead[0].length,
+        tracks.backing[0].length,
+        tracks.instrumental[0].length,
+      );
       if (frameIndex >= frameCount) {
         frameIndex = 0;
       }
@@ -64,22 +74,19 @@ export const createPlayerRuntime = (
       port.methods.setPlaying({ playing, frameIndex });
     },
     seek: (message) => {
-      if (!channels) {
-        return;
-      }
-      frameIndex = Math.max(
-        0,
-        Math.min(message.frameIndex, channels[0].length),
-      );
+      frameIndex = message.frameIndex;
       frameIndexTracker.reset(frameIndex);
       port.methods.setFrameIndex({ frameIndex });
+    },
+    setTrackVolume: (message) => {
+      trackVolumes[message.waveType] = message.volume;
     },
   });
 
   return {
     port,
     process: (output) => {
-      if (!channels || !playing) {
+      if (!tracks || !playing) {
         for (const out of output) {
           out.fill(0);
         }
@@ -88,14 +95,26 @@ export const createPlayerRuntime = (
 
       for (let channel = 0; channel < output.length; channel++) {
         const out = output[channel];
-        const data = channels[channel];
         for (let i = 0; i < out.length; i++) {
           const index = frameIndex + i;
-          out[i] = index < data.length ? data[index] : 0;
+          let value = 0;
+
+          for (const waveType of waveTypes) {
+            const wave = tracks[waveType][channel];
+            const data = index < wave.length ? wave[index] : 0;
+            const volume = trackVolumes[waveType] ?? 1;
+            value += data * volume;
+          }
+
+          out[i] = value;
         }
       }
 
-      const frameCount = channels[0].length;
+      const frameCount = Math.max(
+        tracks.lead[0].length,
+        tracks.backing[0].length,
+        tracks.instrumental[0].length,
+      );
       frameIndex += output[0].length;
       if (frameIndex >= frameCount) {
         frameIndex = 0;
