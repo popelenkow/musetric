@@ -62,7 +62,7 @@
     }
   },
   "scripts": {
-    "postinstall": "node --conditions=monorepo ./scripts/install.ts",
+    "postinstall": "node ./scripts/install.ts",
     "project:build": "cpx \"src/**/*.wgsl\" dist --clean && tsc --build",
     "check:ts": "tsc --build",
     "check:lint": "eslint . --cache",
