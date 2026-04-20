@@ -1,4 +1,4 @@
-import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
+import { setOffscreenCanvasSize } from '@musetric/resource-utils/cross/offscreenCanvas';
 import { type WaveType, waveTypes } from '../../common/waveType.es.js';
 import {
   createWaveformProcessor,
