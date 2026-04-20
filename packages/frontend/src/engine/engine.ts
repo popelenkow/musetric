@@ -17,7 +17,11 @@ const initialState: EngineState = {
   statuses: {
     decoder: 'pending',
     spectrogram: 'pending',
-    waveform: 'pending',
+    waveform: {
+      lead: 'pending',
+      backing: 'pending',
+      instrumental: 'pending',
+    },
   },
   colors: {
     background: '#000000',

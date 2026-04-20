@@ -7,8 +7,8 @@ import { routes } from '../../app/router/routes.js';
 import { ViewError } from '../../components/ViewError.js';
 import { ViewPending } from '../../components/ViewPending.js';
 import { ProjectProgressFlow } from './Flow/ProjectProgressFlow.js';
+import { ProjectApp } from './ProjectApp.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
-import { ProjectView } from './ProjectView.js';
 import { useThemeViewColors } from './settings/theme.js';
 
 export const ProjectPage: FC = () => {
@@ -48,5 +48,5 @@ export const ProjectPage: FC = () => {
     return <ProjectProgressFlow project={project.data} />;
   }
 
-  return <ProjectView project={project.data} />;
+  return <ProjectApp project={project.data} />;
 };

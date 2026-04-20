@@ -25,7 +25,7 @@
 **Syntax**
 
 - Follow the existing ESLint and TypeScript config. Do not fight it.
-- Use `camelCase` for files and directories. Use `PascalCase` only for React component identifiers and types where appropriate.
+- Use `camelCase` for directories and non-component files, and use `PascalCase` for every React component, including both the component identifier and the file that defines it.
 - Do not use `null`, except `useRef(null)`. Use `undefined`, explicit state objects, or another project-native shape everywhere else.
 - Do not use classes, `this`, `switch`, method syntax in object literals, non-null assertions, or inline destructuring of function parameters.
 
@@ -51,6 +51,11 @@
 
 - Write callback implementations inline in API objects with callback fields or handlers, and inline in React JSX props.
 - Do not extract callbacks for trivial direct logic, even when the same small code is repeated; extract a callback only when it hides non-trivial complexity or defines a reusable domain entity.
+
+**MUI**
+
+- Do not introduce unnecessary Material UI customization. Prefer the built-in variants, spacing, and visual design by default, but preserve existing behavior and established UI output when custom styling is already serving a real purpose.
+- When a Material UI component already exposes a dedicated prop for a layout or visual option, prefer that prop over `sx` only if the result stays behaviorally and visually equivalent; use `sx` whenever it is needed to preserve the current result or to express styling that the component props do not cover.
 
 ## Runtime Boundaries
 

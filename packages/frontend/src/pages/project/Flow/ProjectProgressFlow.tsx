@@ -17,13 +17,11 @@ export const ProjectProgressFlow: FC<ProjectProgressFlowProps> = (props) => {
   return (
     <ProjectLayout>
       <Box
-        sx={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        padding={4}
+        width='100%'
+        display='flex'
+        alignItems='center'
+        justifyContent='center'
+        p={4}
         flex={1}
       >
         <Stack width='100%' maxWidth='48rem' position='relative' gap={3}>

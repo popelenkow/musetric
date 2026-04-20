@@ -11,14 +11,8 @@ export const ProjectLayout: FC<ProjectLayoutProps> = (props) => {
   const headingContent = heading ?? <ProjectBackButton />;
 
   return (
-    <Stack height='100dvh' position='relative'>
-      <Stack
-        direction='row'
-        padding={4}
-        gap={2}
-        alignItems='center'
-        position='relative'
-      >
+    <Stack height='100dvh' position='relative' p={2} gap={2}>
+      <Stack direction='row' gap={2} alignItems='center' position='relative'>
         {headingContent}
       </Stack>
       {children}

@@ -28,14 +28,18 @@ export const createEngineWaveform = (
 
   port.instance.onerror = () => {
     store.update((state) => {
-      state.statuses.waveform = 'error';
+      state.statuses.waveform = {
+        lead: 'error',
+        backing: 'error',
+        instrumental: 'error',
+      };
     });
   };
 
   port.bindHandlers({
     setState: (message) => {
       store.update((state) => {
-        state.statuses.waveform = message.status;
+        state.statuses.waveform[message.waveType] = message.status;
       });
     },
   });
@@ -75,15 +79,18 @@ export const createEngineWaveform = (
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
         port.methods.resize({
+          waveType: type,
           viewSize: getCanvasSize(canvas),
         });
       });
 
       return () => {
         unsubscribeResizeObserver();
-        port.methods.unmount();
+        port.methods.unmount({
+          waveType: type,
+        });
         store.update((state) => {
-          state.statuses.waveform = 'pending';
+          state.statuses.waveform[type] = 'pending';
         });
       };
     },

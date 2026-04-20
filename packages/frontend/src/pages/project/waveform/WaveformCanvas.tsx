@@ -16,7 +16,7 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
   const { t } = useTranslation();
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
-  const status = useEngineStore((state) => state.statuses.waveform);
+  const status = useEngineStore((state) => state.statuses.waveform[type]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -54,12 +54,12 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
         }}
       />
       {status === 'pending' && (
-        <Box sx={{ position: 'absolute', inset: 0 }}>
+        <Box position='absolute' top={0} right={0} bottom={0} left={0}>
           <ViewPending />
         </Box>
       )}
       {status === 'error' && (
-        <Box sx={{ position: 'absolute', inset: 0 }}>
+        <Box position='absolute' top={0} right={0} bottom={0} left={0}>
           <ViewError message={t('pages.project.progress.error.waveform')} />
         </Box>
       )}

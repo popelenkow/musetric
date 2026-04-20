@@ -77,19 +77,18 @@ export const createSpectrogramRuntime = async (
     unmount: () => {
       processor.dispose();
       processor = createProcessor();
-      wave = undefined;
       trackProgress = 0;
       port.methods.setState({
         status: 'pending',
       });
     },
-    setTrackProgress: async (message) => {
+    setTrackProgress: (message) => {
       trackProgress = message.trackProgress;
-      await render();
+      void render();
     },
-    updateConfig: async (message) => {
+    updateConfig: (message) => {
       processor.updateConfig(message.patch);
-      await render();
+      void render();
     },
   });
 };

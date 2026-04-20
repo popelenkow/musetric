@@ -1,5 +1,6 @@
 import { api } from '@musetric/api';
 import { requestWithAxios } from '@musetric/api/dom';
+import { waveTypes } from '@musetric/audio/es';
 import { waveformChannel } from '@musetric/audio/waveform';
 import { createWaveformRuntime } from '@musetric/audio/waveform/worker';
 import axios from 'axios';
@@ -7,9 +8,12 @@ import axios from 'axios';
 const port = waveformChannel.inbound(self);
 
 const reportError = () => {
-  port.methods.setState({
-    status: 'error',
-  });
+  for (const waveType of waveTypes) {
+    port.methods.setState({
+      waveType,
+      status: 'error',
+    });
+  }
 };
 self.addEventListener('error', reportError);
 self.addEventListener('unhandledrejection', reportError);

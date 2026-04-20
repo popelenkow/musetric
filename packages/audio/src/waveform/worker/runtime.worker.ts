@@ -1,13 +1,21 @@
 import { setOffscreenCanvasSize } from '../../common/offscreenCanvas.cross.js';
+import { type WaveType, waveTypes } from '../../common/waveType.es.js';
 import {
   createWaveformProcessor,
   type WaveformProcessor,
 } from '../processor.js';
-import { type waveformChannel, type WaveType } from '../protocol.cross.js';
+import { type waveformChannel } from '../protocol.cross.js';
 
 export type CreateWaveformRuntimeOptions = {
   port: ReturnType<typeof waveformChannel.inbound<DedicatedWorkerGlobalScope>>;
   getWave: (projectId: number, waveType: WaveType) => Promise<Float32Array>;
+};
+
+type WaveItem = {
+  canvas: OffscreenCanvas;
+  processor: WaveformProcessor;
+  wave?: Float32Array;
+  projectId: number;
 };
 
 export const createWaveformRuntime = (
@@ -15,59 +23,71 @@ export const createWaveformRuntime = (
 ) => {
   const { port, getWave } = options;
 
-  let canvas: OffscreenCanvas | undefined = undefined;
-  let wave: Float32Array | undefined = undefined;
-  let processor: WaveformProcessor | undefined = undefined;
   let trackProgress = 0;
+  const waveItems: Partial<Record<WaveType, WaveItem>> = {};
 
-  const render = (): boolean => {
-    if (!wave || !processor) return false;
-    processor.render(wave, trackProgress);
+  const render = (waveType: WaveType): boolean => {
+    const item = waveItems[waveType];
+    if (!item || !item.wave) {
+      return false;
+    }
+
+    item.processor.render(item.wave, trackProgress);
     return true;
+  };
+
+  const renderAll = () => {
+    for (const waveType of waveTypes) {
+      render(waveType);
+    }
   };
 
   port.bindHandlers({
     mount: async (message) => {
-      trackProgress = message.trackProgress;
-      canvas = message.canvas;
-
       try {
+        trackProgress = message.trackProgress;
         setOffscreenCanvasSize(message.canvas, message.viewSize);
-        processor = createWaveformProcessor(message.canvas, message.colors);
-
-        wave = await getWave(message.projectId, message.waveType);
-        render();
+        const item: WaveItem = {
+          canvas: message.canvas,
+          processor: createWaveformProcessor(message.canvas, message.colors),
+          projectId: message.projectId,
+        };
+        waveItems[message.waveType] = item;
+        item.wave = await getWave(message.projectId, message.waveType);
+        render(message.waveType);
         port.methods.setState({
+          waveType: message.waveType,
           status: 'success',
         });
       } catch (error) {
         console.error('Failed to load project wave', error);
         port.methods.setState({
+          waveType: message.waveType,
           status: 'error',
         });
       }
     },
-    unmount: () => {
-      canvas = undefined;
-      wave = undefined;
-      processor = undefined;
-      trackProgress = 0;
+    unmount: (message) => {
+      waveItems[message.waveType] = undefined;
     },
     setTrackProgress: (message) => {
       trackProgress = message.trackProgress;
-      render();
+      renderAll();
     },
     setColors: (message) => {
-      processor?.setColors(message.colors);
-      render();
+      for (const waveType of waveTypes) {
+        waveItems[waveType]?.processor.setColors(message.colors);
+      }
+      renderAll();
     },
     resize: (message) => {
-      if (!canvas) {
+      const item = waveItems[message.waveType];
+      if (!item) {
         return;
       }
 
-      setOffscreenCanvasSize(canvas, message.viewSize);
-      render();
+      setOffscreenCanvasSize(item.canvas, message.viewSize);
+      render(message.waveType);
     },
   });
 };
