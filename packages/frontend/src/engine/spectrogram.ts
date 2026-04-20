@@ -1,9 +1,8 @@
+import { spectrogramChannel, type SpectrogramConfig } from '@musetric/audio';
 import {
   getCanvasSize,
-  spectrogramChannel,
-  type SpectrogramConfig,
   subscribeResizeObserver,
-} from '@musetric/audio';
+} from '@musetric/resource-utils/dom';
 import type { Store } from '../common/store.js';
 import spectrogramWorkerUrl from './spectrogram.worker.ts?worker&url';
 import { type EngineState, getTrackProgress } from './state.js';

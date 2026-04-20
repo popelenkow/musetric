@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./tsconfig.src.json" },
+    { "path": "./tsconfig.dom.json" },
     { "path": "./tsconfig.cross.json" },
     { "path": "./tsconfig.node.json" },
     { "path": "./tsconfig.script.json" },

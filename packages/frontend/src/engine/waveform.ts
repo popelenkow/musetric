@@ -1,10 +1,9 @@
+import { waveformChannel, type WaveType } from '@musetric/audio';
 import {
   getCanvasSize,
   resizeCanvas,
   subscribeResizeObserver,
-  waveformChannel,
-  type WaveType,
-} from '@musetric/audio';
+} from '@musetric/resource-utils/dom';
 import type { Store } from '../common/store.js';
 import { type EngineState, getTrackProgress } from './state.js';
 import waveformWorkerUrl from './waveform.worker.ts?worker&url';

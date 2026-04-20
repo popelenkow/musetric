@@ -12,6 +12,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./dom": {
+      "monorepo": "./src/index.dom.ts",
+      "types": "./dist/index.dom.d.ts",
+      "import": "./dist/index.dom.js",
+      "default": "./dist/index.dom.js"
+    },
     "./cross/*": {
       "monorepo": "./src/*.cross.ts",
       "types": "./dist/*.cross.d.ts",
