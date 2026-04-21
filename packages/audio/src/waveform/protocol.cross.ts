@@ -4,6 +4,7 @@ import type { ViewSize } from '../common/viewSize.es.js';
 import type { WaveType } from '../common/waveType.es.js';
 
 export type WaveformOutboundMethods = {
+  boot: () => void;
   mount: (message: {
     projectId: number;
     waveType: WaveType;
@@ -19,6 +20,7 @@ export type WaveformOutboundMethods = {
 };
 
 export type WaveformInboundMethods = {
+  booted: () => void;
   setState: (message: {
     waveType: WaveType;
     status: 'error' | 'success';
@@ -30,10 +32,17 @@ export const waveformChannel = createMessageChannel<
   WaveformOutboundMethods
 >({
   inbound: {
-    keys: ['setState'],
+    keys: ['booted', 'setState'],
   },
   outbound: {
-    keys: ['mount', 'unmount', 'setTrackProgress', 'setColors', 'resize'],
+    keys: [
+      'boot',
+      'mount',
+      'unmount',
+      'setTrackProgress',
+      'setColors',
+      'resize',
+    ],
     transfers: {
       mount: (message) => [message.canvas],
     },

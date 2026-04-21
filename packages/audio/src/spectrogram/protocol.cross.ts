@@ -14,6 +14,7 @@ export type SpectrogramOutboundMethods = {
 };
 
 export type SpectrogramInboundMethods = {
+  booted: () => void;
   setState: (message: { status: 'pending' | 'error' | 'success' }) => void;
 };
 
@@ -22,7 +23,7 @@ export const spectrogramChannel = createMessageChannel<
   SpectrogramOutboundMethods
 >({
   inbound: {
-    keys: ['setState'],
+    keys: ['booted', 'setState'],
   },
   outbound: {
     keys: ['boot', 'mount', 'unmount', 'setTrackProgress', 'updateConfig'],

@@ -19,12 +19,15 @@ self.addEventListener('error', reportError);
 self.addEventListener('unhandledrejection', reportError);
 self.addEventListener('messageerror', reportError);
 
-createWaveformRuntime({
-  port,
-  getWave: async (projectId, waveType) => {
-    const wave = await requestWithAxios(axios, api.wave.get.base, {
-      params: { projectId, type: waveType },
-    });
-    return wave;
-  },
+port.bindBoot(() => {
+  createWaveformRuntime({
+    port,
+    getWave: async (projectId, waveType) => {
+      const wave = await requestWithAxios(axios, api.wave.get.base, {
+        params: { projectId, type: waveType },
+      });
+      return wave;
+    },
+  });
+  port.methods.booted();
 });

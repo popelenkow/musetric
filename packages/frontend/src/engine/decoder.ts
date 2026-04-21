@@ -1,4 +1,8 @@
 import { decoderChannel } from '@musetric/audio';
+import {
+  type ControlledPromise,
+  createControlledPromise,
+} from '@musetric/resource-utils';
 import type { Store } from '../common/store.js';
 import decoderWorkerUrl from './decoder.worker.ts?worker&url';
 import type { EngineState } from './state.js';
@@ -7,6 +11,7 @@ type Unmount = () => void;
 
 export type EngineDecoder = {
   port: ReturnType<typeof decoderChannel.outbound<Worker>>;
+  boot: () => Promise<void>;
   mount: (projectId: number) => Unmount;
 };
 
@@ -23,6 +28,7 @@ export const createEngineDecoder = (
   const { store, sampleRate, playerPort, spectrogramPort } = options;
   const worker = new Worker(decoderWorkerUrl, { type: 'module' });
   const port = decoderChannel.outbound(worker);
+  const bootPromise: ControlledPromise<void> = createControlledPromise<void>();
 
   port.instance.onerror = () => {
     store.update((state) => {
@@ -31,6 +37,9 @@ export const createEngineDecoder = (
   };
 
   port.bindHandlers({
+    booted: () => {
+      bootPromise.resolve();
+    },
     setState: (message) => {
       store.update((state) => {
         state.statuses.decoder = message.status;
@@ -52,13 +61,16 @@ export const createEngineDecoder = (
     },
   });
 
-  port.methods.boot({
-    playerPort,
-    spectrogramPort,
-  });
-
   return {
     port,
+    boot: async () => {
+      port.methods.boot({
+        playerPort,
+        spectrogramPort,
+      });
+
+      return bootPromise.promise;
+    },
     mount: (projectId) => {
       port.methods.mount({
         projectId,

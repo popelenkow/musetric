@@ -17,7 +17,7 @@ self.addEventListener('error', reportError);
 self.addEventListener('unhandledrejection', reportError);
 self.addEventListener('messageerror', reportError);
 
-port.bindBoot((message) =>
+port.bindBoot((message) => {
   createDecoderRuntime({
     port,
     playerPort: playerDataChannel.outbound(message.playerPort),
@@ -35,5 +35,6 @@ port.bindBoot((message) =>
       );
       return encodedBuffer.buffer;
     },
-  }),
-);
+  });
+  port.methods.booted();
+});
