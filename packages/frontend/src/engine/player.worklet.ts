@@ -22,6 +22,7 @@ export class PlayerProcessor
         runtime.process(output);
         return true;
       };
+      port.methods.booted();
     });
   }
 

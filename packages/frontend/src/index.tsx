@@ -11,7 +11,7 @@ const runApp = async () => {
     throw new Error('Root element or splash screen not found');
   }
   await initI18next();
-  await engine.initPlayer();
+  await engine.boot();
 
   createRoot(rootElement).render(
     <StrictMode>

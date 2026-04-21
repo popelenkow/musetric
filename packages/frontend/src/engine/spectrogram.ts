@@ -1,5 +1,9 @@
 import { spectrogramChannel, type SpectrogramConfig } from '@musetric/audio';
 import {
+  type ControlledPromise,
+  createControlledPromise,
+} from '@musetric/resource-utils';
+import {
   getCanvasSize,
   subscribeResizeObserver,
 } from '@musetric/resource-utils/dom';
@@ -11,6 +15,7 @@ type Unmount = () => void;
 
 export type EngineSpectrogram = {
   port: ReturnType<typeof spectrogramChannel.outbound<Worker>>;
+  boot: () => Promise<void>;
   mount: (
     canvas: HTMLCanvasElement,
     config: Partial<SpectrogramConfig>,
@@ -30,6 +35,7 @@ export const createEngineSpectrogram = (
   const { store, sampleRate, decoderPort } = options;
   const worker = new Worker(spectrogramWorkerUrl, { type: 'module' });
   const port = spectrogramChannel.outbound(worker);
+  const bootPromise: ControlledPromise<void> = createControlledPromise<void>();
   port.instance.onerror = () => {
     store.update((state) => {
       state.statuses.spectrogram = 'error';
@@ -37,6 +43,9 @@ export const createEngineSpectrogram = (
   };
 
   port.bindHandlers({
+    booted: () => {
+      bootPromise.resolve();
+    },
     setState: (message) => {
       store.update((state) => {
         state.statuses.spectrogram = message.status;
@@ -59,12 +68,15 @@ export const createEngineSpectrogram = (
     },
   );
 
-  port.methods.boot({
-    dataPort: decoderPort,
-  });
-
   return {
     port,
+    boot: async () => {
+      port.methods.boot({
+        dataPort: decoderPort,
+      });
+
+      return bootPromise.promise;
+    },
     mount: (canvas, config) => {
       const viewSize = getCanvasSize(canvas);
       const offscreenCanvas = canvas.transferControlToOffscreen();

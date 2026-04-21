@@ -40,7 +40,7 @@ export type Engine = {
   spectrogram: EngineSpectrogram;
   waveform: EngineWaveform;
   player: EnginePlayer;
-  initPlayer: () => Promise<void>;
+  boot: () => Promise<void>;
 };
 
 export const createEngine = (): Engine => {
@@ -65,12 +65,18 @@ export const createEngine = (): Engine => {
       spectrogramPort: spectrogramChannel.port1,
     }),
     player: createEngineStubPlayer(),
-    initPlayer: async () => {
+    boot: async () => {
       ref.player = await createEnginePlayer({
         context,
         store,
         decoderPort: playerChannel.port2,
       });
+      await Promise.all([
+        ref.player.boot(),
+        ref.decoder.boot(),
+        ref.spectrogram.boot(),
+        ref.waveform.boot(),
+      ]);
     },
   };
 

@@ -3,11 +3,16 @@ import {
   playerProcessorName,
   type WaveType,
 } from '@musetric/audio';
+import {
+  type ControlledPromise,
+  createControlledPromise,
+} from '@musetric/resource-utils';
 import type { Store } from '../common/store.js';
 import playerWorkletUrl from './player.worklet.ts?worker&url';
 import { type EngineState } from './state.js';
 
 export type EnginePlayer = {
+  boot: () => Promise<void>;
   play: () => Promise<void>;
   pause: () => void;
   seek: (frameIndex: number) => void;
@@ -15,6 +20,9 @@ export type EnginePlayer = {
 };
 
 export const createEngineStubPlayer = (): EnginePlayer => ({
+  boot: async () => {
+    // nothing
+  },
   play: async () => {
     // nothing
   },
@@ -46,8 +54,12 @@ export const createEnginePlayer = async (
   });
   node.connect(context.destination);
   const port = playerChannel.outbound(node.port);
+  const bootPromise: ControlledPromise<void> = createControlledPromise<void>();
 
   port.bindHandlers({
+    booted: () => {
+      bootPromise.resolve();
+    },
     setPlaying: (message) => {
       store.update((state) => {
         state.playing = message.playing;
@@ -60,11 +72,15 @@ export const createEnginePlayer = async (
       });
     },
   });
-  port.methods.boot({
-    dataPort: decoderPort,
-  });
 
   const ref: EnginePlayer = {
+    boot: async () => {
+      port.methods.boot({
+        dataPort: decoderPort,
+      });
+
+      return bootPromise.promise;
+    },
     play: async () => {
       if (context.state === 'suspended') {
         await context.resume();

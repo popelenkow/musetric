@@ -16,10 +16,11 @@ self.addEventListener('error', reportError);
 self.addEventListener('unhandledrejection', reportError);
 self.addEventListener('messageerror', reportError);
 
-port.bindBoot(async (message) =>
-  createSpectrogramRuntime({
+port.bindBoot(async (message) => {
+  await createSpectrogramRuntime({
     port,
     dataPort: spectrogramDataChannel.inbound(message.dataPort),
     profiling,
-  }),
-);
+  });
+  port.methods.booted();
+});

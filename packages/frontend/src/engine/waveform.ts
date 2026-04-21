@@ -1,5 +1,9 @@
 import { waveformChannel, type WaveType } from '@musetric/audio';
 import {
+  type ControlledPromise,
+  createControlledPromise,
+} from '@musetric/resource-utils';
+import {
   getCanvasSize,
   resizeCanvas,
   subscribeResizeObserver,
@@ -12,6 +16,7 @@ type Unmount = () => void;
 
 export type EngineWaveform = {
   port: ReturnType<typeof waveformChannel.outbound<Worker>>;
+  boot: () => Promise<void>;
   mount: (options: {
     projectId: number;
     type: WaveType;
@@ -24,6 +29,7 @@ export const createEngineWaveform = (
 ): EngineWaveform => {
   const worker = new Worker(waveformWorkerUrl, { type: 'module' });
   const port = waveformChannel.outbound(worker);
+  const bootPromise: ControlledPromise<void> = createControlledPromise<void>();
 
   port.instance.onerror = () => {
     store.update((state) => {
@@ -36,6 +42,9 @@ export const createEngineWaveform = (
   };
 
   port.bindHandlers({
+    booted: () => {
+      bootPromise.resolve();
+    },
     setState: (message) => {
       store.update((state) => {
         state.statuses.waveform[message.waveType] = message.status;
@@ -60,6 +69,11 @@ export const createEngineWaveform = (
 
   return {
     port,
+    boot: async () => {
+      port.methods.boot();
+
+      return bootPromise.promise;
+    },
     mount: (options) => {
       const { projectId, type, canvas } = options;
 
