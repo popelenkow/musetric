@@ -3,6 +3,7 @@ export type GpuContext = { adapter: GPUAdapter; device: GPUDevice };
 export const createGpuContext = async (
   profiling?: boolean,
 ): Promise<GpuContext> => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const adapter = await navigator.gpu?.requestAdapter();
   if (!adapter) {
     throw new Error('WebGPU adapter not available');

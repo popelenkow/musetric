@@ -5,7 +5,8 @@ export const getDurationSeconds = async (
   fromPath: string,
   logger: Logger,
 ): Promise<number> => {
-  let duration: number | undefined = undefined;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  let duration = undefined as number | undefined;
 
   await spawnScript({
     command: 'ffprobe',

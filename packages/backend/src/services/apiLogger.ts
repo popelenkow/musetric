@@ -11,7 +11,7 @@ export const registerApiLogger = (app: FastifyInstance) => {
           url: request.url,
           host: request.headers.host,
           remoteAddress: request.ip,
-          remotePort: request.socket?.remotePort,
+          remotePort: request.socket.remotePort,
         },
       },
       'incoming request',

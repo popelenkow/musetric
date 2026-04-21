@@ -26,12 +26,20 @@ import { SongField } from '../fields/Song/index.js';
 import { songValueSchema } from '../fields/Song/schema.js';
 
 const schema = (t: TFunction) =>
-  z.object({
-    song: songValueSchema(),
-    name: nameValueSchema(t),
-    preview: previewValueSchema().optional(),
-  });
-type FormValue = z.infer<ReturnType<typeof schema>>;
+  z
+    .object({
+      song: songValueSchema().optional(),
+      name: nameValueSchema(t).optional(),
+      preview: previewValueSchema().optional(),
+    })
+    .pipe(
+      z.object({
+        song: songValueSchema(),
+        name: nameValueSchema(t),
+        preview: previewValueSchema().optional(),
+      }),
+    );
+type SubmitValue = z.output<ReturnType<typeof schema>>;
 
 export const CreateDialog: FC = () => {
   const { t } = useTranslation();
@@ -43,12 +51,12 @@ export const CreateDialog: FC = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValue>({
+  } = useForm({
     resolver: zodResolver(schema(t)),
   });
 
   const close = () => routes.projects.navigate();
-  const onSubmit = async (value: FormValue) => {
+  const onSubmit = async (value: SubmitValue) => {
     await create.mutateAsync({
       song: value.song.file,
       name: value.name,

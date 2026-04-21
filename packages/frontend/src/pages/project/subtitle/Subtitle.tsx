@@ -18,7 +18,7 @@ type SubtitleLines = {
 
 const getSegmentEnd = (segment: api.subtitle.Segment) => {
   const words = segment.words;
-  if (words && words.length > 0) {
+  if (words.length > 0) {
     return words[words.length - 1].end;
   }
   return segment.end;

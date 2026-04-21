@@ -24,7 +24,7 @@ export const getArrayBufferViewConstructor = <Schema>(
   schema: Schema,
 ): SchemaConstructor<Schema> | undefined => {
   if (schema instanceof z.ZodCustom) {
-    const view = schema._zod?.bag?.Class;
+    const view = schema._zod.bag.Class;
     const constructor = arrayBufferViews.find((x) => x === view);
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return constructor as unknown as SchemaConstructor<Schema> | undefined;
