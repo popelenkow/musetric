@@ -10,7 +10,7 @@ export type DemuxedTrack = {
   decoderConfig: AudioDecoderConfig;
   packets: AsyncGenerator<EncodedPacket, void, unknown>;
   sampleRate: number;
-  numberOfChannels: 1 | 2;
+  numberOfChannels: number;
 };
 
 export const demuxTrack = async (input: Input): Promise<DemuxedTrack> => {
@@ -20,10 +20,8 @@ export const demuxTrack = async (input: Input): Promise<DemuxedTrack> => {
   }
 
   const { numberOfChannels } = audioTrack;
-  if (numberOfChannels !== 1 && numberOfChannels !== 2) {
-    throw new Error(
-      'Unsupported fMP4: only mono and stereo tracks are supported',
-    );
+  if (numberOfChannels < 1) {
+    throw new Error('Unsupported fMP4: audio track has no channels');
   }
 
   const decoderConfig = await audioTrack.getDecoderConfig();

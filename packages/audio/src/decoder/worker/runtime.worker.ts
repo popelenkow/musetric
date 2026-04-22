@@ -34,8 +34,13 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
             decodeMp4(backingBuffer, sampleRate),
             decodeMp4(instrumentalBuffer, sampleRate),
           ]);
-
+        const frameCount = Math.max(
+          leadDecoded.frameCount,
+          backingDecoded.frameCount,
+          instrumentalDecoded.frameCount,
+        );
         playerPort.methods.mount({
+          frameCount,
           tracks: {
             lead: leadDecoded.channels,
             backing: backingDecoded.channels,
@@ -46,11 +51,7 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
           samples: leadDecoded.channels[0],
         });
         port.methods.mounted({
-          frameCount: Math.max(
-            leadDecoded.frameCount,
-            backingDecoded.frameCount,
-            instrumentalDecoded.frameCount,
-          ),
+          frameCount,
         });
       } catch (error) {
         console.error('Failed to load and decode project audio track', error);

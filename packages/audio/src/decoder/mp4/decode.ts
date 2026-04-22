@@ -1,22 +1,10 @@
 import { type DemuxedTrack } from './demux.js';
 
-const concatChunks = (
-  chunks: Float32Array<ArrayBuffer>[],
-  totalFrames: number,
-): Float32Array<ArrayBuffer> => {
-  const result = new Float32Array(totalFrames);
-  let offset = 0;
-  for (const chunk of chunks) {
-    result.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return result;
-};
-
 export type DecodedTrack = {
   channels: Float32Array[];
   sampleRate: number;
 };
+
 export const decodeTrack = async (
   track: DemuxedTrack,
 ): Promise<DecodedTrack> => {
@@ -27,7 +15,10 @@ export const decodeTrack = async (
     throw new Error(`Unsupported AudioDecoder config: ${decoderConfig.codec}`);
   }
 
-  const chunksByChannel: Float32Array<ArrayBuffer>[][] = [[], []];
+  const chunksByChannel: Float32Array<ArrayBuffer>[][] = Array.from(
+    { length: numberOfChannels },
+    () => [],
+  );
   let frameCount = 0;
   let decodeError: Error | undefined = undefined;
 
@@ -69,11 +60,14 @@ export const decodeTrack = async (
     decoder.close();
   }
 
-  const left = concatChunks(chunksByChannel[0], frameCount);
-  if (numberOfChannels === 1) {
-    return { channels: [left], sampleRate };
-  }
-
-  const right = concatChunks(chunksByChannel[1], frameCount);
-  return { channels: [left, right], sampleRate };
+  const channels = chunksByChannel.map((chunks) => {
+    const result = new Float32Array(frameCount);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return result;
+  });
+  return { channels, sampleRate };
 };

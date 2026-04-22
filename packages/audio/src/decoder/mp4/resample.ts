@@ -1,4 +1,4 @@
-const resampleChannel = async (
+export const resampleChannel = async (
   samples: Float32Array,
   sourceSampleRate: number,
   targetSampleRate: number,
@@ -14,30 +14,4 @@ const resampleChannel = async (
   } finally {
     src.destroy();
   }
-};
-
-export const resampleChannels = async (
-  channels: Float32Array[],
-  sourceSampleRate: number,
-  targetSampleRate: number,
-): Promise<Float32Array[]> => {
-  if (sourceSampleRate === targetSampleRate) {
-    return channels;
-  }
-
-  if (channels.length === 1) {
-    const resampled = await resampleChannel(
-      channels[0],
-      sourceSampleRate,
-      targetSampleRate,
-    );
-    return [resampled];
-  }
-
-  const [left, right] = await Promise.all([
-    resampleChannel(channels[0], sourceSampleRate, targetSampleRate),
-    resampleChannel(channels[1], sourceSampleRate, targetSampleRate),
-  ]);
-
-  return [left, right];
 };

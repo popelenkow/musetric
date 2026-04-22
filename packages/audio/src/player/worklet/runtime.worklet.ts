@@ -12,7 +12,7 @@ export type CreatePlayerRuntimeOptions = {
 
 export type PlayerRuntime = {
   port: ReturnType<typeof playerChannel.inbound<MessagePort>>;
-  process: (output: Float32Array[]) => void;
+  process: (outputs: Float32Array[]) => void;
 };
 
 export const createPlayerRuntime = (
@@ -20,6 +20,7 @@ export const createPlayerRuntime = (
 ): PlayerRuntime => {
   const { port, dataPort } = options;
 
+  let frameCount = 0;
   let tracks: Record<StemType, Float32Array[]> | undefined = undefined;
   let frameIndex = 0;
   let playing = false;
@@ -28,6 +29,7 @@ export const createPlayerRuntime = (
 
   dataPort.bindHandlers({
     mount: (message) => {
+      frameCount = message.frameCount;
       tracks = message.tracks;
       frameIndex = 0;
       playing = false;
@@ -35,6 +37,7 @@ export const createPlayerRuntime = (
       port.methods.setPlaying({ playing, frameIndex });
     },
     unmount: () => {
+      frameCount = 0;
       tracks = undefined;
       frameIndex = 0;
       playing = false;
@@ -49,11 +52,6 @@ export const createPlayerRuntime = (
         return;
       }
 
-      const frameCount = Math.max(
-        tracks.lead[0].length,
-        tracks.backing[0].length,
-        tracks.instrumental[0].length,
-      );
       if (frameIndex >= frameCount) {
         frameIndex = 0;
       }
@@ -77,37 +75,31 @@ export const createPlayerRuntime = (
 
   return {
     port,
-    process: (output) => {
+    process: (outputs) => {
+      outputs.forEach((output) => {
+        output.fill(0);
+      });
       if (!tracks || !playing) {
-        for (const out of output) {
-          out.fill(0);
-        }
         return;
       }
 
-      for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
-        const out = output[channelIndex];
-        for (let i = 0; i < out.length; i++) {
-          const index = frameIndex + i;
-          let value = 0;
-
-          for (const stemType of stemTypes) {
-            const samples = tracks[stemType][channelIndex];
-            const sample = index < samples.length ? samples[index] : 0;
-            const volume = trackVolumes[stemType] ?? 1;
-            value += sample * volume;
+      const currentTracks = tracks;
+      outputs.forEach((output, channelIndex) => {
+        stemTypes.forEach((stemType) => {
+          const samples = currentTracks[stemType][channelIndex];
+          if (!samples) {
+            return;
           }
 
-          out[i] = value;
-        }
-      }
+          const volume = trackVolumes[stemType] ?? 1;
+          output.forEach((_, i) => {
+            const sample = samples[frameIndex + i] ?? 0;
+            output[i] += sample * volume;
+          });
+        });
+      });
 
-      const frameCount = Math.max(
-        tracks.lead[0].length,
-        tracks.backing[0].length,
-        tracks.instrumental[0].length,
-      );
-      frameIndex += output[0].length;
+      frameIndex += outputs[0].length;
       if (frameIndex >= frameCount) {
         frameIndex = 0;
         playing = false;
