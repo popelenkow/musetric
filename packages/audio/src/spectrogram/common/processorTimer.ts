@@ -9,7 +9,7 @@ export const spectrogramTimerLabels = [
   'writeBuffers',
   'createCommand',
   'submitCommand',
-  'sliceWave',
+  'sliceSamples',
   'windowing',
   'fourierReverse',
   'fourierTransform',
@@ -24,7 +24,7 @@ export type SpectrogramTimerLabel = (typeof spectrogramTimerLabels)[number];
 export type SpectrogramProcessorMetrics = Record<SpectrogramTimerLabel, number>;
 
 const gpuLabels = [
-  'sliceWave',
+  'sliceSamples',
   'windowing',
   'fourierReverse',
   'fourierTransform',

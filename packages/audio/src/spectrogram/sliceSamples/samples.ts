@@ -1,22 +1,22 @@
 import { createResourceCell } from '@musetric/resource-utils';
 import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
-export type StateWave = {
+export type StateSamples = {
   buffer: GPUBuffer;
   array: Float32Array;
   write: (
-    wave: Float32Array,
+    samples: Float32Array,
     trackProgress: number,
     config: ExtSpectrogramConfig,
   ) => void;
 };
 
-export const createStateWaveCell = (device: GPUDevice) =>
+export const createStateSamplesCell = (device: GPUDevice) =>
   createResourceCell({
-    create: (visibleSamples: number): StateWave => {
+    create: (visibleSamples: number): StateSamples => {
       const array = new Float32Array(visibleSamples);
       const buffer = device.createBuffer({
-        label: 'pipeline-wave-buffer',
+        label: 'pipeline-samples-buffer',
         size: array.byteLength,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
@@ -24,7 +24,7 @@ export const createStateWaveCell = (device: GPUDevice) =>
       return {
         buffer,
         array,
-        write: (wave, trackProgress, config) => {
+        write: (samples, trackProgress, config) => {
           const {
             windowSize,
             sampleRate,
@@ -35,17 +35,17 @@ export const createStateWaveCell = (device: GPUDevice) =>
           const afterSamples = visibleTimeAfter * sampleRate;
           const totalVisibleSamples = beforeSamples + afterSamples;
           const startIndex = Math.floor(
-            trackProgress * wave.length - beforeSamples,
+            trackProgress * samples.length - beforeSamples,
           );
 
           const from = Math.max(0, -startIndex);
-          const to = Math.min(totalVisibleSamples, wave.length - startIndex);
+          const to = Math.min(totalVisibleSamples, samples.length - startIndex);
 
           if (from > 0) {
             array.fill(0, 0, from);
           }
           if (to > from) {
-            const slice = wave.subarray(startIndex + from, startIndex + to);
+            const slice = samples.subarray(startIndex + from, startIndex + to);
             array.set(slice, from);
           }
           if (to < array.length) {
@@ -55,8 +55,8 @@ export const createStateWaveCell = (device: GPUDevice) =>
         },
       };
     },
-    dispose: (wave) => {
-      wave.buffer.destroy();
+    dispose: (stateSamples) => {
+      stateSamples.buffer.destroy();
     },
     equals: (current, next) => current === next,
   });

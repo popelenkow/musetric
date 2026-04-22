@@ -4,7 +4,7 @@ import {
   type SpectrogramConfig,
 } from '@musetric/audio/spectrogram';
 import { defaultSampleRate } from '@musetric/resource-utils';
-import { progress, runs, skipRuns, wave } from './constants.js';
+import { progress, runs, samples, skipRuns } from './constants.js';
 import { waitNextFrame } from './waitNextFrame.js';
 
 export const runPipeline = async (
@@ -47,7 +47,7 @@ export const runPipeline = async (
   });
 
   for (let i = 0; i < skipRuns + runs; i++) {
-    await processor.render(wave, progress);
+    await processor.render(samples, progress);
     await waitNextFrame(15);
   }
   processor.dispose();

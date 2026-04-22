@@ -36,7 +36,7 @@ export const spectrogramChannel = createMessageChannel<
 });
 
 export type SpectrogramDataMethods = {
-  mount: (message: { wave: Float32Array<SharedArrayBuffer> }) => void;
+  mount: (message: { samples: Float32Array<SharedArrayBuffer> }) => void;
   unmount: () => void;
 };
 
