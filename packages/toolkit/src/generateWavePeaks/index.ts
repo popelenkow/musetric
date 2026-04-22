@@ -4,26 +4,26 @@ import { type Logger } from '@musetric/resource-utils';
 import { getDurationSeconds } from './getDuration.js';
 import { readPcm } from './readPcm.js';
 
-const waveWidth = 3840;
+const wavePeakCount = 3840;
 
-export type GenerateWaveOptions = {
+export type GenerateWavePeaksOptions = {
   fromPath: string;
   toPath: string;
   sampleRate: number;
   logger: Logger;
 };
 
-export const generateWave = async (
-  options: GenerateWaveOptions,
+export const generateWavePeaks = async (
+  options: GenerateWavePeaksOptions,
 ): Promise<void> => {
   const { fromPath, toPath, sampleRate, logger } = options;
   await mkdir(dirname(toPath), { recursive: true });
 
-  const output = new Float32Array(waveWidth * 2);
+  const wavePeaks = new Float32Array(wavePeakCount * 2);
 
   const durationSeconds = await getDurationSeconds(fromPath, logger);
   const totalSamples = Math.floor(durationSeconds * sampleRate);
-  const segmentStep = totalSamples / waveWidth;
+  const segmentStep = totalSamples / wavePeakCount;
 
   let lastSegmentIndex = -1;
   await readPcm({
@@ -33,26 +33,26 @@ export const generateWave = async (
     onSample: (left, right, sampleIndex) => {
       const value = (left + right) * 0.5;
       const segmentIndex = Math.floor(sampleIndex / segmentStep);
-      if (segmentIndex >= waveWidth) {
+      if (segmentIndex >= wavePeakCount) {
         return;
       }
       const baseIndex = segmentIndex * 2;
       if (segmentIndex !== lastSegmentIndex) {
-        output[baseIndex] = value;
-        output[baseIndex + 1] = value;
+        wavePeaks[baseIndex] = value;
+        wavePeaks[baseIndex + 1] = value;
         lastSegmentIndex = segmentIndex;
       }
-      if (value < output[baseIndex]) {
-        output[baseIndex] = value;
+      if (value < wavePeaks[baseIndex]) {
+        wavePeaks[baseIndex] = value;
       }
-      if (value > output[baseIndex + 1]) {
-        output[baseIndex + 1] = value;
+      if (value > wavePeaks[baseIndex + 1]) {
+        wavePeaks[baseIndex + 1] = value;
       }
     },
   });
 
   await writeFile(
     toPath,
-    Buffer.from(output.buffer, output.byteOffset, output.byteLength),
+    Buffer.from(wavePeaks.buffer, wavePeaks.byteOffset, wavePeaks.byteLength),
   );
 };

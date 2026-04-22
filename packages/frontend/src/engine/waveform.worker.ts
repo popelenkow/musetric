@@ -22,11 +22,11 @@ self.addEventListener('messageerror', reportError);
 port.bindBoot(() => {
   createWaveformRuntime({
     port,
-    getWave: async (projectId, stemType) => {
-      const wave = await requestWithAxios(axios, api.wave.get.base, {
+    getWavePeaks: async (projectId, stemType) => {
+      const wavePeaks = await requestWithAxios(axios, api.wavePeaks.get.base, {
         params: { projectId, stemType },
       });
-      return wave;
+      return wavePeaks;
     },
   });
   port.methods.booted();

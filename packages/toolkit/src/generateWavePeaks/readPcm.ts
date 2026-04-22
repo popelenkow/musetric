@@ -59,6 +59,6 @@ export const readPcm = async (options: ReadPcmOptions): Promise<void> => {
     },
     stderr: { mode: 'logText' },
     logger,
-    processName: 'generateWave.readPcm',
+    processName: 'generateWavePeaks.readPcm',
   });
 };

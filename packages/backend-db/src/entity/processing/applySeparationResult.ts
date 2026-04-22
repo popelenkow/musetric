@@ -13,7 +13,7 @@ export type ApplySeparationResultArg = {
     backingId: string;
     instrumentalId: string;
   };
-  wave: {
+  wavePeaks: {
     leadId: string;
     backingId: string;
     instrumentalId: string;
@@ -74,19 +74,23 @@ export const applySeparationResult = (database: DatabaseSync) => {
       );
 
       await Promise.resolve(
-        insertWaveStatement.run(arg.projectId, 'lead', arg.wave.leadId),
+        insertWaveStatement.run(arg.projectId, 'lead', arg.wavePeaks.leadId),
       );
 
       await Promise.resolve(
         insertWaveStatement.run(
           arg.projectId,
           'instrumental',
-          arg.wave.instrumentalId,
+          arg.wavePeaks.instrumentalId,
         ),
       );
 
       await Promise.resolve(
-        insertWaveStatement.run(arg.projectId, 'backing', arg.wave.backingId),
+        insertWaveStatement.run(
+          arg.projectId,
+          'backing',
+          arg.wavePeaks.backingId,
+        ),
       );
     });
   };

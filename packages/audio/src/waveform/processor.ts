@@ -6,7 +6,7 @@ const barStep = 3;
 
 export type WaveformProcessor = {
   setColors: (colors: ViewColors) => void;
-  render: (wave: Float32Array, trackProgress: number) => void;
+  render: (wavePeaks: Float32Array, trackProgress: number) => void;
 };
 
 export const createWaveformProcessor = (
@@ -20,9 +20,9 @@ export const createWaveformProcessor = (
     setColors: (nextColors) => {
       colors = nextColors;
     },
-    render: (wave, trackProgress) => {
+    render: (wavePeaks, trackProgress) => {
       const segmentCount = Math.floor(canvas.width / barStep);
-      const segments = generateWaveformSegments(wave, segmentCount);
+      const segments = generateWaveformSegments(wavePeaks, segmentCount);
       draw.run(segments, trackProgress, colors);
     },
   };

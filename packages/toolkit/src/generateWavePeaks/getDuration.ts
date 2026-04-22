@@ -31,7 +31,7 @@ export const getDurationSeconds = async (
     },
     stderr: { mode: 'logText' },
     logger,
-    processName: 'generateWave.getDurationSeconds',
+    processName: 'generateWavePeaks.getDurationSeconds',
   });
 
   if (!duration || !Number.isFinite(duration) || duration < 0) {

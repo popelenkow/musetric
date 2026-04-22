@@ -3,7 +3,11 @@ import {
   type EventEmitter,
   type Logger,
 } from '@musetric/resource-utils';
-import { convertToFmp4, generateWave, separateAudio } from '@musetric/toolkit';
+import {
+  convertToFmp4,
+  generateWavePeaks,
+  separateAudio,
+} from '@musetric/toolkit';
 import { type FastifyInstance } from 'fastify';
 import { envs } from '../../common/envs.js';
 import {
@@ -100,25 +104,25 @@ export const createSeparationWorker = (
           }),
         ]);
 
-        const waveLead = app.blobStorage.createPath();
-        const waveBacking = app.blobStorage.createPath();
-        const waveInstrumental = app.blobStorage.createPath();
+        const wavePeaksLead = app.blobStorage.createPath();
+        const wavePeaksBacking = app.blobStorage.createPath();
+        const wavePeaksInstrumental = app.blobStorage.createPath();
         await Promise.all([
-          generateWave({
+          generateWavePeaks({
             fromPath: masterLead.blobPath,
-            toPath: waveLead.blobPath,
+            toPath: wavePeaksLead.blobPath,
             sampleRate: defaultSampleRate,
             logger,
           }),
-          generateWave({
+          generateWavePeaks({
             fromPath: masterBacking.blobPath,
-            toPath: waveBacking.blobPath,
+            toPath: wavePeaksBacking.blobPath,
             sampleRate: defaultSampleRate,
             logger,
           }),
-          generateWave({
+          generateWavePeaks({
             fromPath: masterInstrumental.blobPath,
-            toPath: waveInstrumental.blobPath,
+            toPath: wavePeaksInstrumental.blobPath,
             sampleRate: defaultSampleRate,
             logger,
           }),
@@ -136,10 +140,10 @@ export const createSeparationWorker = (
             backingId: deliveryBacking.blobId,
             instrumentalId: deliveryInstrumental.blobId,
           },
-          wave: {
-            leadId: waveLead.blobId,
-            backingId: waveBacking.blobId,
-            instrumentalId: waveInstrumental.blobId,
+          wavePeaks: {
+            leadId: wavePeaksLead.blobId,
+            backingId: wavePeaksBacking.blobId,
+            instrumentalId: wavePeaksInstrumental.blobId,
           },
         });
 

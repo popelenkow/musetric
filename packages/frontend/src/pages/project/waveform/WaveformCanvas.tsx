@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { type StemType } from '@musetric/audio';
+import type { api } from '@musetric/api';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewError } from '../../../components/ViewError.js';
@@ -9,7 +9,7 @@ import { useEngineStore } from '../../../engine/useEngineStore.js';
 
 export type WaveformCanvasProps = {
   projectId: number;
-  stemType: StemType;
+  stemType: api.wavePeaks.StemType;
 };
 export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
   const { projectId, stemType } = props;

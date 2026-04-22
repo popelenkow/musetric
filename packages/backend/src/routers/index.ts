@@ -4,7 +4,7 @@ import { audioMasterRouter } from './audioMaster.js';
 import { previewRouter } from './preview.js';
 import { projectRouter } from './project.js';
 import { subtitleRouter } from './subtitle.js';
-import { waveRouter } from './wave.js';
+import { wavePeaksRouter } from './wavePeaks.js';
 
 export const registerRouters = (app: FastifyInstance) => {
   app.register(audioDeliveryRouter);
@@ -12,5 +12,5 @@ export const registerRouters = (app: FastifyInstance) => {
   app.register(previewRouter);
   app.register(projectRouter);
   app.register(subtitleRouter);
-  app.register(waveRouter);
+  app.register(wavePeaksRouter);
 };
