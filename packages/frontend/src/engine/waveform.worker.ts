@@ -1,6 +1,6 @@
 import { api } from '@musetric/api';
 import { requestWithAxios } from '@musetric/api/dom';
-import { waveTypes } from '@musetric/audio/es';
+import { stemTypes } from '@musetric/audio/es';
 import { waveformChannel } from '@musetric/audio/waveform';
 import { createWaveformRuntime } from '@musetric/audio/waveform/worker';
 import axios from 'axios';
@@ -8,9 +8,9 @@ import axios from 'axios';
 const port = waveformChannel.inbound(self);
 
 const reportError = () => {
-  for (const waveType of waveTypes) {
+  for (const stemType of stemTypes) {
     port.methods.setState({
-      waveType,
+      stemType,
       status: 'error',
     });
   }
@@ -22,9 +22,9 @@ self.addEventListener('messageerror', reportError);
 port.bindBoot(() => {
   createWaveformRuntime({
     port,
-    getWave: async (projectId, waveType) => {
+    getWave: async (projectId, stemType) => {
       const wave = await requestWithAxios(axios, api.wave.get.base, {
-        params: { projectId, type: waveType },
+        params: { projectId, stemType },
       });
       return wave;
     },

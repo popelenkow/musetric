@@ -2,7 +2,7 @@ import {
   type ChannelArrays,
   toChannelArrays,
 } from '../../common/channelBuffers.es.js';
-import { type WaveType, waveTypes } from '../../common/waveType.es.js';
+import { type StemType, stemTypes } from '../../common/stemType.es.js';
 import {
   type playerChannel,
   type playerDataChannel,
@@ -24,10 +24,10 @@ export const createPlayerRuntime = (
 ): PlayerRuntime => {
   const { port, dataPort } = options;
 
-  let tracks: Record<WaveType, ChannelArrays> | undefined = undefined;
+  let tracks: Record<StemType, ChannelArrays> | undefined = undefined;
   let frameIndex = 0;
   let playing = false;
-  const trackVolumes: Partial<Record<WaveType, number>> = {};
+  const trackVolumes: Partial<Record<StemType, number>> = {};
   const frameIndexTracker = createFrameIndexTracker(frameIndex);
 
   dataPort.bindHandlers({
@@ -79,7 +79,7 @@ export const createPlayerRuntime = (
       port.methods.setFrameIndex({ frameIndex });
     },
     setTrackVolume: (message) => {
-      trackVolumes[message.waveType] = message.volume;
+      trackVolumes[message.stemType] = message.volume;
     },
   });
 
@@ -99,10 +99,10 @@ export const createPlayerRuntime = (
           const index = frameIndex + i;
           let value = 0;
 
-          for (const waveType of waveTypes) {
-            const wave = tracks[waveType][channel];
+          for (const stemType of stemTypes) {
+            const wave = tracks[stemType][channel];
             const data = index < wave.length ? wave[index] : 0;
-            const volume = trackVolumes[waveType] ?? 1;
+            const volume = trackVolumes[stemType] ?? 1;
             value += data * volume;
           }
 

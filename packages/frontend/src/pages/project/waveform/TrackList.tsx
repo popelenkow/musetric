@@ -1,5 +1,5 @@
 import { Box, Paper, Stack } from '@mui/material';
-import { waveTypes } from '@musetric/audio';
+import { stemTypes } from '@musetric/audio';
 import { type FC } from 'react';
 import { useProjectStore } from '../store.js';
 import { TrackVolumeControl } from './TrackVolumeControl.js';
@@ -29,9 +29,9 @@ export const TrackList: FC<TrackListProps> = (props) => {
         scrollbarGutter: 'stable',
       }}
     >
-      {waveTypes.map((waveType) => (
+      {stemTypes.map((stemType) => (
         <Stack
-          key={waveType}
+          key={stemType}
           direction='row'
           gap={1}
           height={100}
@@ -39,12 +39,12 @@ export const TrackList: FC<TrackListProps> = (props) => {
         >
           {isVolumeMixerVisible && (
             <Box width={200}>
-              <TrackVolumeControl waveType={waveType} />
+              <TrackVolumeControl stemType={stemType} />
             </Box>
           )}
           {isWaveformVisible && (
             <Box component={Paper} elevation={3} flexGrow={1}>
-              <WaveformCanvas projectId={projectId} type={waveType} />
+              <WaveformCanvas projectId={projectId} stemType={stemType} />
             </Box>
           )}
         </Stack>

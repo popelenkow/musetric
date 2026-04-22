@@ -22,14 +22,14 @@ port.bindBoot((message) => {
     port,
     playerPort: playerDataChannel.outbound(message.playerPort),
     spectrogramPort: spectrogramDataChannel.outbound(message.spectrogramPort),
-    getEncodedBuffer: async (projectId, type) => {
+    getEncodedBuffer: async (projectId, stemType) => {
       const encodedBuffer = await requestWithAxios(
         axios,
         api.audioDelivery.get.base,
         {
           params: {
             projectId,
-            type,
+            stemType,
           },
         },
       );

@@ -1,4 +1,4 @@
-import { type WaveType } from '@musetric/audio';
+import { type StemType } from '@musetric/audio';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { engine } from '../../engine/engine.js';
@@ -6,7 +6,7 @@ import { engine } from '../../engine/engine.js';
 export type ProjectState = {
   isWaveformVisible: boolean;
   isVolumeMixerVisible: boolean;
-  trackVolumes: Record<WaveType, number>;
+  trackVolumes: Record<StemType, number>;
 };
 
 const initialState: ProjectState = {
@@ -24,7 +24,7 @@ export type ProjectActions = {
   toggleWaveformVisible: () => void;
   setVolumeMixerVisible: (value: boolean) => void;
   toggleVolumeMixerVisible: () => void;
-  setTrackVolume: (waveType: WaveType, volume: number) => void;
+  setTrackVolume: (stemType: StemType, volume: number) => void;
 };
 
 type State = ProjectState & ProjectActions;
@@ -44,11 +44,11 @@ export const useProjectStore = create<State>()(
         set((state) => ({
           isVolumeMixerVisible: !state.isVolumeMixerVisible,
         })),
-      setTrackVolume: (waveType, volume) =>
+      setTrackVolume: (stemType, volume) =>
         set((state) => ({
           trackVolumes: {
             ...state.trackVolumes,
-            [waveType]: volume,
+            [stemType]: volume,
           },
         })),
     };

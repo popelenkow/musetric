@@ -3,14 +3,14 @@ import { table } from '../../schema/index.js';
 
 export const get = (database: DatabaseSync) => {
   const statement = database.prepare(
-    `SELECT id, projectId, type, blobId FROM Wave WHERE projectId = ? AND type = ?`,
+    `SELECT id, projectId, stemType, blobId FROM Wave WHERE projectId = ? AND stemType = ?`,
   );
 
   return async (
     projectId: number,
-    type: table.wave.Type,
+    stemType: table.wave.StemType,
   ): Promise<table.wave.Item | undefined> => {
-    const row = await Promise.resolve(statement.get(projectId, type));
+    const row = await Promise.resolve(statement.get(projectId, stemType));
     if (!row) {
       return undefined;
     }

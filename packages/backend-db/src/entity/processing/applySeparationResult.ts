@@ -25,10 +25,10 @@ export const applySeparationResult = (database: DatabaseSync) => {
     `INSERT INTO AudioMaster (projectId, type, blobId) VALUES (?, ?, ?)`,
   );
   const insertDeliveryStatement = database.prepare(
-    `INSERT INTO AudioDelivery (projectId, type, blobId) VALUES (?, ?, ?)`,
+    `INSERT INTO AudioDelivery (projectId, stemType, blobId) VALUES (?, ?, ?)`,
   );
   const insertWaveStatement = database.prepare(
-    `INSERT INTO Wave (projectId, type, blobId) VALUES (?, ?, ?)`,
+    `INSERT INTO Wave (projectId, stemType, blobId) VALUES (?, ?, ?)`,
   );
 
   return async (arg: ApplySeparationResultArg): Promise<void> => {

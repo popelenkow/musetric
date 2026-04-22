@@ -1,28 +1,28 @@
 import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
 import type { ViewColors } from '../common/colors.es.js';
+import type { StemType } from '../common/stemType.es.js';
 import type { ViewSize } from '../common/viewSize.es.js';
-import type { WaveType } from '../common/waveType.es.js';
 
 export type WaveformOutboundMethods = {
   boot: () => void;
   mount: (message: {
     projectId: number;
-    waveType: WaveType;
+    stemType: StemType;
     trackProgress: number;
     canvas: OffscreenCanvas;
     colors: ViewColors;
     viewSize: ViewSize;
   }) => void;
-  unmount: (message: { waveType: WaveType }) => void;
+  unmount: (message: { stemType: StemType }) => void;
   setTrackProgress: (message: { trackProgress: number }) => void;
   setColors: (message: { colors: ViewColors }) => void;
-  resize: (message: { waveType: WaveType; viewSize: ViewSize }) => void;
+  resize: (message: { stemType: StemType; viewSize: ViewSize }) => void;
 };
 
 export type WaveformInboundMethods = {
   booted: () => void;
   setState: (message: {
-    waveType: WaveType;
+    stemType: StemType;
     status: 'error' | 'success';
   }) => void;
 };

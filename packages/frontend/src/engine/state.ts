@@ -1,8 +1,8 @@
-import { type ViewColors, type WaveType } from '@musetric/audio';
+import { type StemType, type ViewColors } from '@musetric/audio';
 
 export type PortStatus = 'pending' | 'success' | 'error';
 
-export type WaveformStatuses = Record<WaveType, PortStatus>;
+export type WaveformStatuses = Record<StemType, PortStatus>;
 
 export type EngineStatuses = {
   decoder: PortStatus;

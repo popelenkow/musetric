@@ -29,26 +29,26 @@ export namespace audioMaster {
 }
 
 export namespace audioDelivery {
-  export const typeSchema = z.enum(['lead', 'backing', 'instrumental']);
-  export type Type = z.infer<typeof typeSchema>;
+  export const stemTypeSchema = z.enum(['lead', 'backing', 'instrumental']);
+  export type StemType = z.infer<typeof stemTypeSchema>;
 
   export const itemSchema = z.object({
     id: numericIdSchema,
     projectId: numericIdSchema,
-    type: typeSchema,
+    stemType: stemTypeSchema,
     blobId: z.string(),
   });
   export type Item = z.infer<typeof itemSchema>;
 }
 
 export namespace wave {
-  export const typeSchema = z.enum(['lead', 'backing', 'instrumental']);
-  export type Type = z.infer<typeof typeSchema>;
+  export const stemTypeSchema = z.enum(['lead', 'backing', 'instrumental']);
+  export type StemType = z.infer<typeof stemTypeSchema>;
 
   export const itemSchema = z.object({
     id: numericIdSchema,
     projectId: numericIdSchema,
-    type: typeSchema,
+    stemType: stemTypeSchema,
     blobId: z.string(),
   });
   export type Item = z.infer<typeof itemSchema>;

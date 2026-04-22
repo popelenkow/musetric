@@ -1,4 +1,4 @@
-import { waveformChannel, type WaveType } from '@musetric/audio';
+import { type StemType, waveformChannel } from '@musetric/audio';
 import {
   type ControlledPromise,
   createControlledPromise,
@@ -19,7 +19,7 @@ export type EngineWaveform = {
   boot: () => Promise<void>;
   mount: (options: {
     projectId: number;
-    type: WaveType;
+    stemType: StemType;
     canvas: HTMLCanvasElement;
   }) => Unmount;
 };
@@ -47,7 +47,7 @@ export const createEngineWaveform = (
     },
     setState: (message) => {
       store.update((state) => {
-        state.statuses.waveform[message.waveType] = message.status;
+        state.statuses.waveform[message.stemType] = message.status;
       });
     },
   });
@@ -75,7 +75,7 @@ export const createEngineWaveform = (
       return bootPromise.promise;
     },
     mount: (options) => {
-      const { projectId, type, canvas } = options;
+      const { projectId, stemType, canvas } = options;
 
       resizeCanvas(canvas);
       const viewSize = getCanvasSize(canvas);
@@ -83,7 +83,7 @@ export const createEngineWaveform = (
 
       port.methods.mount({
         projectId,
-        waveType: type,
+        stemType,
         trackProgress: getTrackProgress(store.get()),
         canvas: offscreenCanvas,
         colors: store.get().colors,
@@ -92,7 +92,7 @@ export const createEngineWaveform = (
 
       const unsubscribeResizeObserver = subscribeResizeObserver(canvas, () => {
         port.methods.resize({
-          waveType: type,
+          stemType,
           viewSize: getCanvasSize(canvas),
         });
       });
@@ -100,10 +100,10 @@ export const createEngineWaveform = (
       return () => {
         unsubscribeResizeObserver();
         port.methods.unmount({
-          waveType: type,
+          stemType,
         });
         store.update((state) => {
-          state.statuses.waveform[type] = 'pending';
+          state.statuses.waveform[stemType] = 'pending';
         });
       };
     },

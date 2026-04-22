@@ -1,16 +1,16 @@
 import { z } from 'zod';
 import { createApiRoute } from '../common/apiRoute.js';
 
-export const typeSchema = z.enum(['lead', 'backing', 'instrumental']);
-export type Type = z.infer<typeof typeSchema>;
+export const stemTypeSchema = z.enum(['lead', 'backing', 'instrumental']);
+export type StemType = z.infer<typeof stemTypeSchema>;
 
 export namespace get {
   export const base = createApiRoute({
     method: 'get',
-    path: '/api/audioDelivery/project/:projectId/:type',
+    path: '/api/audioDelivery/project/:projectId/:stemType',
     paramsSchema: z.object({
       projectId: z.number(),
-      type: typeSchema,
+      stemType: stemTypeSchema,
     }),
     requestSchema: z.void(),
     responseSchema: z.instanceof(Uint8Array<ArrayBuffer>),

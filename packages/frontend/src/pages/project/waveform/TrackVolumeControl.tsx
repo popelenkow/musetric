@@ -1,24 +1,24 @@
 import { Paper, Slider, Stack, Typography } from '@mui/material';
-import { type WaveType } from '@musetric/audio';
+import { type StemType } from '@musetric/audio';
 import type { TFunction } from 'i18next';
 import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProjectStore } from '../store.js';
 
-const waveformTrackLabels: Record<WaveType, (t: TFunction) => string> = {
-  lead: (t) => t('pages.project.waveform.type.lead'),
-  backing: (t) => t('pages.project.waveform.type.backing'),
-  instrumental: (t) => t('pages.project.waveform.type.instrumental'),
+const stemLabels: Record<StemType, (t: TFunction) => string> = {
+  lead: (t) => t('pages.project.waveform.stemType.lead'),
+  backing: (t) => t('pages.project.waveform.stemType.backing'),
+  instrumental: (t) => t('pages.project.waveform.stemType.instrumental'),
 };
 
 export type TrackVolumeControlProps = {
-  waveType: WaveType;
+  stemType: StemType;
 };
 
 export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
-  const { waveType } = props;
+  const { stemType } = props;
   const { t } = useTranslation();
-  const trackVolume = useProjectStore((state) => state.trackVolumes[waveType]);
+  const trackVolume = useProjectStore((state) => state.trackVolumes[stemType]);
   const setTrackVolume = useProjectStore((state) => state.setTrackVolume);
   const volumePercent = Math.round(trackVolume * 100);
 
@@ -38,7 +38,7 @@ export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
         minWidth={0}
       >
         <Typography variant='subtitle2' fontWeight='bold'>
-          {waveformTrackLabels[waveType](t)}
+          {stemLabels[stemType](t)}
         </Typography>
         <Typography variant='caption'>{`${volumePercent}%`}</Typography>
       </Stack>
@@ -48,7 +48,7 @@ export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
         max={100}
         value={volumePercent}
         onChange={(_, value) => {
-          setTrackVolume(waveType, value / 100);
+          setTrackVolume(stemType, value / 100);
         }}
       />
     </Stack>
