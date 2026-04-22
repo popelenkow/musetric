@@ -8,31 +8,34 @@ import { type waveformChannel } from '../protocol.cross.js';
 
 export type CreateWaveformRuntimeOptions = {
   port: ReturnType<typeof waveformChannel.inbound<DedicatedWorkerGlobalScope>>;
-  getWave: (projectId: number, stemType: StemType) => Promise<Float32Array>;
+  getWavePeaks: (
+    projectId: number,
+    stemType: StemType,
+  ) => Promise<Float32Array>;
 };
 
-type WaveItem = {
+type WaveformItem = {
   canvas: OffscreenCanvas;
   processor: WaveformProcessor;
-  wave?: Float32Array;
+  wavePeaks?: Float32Array;
   projectId: number;
 };
 
 export const createWaveformRuntime = (
   options: CreateWaveformRuntimeOptions,
 ) => {
-  const { port, getWave } = options;
+  const { port, getWavePeaks } = options;
 
   let trackProgress = 0;
-  const waveItems: Partial<Record<StemType, WaveItem>> = {};
+  const waveformItems: Partial<Record<StemType, WaveformItem>> = {};
 
   const render = (stemType: StemType): boolean => {
-    const item = waveItems[stemType];
-    if (!item || !item.wave) {
+    const item = waveformItems[stemType];
+    if (!item || !item.wavePeaks) {
       return false;
     }
 
-    item.processor.render(item.wave, trackProgress);
+    item.processor.render(item.wavePeaks, trackProgress);
     return true;
   };
 
@@ -47,20 +50,23 @@ export const createWaveformRuntime = (
       try {
         trackProgress = message.trackProgress;
         setOffscreenCanvasSize(message.canvas, message.viewSize);
-        const item: WaveItem = {
+        const item: WaveformItem = {
           canvas: message.canvas,
           processor: createWaveformProcessor(message.canvas, message.colors),
           projectId: message.projectId,
         };
-        waveItems[message.stemType] = item;
-        item.wave = await getWave(message.projectId, message.stemType);
+        waveformItems[message.stemType] = item;
+        item.wavePeaks = await getWavePeaks(
+          message.projectId,
+          message.stemType,
+        );
         render(message.stemType);
         port.methods.setState({
           stemType: message.stemType,
           status: 'success',
         });
       } catch (error) {
-        console.error('Failed to load project wave', error);
+        console.error('Failed to load project waveform', error);
         port.methods.setState({
           stemType: message.stemType,
           status: 'error',
@@ -68,7 +74,7 @@ export const createWaveformRuntime = (
       }
     },
     unmount: (message) => {
-      waveItems[message.stemType] = undefined;
+      waveformItems[message.stemType] = undefined;
     },
     setTrackProgress: (message) => {
       trackProgress = message.trackProgress;
@@ -76,12 +82,12 @@ export const createWaveformRuntime = (
     },
     setColors: (message) => {
       for (const stemType of stemTypes) {
-        waveItems[stemType]?.processor.setColors(message.colors);
+        waveformItems[stemType]?.processor.setColors(message.colors);
       }
       renderAll();
     },
     resize: (message) => {
-      const item = waveItems[message.stemType];
+      const item = waveformItems[message.stemType];
       if (!item) {
         return;
       }

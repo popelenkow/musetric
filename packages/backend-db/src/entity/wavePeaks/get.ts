@@ -8,12 +8,12 @@ export const get = (database: DatabaseSync) => {
 
   return async (
     projectId: number,
-    stemType: table.wave.StemType,
-  ): Promise<table.wave.Item | undefined> => {
+    stemType: table.wavePeaks.StemType,
+  ): Promise<table.wavePeaks.Item | undefined> => {
     const row = await Promise.resolve(statement.get(projectId, stemType));
     if (!row) {
       return undefined;
     }
-    return table.wave.itemSchema.parse(row);
+    return table.wavePeaks.itemSchema.parse(row);
   };
 };

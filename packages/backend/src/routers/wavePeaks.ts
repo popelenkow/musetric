@@ -4,23 +4,23 @@ import { type FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { assertFound } from '../common/assertFound.js';
 import { handleCachedFile } from '../common/cachedFile.js';
 
-export const waveRouter: FastifyPluginCallbackZod = (app) => {
+export const wavePeaksRouter: FastifyPluginCallbackZod = (app) => {
   app.addHook('onRoute', (opts) => {
-    if (opts.schema) opts.schema.tags = ['wave'];
+    if (opts.schema) opts.schema.tags = ['wavePeaks'];
   });
 
   app.route({
-    ...fastifyRoute(api.wave.get.base),
+    ...fastifyRoute(api.wavePeaks.get.base),
     handler: async (request, reply) => {
       const { projectId, stemType } = request.params;
-      const wave = await app.db.wave.get(projectId, stemType);
+      const wavePeaks = await app.db.wavePeaks.get(projectId, stemType);
       assertFound(
-        wave,
-        `Wave for project ${projectId} and stem type ${stemType} not found`,
+        wavePeaks,
+        `Wave peaks for project ${projectId} and stemType ${stemType} not found`,
       );
 
-      const stat = await app.blobStorage.getStat(wave.blobId);
-      assertFound(stat, `Wave blob for id ${wave.blobId} not found`);
+      const stat = await app.blobStorage.getStat(wavePeaks.blobId);
+      assertFound(stat, `Wave peaks blob for id ${wavePeaks.blobId} not found`);
 
       const isNotModified = handleCachedFile(request, reply, {
         filename: 'waveform.bin',
@@ -33,7 +33,7 @@ export const waveRouter: FastifyPluginCallbackZod = (app) => {
         return;
       }
 
-      const stream = app.blobStorage.getStream(wave.blobId);
+      const stream = app.blobStorage.getStream(wavePeaks.blobId);
       return reply.send(stream);
     },
   });

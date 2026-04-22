@@ -41,7 +41,7 @@ export namespace audioDelivery {
   export type Item = z.infer<typeof itemSchema>;
 }
 
-export namespace wave {
+export namespace wavePeaks {
   export const stemTypeSchema = z.enum(['lead', 'backing', 'instrumental']);
   export type StemType = z.infer<typeof stemTypeSchema>;
 

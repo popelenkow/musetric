@@ -4,19 +4,19 @@ export type WaveformSegment = {
 };
 
 export const generateWaveformSegments = (
-  data: Float32Array,
-  width: number,
+  wavePeaks: Float32Array,
+  segmentCount: number,
 ): WaveformSegment[] => {
-  const step = data.length / (2 * width);
+  const step = wavePeaks.length / (2 * segmentCount);
   const segments: WaveformSegment[] = [];
-  for (let i = 0; i < width; i++) {
+  for (let i = 0; i < segmentCount; i++) {
     const start = Math.floor(i * step);
     const end = Math.floor((i + 1) * step);
     let min = 1;
     let max = -1;
     for (let j = start; j < end; j++) {
-      min = Math.min(min, data[j * 2]);
-      max = Math.max(max, data[j * 2 + 1]);
+      min = Math.min(min, wavePeaks[j * 2]);
+      max = Math.max(max, wavePeaks[j * 2 + 1]);
     }
     segments.push({ min, max });
   }
