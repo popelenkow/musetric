@@ -1,7 +1,7 @@
 import {
   playerChannel,
   playerProcessorName,
-  type WaveType,
+  type StemType,
 } from '@musetric/audio';
 import {
   type ControlledPromise,
@@ -16,7 +16,7 @@ export type EnginePlayer = {
   play: () => Promise<void>;
   pause: () => void;
   seek: (frameIndex: number) => void;
-  setTrackVolume: (waveType: WaveType, volume: number) => void;
+  setTrackVolume: (stemType: StemType, volume: number) => void;
 };
 
 export const createEngineStubPlayer = (): EnginePlayer => ({
@@ -95,9 +95,9 @@ export const createEnginePlayer = async (
         frameIndex: nextFrameIndex,
       });
     },
-    setTrackVolume: (waveType, volume) => {
+    setTrackVolume: (stemType, volume) => {
       port.methods.setTrackVolume({
-        waveType,
+        stemType,
         volume,
       });
     },

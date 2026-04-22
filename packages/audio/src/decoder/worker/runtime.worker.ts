@@ -1,5 +1,5 @@
 import { toChannelBuffers } from '../../common/channelBuffers.es.js';
-import type { WaveType } from '../../common/waveType.es.js';
+import type { StemType } from '../../common/stemType.es.js';
 import { type playerDataChannel } from '../../player/protocol.cross.js';
 import { type spectrogramDataChannel } from '../../spectrogram/protocol.cross.js';
 import { decodeMp4 } from '../mp4/index.js';
@@ -8,7 +8,7 @@ import { type decoderChannel } from '../protocol.cross.js';
 export type CreateDecoderRuntimeOptions = {
   getEncodedBuffer: (
     projectId: number,
-    waveType: WaveType,
+    stemType: StemType,
   ) => Promise<ArrayBuffer>;
   port: ReturnType<typeof decoderChannel.inbound<DedicatedWorkerGlobalScope>>;
   playerPort: ReturnType<typeof playerDataChannel.outbound<MessagePort>>;

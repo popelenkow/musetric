@@ -1,5 +1,5 @@
 import { setOffscreenCanvasSize } from '@musetric/resource-utils/cross/offscreenCanvas';
-import { type WaveType, waveTypes } from '../../common/waveType.es.js';
+import { type StemType, stemTypes } from '../../common/stemType.es.js';
 import {
   createWaveformProcessor,
   type WaveformProcessor,
@@ -8,7 +8,7 @@ import { type waveformChannel } from '../protocol.cross.js';
 
 export type CreateWaveformRuntimeOptions = {
   port: ReturnType<typeof waveformChannel.inbound<DedicatedWorkerGlobalScope>>;
-  getWave: (projectId: number, waveType: WaveType) => Promise<Float32Array>;
+  getWave: (projectId: number, stemType: StemType) => Promise<Float32Array>;
 };
 
 type WaveItem = {
@@ -24,10 +24,10 @@ export const createWaveformRuntime = (
   const { port, getWave } = options;
 
   let trackProgress = 0;
-  const waveItems: Partial<Record<WaveType, WaveItem>> = {};
+  const waveItems: Partial<Record<StemType, WaveItem>> = {};
 
-  const render = (waveType: WaveType): boolean => {
-    const item = waveItems[waveType];
+  const render = (stemType: StemType): boolean => {
+    const item = waveItems[stemType];
     if (!item || !item.wave) {
       return false;
     }
@@ -37,8 +37,8 @@ export const createWaveformRuntime = (
   };
 
   const renderAll = () => {
-    for (const waveType of waveTypes) {
-      render(waveType);
+    for (const stemType of stemTypes) {
+      render(stemType);
     }
   };
 
@@ -52,42 +52,42 @@ export const createWaveformRuntime = (
           processor: createWaveformProcessor(message.canvas, message.colors),
           projectId: message.projectId,
         };
-        waveItems[message.waveType] = item;
-        item.wave = await getWave(message.projectId, message.waveType);
-        render(message.waveType);
+        waveItems[message.stemType] = item;
+        item.wave = await getWave(message.projectId, message.stemType);
+        render(message.stemType);
         port.methods.setState({
-          waveType: message.waveType,
+          stemType: message.stemType,
           status: 'success',
         });
       } catch (error) {
         console.error('Failed to load project wave', error);
         port.methods.setState({
-          waveType: message.waveType,
+          stemType: message.stemType,
           status: 'error',
         });
       }
     },
     unmount: (message) => {
-      waveItems[message.waveType] = undefined;
+      waveItems[message.stemType] = undefined;
     },
     setTrackProgress: (message) => {
       trackProgress = message.trackProgress;
       renderAll();
     },
     setColors: (message) => {
-      for (const waveType of waveTypes) {
-        waveItems[waveType]?.processor.setColors(message.colors);
+      for (const stemType of stemTypes) {
+        waveItems[stemType]?.processor.setColors(message.colors);
       }
       renderAll();
     },
     resize: (message) => {
-      const item = waveItems[message.waveType];
+      const item = waveItems[message.stemType];
       if (!item) {
         return;
       }
 
       setOffscreenCanvasSize(item.canvas, message.viewSize);
-      render(message.waveType);
+      render(message.stemType);
     },
   });
 };

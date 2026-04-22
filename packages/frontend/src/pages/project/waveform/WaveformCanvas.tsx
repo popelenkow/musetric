@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { type api } from '@musetric/api';
+import { type StemType } from '@musetric/audio';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewError } from '../../../components/ViewError.js';
@@ -9,29 +9,29 @@ import { useEngineStore } from '../../../engine/useEngineStore.js';
 
 export type WaveformCanvasProps = {
   projectId: number;
-  type: api.wave.Type;
+  stemType: StemType;
 };
 export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
-  const { projectId, type } = props;
+  const { projectId, stemType } = props;
   const { t } = useTranslation();
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>();
-  const status = useEngineStore((state) => state.statuses.waveform[type]);
+  const status = useEngineStore((state) => state.statuses.waveform[stemType]);
 
   useEffect(() => {
     if (!canvas) return;
     return engine.waveform.mount({
       projectId,
-      type,
+      stemType,
       canvas,
     });
-  }, [canvas, projectId, type]);
+  }, [canvas, projectId, stemType]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <canvas
         ref={setCanvas}
-        key={`${projectId}-${type}`}
+        key={`${projectId}-${stemType}`}
         style={{
           height: '100%',
           width: '100%',

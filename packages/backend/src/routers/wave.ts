@@ -12,11 +12,11 @@ export const waveRouter: FastifyPluginCallbackZod = (app) => {
   app.route({
     ...fastifyRoute(api.wave.get.base),
     handler: async (request, reply) => {
-      const { projectId, type } = request.params;
-      const wave = await app.db.wave.get(projectId, type);
+      const { projectId, stemType } = request.params;
+      const wave = await app.db.wave.get(projectId, stemType);
       assertFound(
         wave,
-        `Wave for project ${projectId} and type ${type} not found`,
+        `Wave for project ${projectId} and stem type ${stemType} not found`,
       );
 
       const stat = await app.blobStorage.getStat(wave.blobId);
