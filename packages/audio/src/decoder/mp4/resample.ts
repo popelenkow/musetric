@@ -1,5 +1,5 @@
 const resampleChannel = async (
-  channel: Float32Array,
+  samples: Float32Array,
   sourceSampleRate: number,
   targetSampleRate: number,
 ): Promise<Float32Array> => {
@@ -10,13 +10,13 @@ const resampleChannel = async (
   });
 
   try {
-    return src.simple(channel);
+    return src.simple(samples);
   } finally {
     src.destroy();
   }
 };
 
-export const resamplePcm = async (
+export const resampleChannels = async (
   channels: Float32Array[],
   sourceSampleRate: number,
   targetSampleRate: number,

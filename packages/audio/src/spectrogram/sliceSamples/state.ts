@@ -4,7 +4,7 @@ import {
 } from '@musetric/resource-utils';
 import { type ExtSpectrogramConfig } from '../common/extConfig.js';
 import { createParamsCell, type StateParams } from './params.js';
-import { createStateWaveCell, type StateWave } from './wave.js';
+import { createStateSamplesCell, type StateSamples } from './samples.js';
 
 export type StateArg = {
   out: GPUBuffer;
@@ -15,7 +15,7 @@ export type State = {
   pipeline: GPUComputePipeline;
   config: ExtSpectrogramConfig;
   params: StateParams;
-  wave: StateWave;
+  samples: StateSamples;
   bindGroup: GPUBindGroup;
 };
 
@@ -24,18 +24,18 @@ export const createStateCell = (
   pipeline: GPUComputePipeline,
 ): ResourceCell<StateArg, State> => {
   const paramsCell = createParamsCell(device);
-  const waveCell = createStateWaveCell(device);
+  const samplesCell = createStateSamplesCell(device);
   const bindGroupCell = createResourceCell({
     create: (arg: {
       out: GPUBuffer;
       params: GPUBuffer;
-      wave: GPUBuffer;
+      samples: GPUBuffer;
     }): GPUBindGroup =>
       device.createBindGroup({
-        label: 'slice-wave-bind-group',
+        label: 'slice-samples-bind-group',
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          { binding: 0, resource: { buffer: arg.wave } },
+          { binding: 0, resource: { buffer: arg.samples } },
           { binding: 1, resource: { buffer: arg.out } },
           { binding: 2, resource: { buffer: arg.params } },
         ],
@@ -44,31 +44,31 @@ export const createStateCell = (
     equals: (current, next) =>
       current.out === next.out &&
       current.params === next.params &&
-      current.wave === next.wave,
+      current.samples === next.samples,
   });
 
   return {
     get: (arg) => {
       const { out, config } = arg;
       const params = paramsCell.get(config);
-      const wave = waveCell.get(params.value.visibleSamples);
+      const samples = samplesCell.get(params.value.visibleSamples);
       const bindGroup = bindGroupCell.get({
         out,
         params: params.buffer,
-        wave: wave.buffer,
+        samples: samples.buffer,
       });
 
       return {
         pipeline,
         config,
         params,
-        wave,
+        samples,
         bindGroup,
       };
     },
     dispose: () => {
       bindGroupCell.dispose();
-      waveCell.dispose();
+      samplesCell.dispose();
       paramsCell.dispose();
     },
   };

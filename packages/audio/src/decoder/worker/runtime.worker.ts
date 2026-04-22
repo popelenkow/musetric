@@ -43,7 +43,7 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
           },
         });
         spectrogramPort.methods.mount({
-          wave: leadDecoded.channels[0],
+          samples: leadDecoded.channels[0],
         });
         port.methods.mounted({
           frameCount: Math.max(

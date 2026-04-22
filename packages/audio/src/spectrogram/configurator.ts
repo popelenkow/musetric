@@ -24,9 +24,9 @@ import {
   type SpectrogramRemap,
 } from './remap/index.js';
 import {
-  createSpectrogramSliceWaveCell,
-  type SpectrogramSliceWave,
-} from './sliceWave/index.js';
+  createSpectrogramSliceSamplesCell,
+  type SpectrogramSliceSamples,
+} from './sliceSamples/index.js';
 import {
   createSpectrogramStateCell,
   type SpectrogramState,
@@ -38,7 +38,7 @@ import {
 
 export type SpectrogramRuntime = {
   state: SpectrogramState;
-  sliceWave: SpectrogramSliceWave;
+  sliceSamples: SpectrogramSliceSamples;
   windowing: SpectrogramWindowing;
   fourier: Fourier;
   magnitudify: SpectrogramMagnitudify;
@@ -62,7 +62,10 @@ export const createSpectrogramConfigurator = (
 
   const cells = {
     state: createSpectrogramStateCell(device),
-    sliceWave: createSpectrogramSliceWaveCell(device, markers.sliceWave),
+    sliceSamples: createSpectrogramSliceSamplesCell(
+      device,
+      markers.sliceSamples,
+    ),
     windowing: createSpectrogramWindowingCell(device, markers.windowing),
     fourier: createFourierCell(device, {
       reverse: markers.fourierReverse,
@@ -99,7 +102,7 @@ export const createSpectrogramConfigurator = (
       draftConfig = undefined;
       const state = cells.state.get(config);
       const { signal, texture } = state;
-      const sliceWave = cells.sliceWave.get({ out: signal.real, config });
+      const sliceSamples = cells.sliceSamples.get({ out: signal.real, config });
       const windowing = cells.windowing.get({ signal: signal.real, config });
       const fourier = cells.fourier.get({ signal, config });
       const magnitudify = cells.magnitudify.get({ signal, config });
@@ -113,7 +116,7 @@ export const createSpectrogramConfigurator = (
 
       runtime = {
         state,
-        sliceWave,
+        sliceSamples,
         windowing,
         fourier,
         magnitudify,
@@ -132,7 +135,7 @@ export const createSpectrogramConfigurator = (
     },
     dispose: () => {
       cells.state.dispose();
-      cells.sliceWave.dispose();
+      cells.sliceSamples.dispose();
       cells.windowing.dispose();
       cells.fourier.dispose();
       cells.magnitudify.dispose();

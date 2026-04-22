@@ -21,6 +21,6 @@ export * from './magnitudify/index.js';
 export * from './processor.js';
 export * from './protocol.cross.js';
 export * from './remap/index.js';
-export * from './sliceWave/index.js';
+export * from './sliceSamples/index.js';
 export * from './state/index.js';
 export * from './windowing/index.js';

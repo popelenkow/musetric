@@ -1,4 +1,4 @@
-struct SliceWaveParams {
+struct SliceSamplesParams {
   windowSize : u32,
   paddedWindowSize : u32,
   windowCount : u32,
@@ -6,9 +6,9 @@ struct SliceWaveParams {
   step : f32,
 };
 
-@group(0) @binding(0) var<storage, read> wave : array<f32>;
+@group(0) @binding(0) var<storage, read> samples : array<f32>;
 @group(0) @binding(1) var<storage, read_write> signal : array<f32>;
-@group(0) @binding(2) var<uniform> params : SliceWaveParams;
+@group(0) @binding(2) var<uniform> params : SliceSamplesParams;
 
 @compute @workgroup_size(64)
 fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
@@ -28,7 +28,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
   if (sampleIndex < windowSize) {
     let srcIndex = u32(f32(windowIndex) * step) + sampleIndex;
     if (srcIndex < visibleSamples) {
-      value = wave[srcIndex];
+      value = samples[srcIndex];
     }
   }
   signal[paddedWindowSize * windowIndex + sampleIndex] = value;

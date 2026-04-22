@@ -8,10 +8,10 @@ import {
   createSpectrogramConfigurator,
   type SpectrogramRuntime,
 } from './configurator.js';
-import { type SpectrogramSliceWave } from './sliceWave/index.js';
+import { type SpectrogramSliceSamples } from './sliceSamples/index.js';
 
 export type SpectrogramProcessor = {
-  render: (wave: Float32Array, trackProgress: number) => Promise<boolean>;
+  render: (samples: Float32Array, trackProgress: number) => Promise<boolean>;
   updateConfig: (config: Partial<SpectrogramConfig>) => void;
   dispose: () => void;
 };
@@ -35,18 +35,18 @@ export const createSpectrogramProcessor = (
 
   const writeBuffers = markers.writeBuffers(
     (
-      sliceWave: SpectrogramSliceWave,
-      wave: Float32Array,
+      sliceSamples: SpectrogramSliceSamples,
+      samples: Float32Array,
       trackProgress: number,
     ) => {
-      sliceWave.write(wave, trackProgress);
+      sliceSamples.write(samples, trackProgress);
     },
   );
   const createCommand = markers.createCommand((runtime: SpectrogramRuntime) => {
     const encoder = device.createCommandEncoder({
       label: 'processor-render-encoder',
     });
-    runtime.sliceWave.run(encoder);
+    runtime.sliceSamples.run(encoder);
     runtime.state.zerofyImag(encoder);
     runtime.windowing.run(encoder);
     runtime.fourier.forward(encoder);
@@ -66,12 +66,12 @@ export const createSpectrogramProcessor = (
   );
 
   const render = markers.total(
-    async (wave: Float32Array, trackProgress: number) => {
+    async (samples: Float32Array, trackProgress: number) => {
       const runtime = configurator.configure();
       if (!runtime) {
         return false;
       }
-      writeBuffers(runtime.sliceWave, wave, trackProgress);
+      writeBuffers(runtime.sliceSamples, samples, trackProgress);
       const command = createCommand(runtime);
       await submitCommand(command);
       return true;
@@ -79,8 +79,8 @@ export const createSpectrogramProcessor = (
   );
 
   return {
-    render: createCallLatest(async (wave, trackProgress) => {
-      const ok = await render(wave, trackProgress);
+    render: createCallLatest(async (samples, trackProgress) => {
+      const ok = await render(samples, trackProgress);
       if (!ok) {
         return false;
       }

@@ -85,17 +85,17 @@ export const createPlayerRuntime = (
         return;
       }
 
-      for (let channel = 0; channel < output.length; channel++) {
-        const out = output[channel];
+      for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
+        const out = output[channelIndex];
         for (let i = 0; i < out.length; i++) {
           const index = frameIndex + i;
           let value = 0;
 
           for (const stemType of stemTypes) {
-            const wave = tracks[stemType][channel];
-            const data = index < wave.length ? wave[index] : 0;
+            const samples = tracks[stemType][channelIndex];
+            const sample = index < samples.length ? samples[index] : 0;
             const volume = trackVolumes[stemType] ?? 1;
-            value += data * volume;
+            value += sample * volume;
           }
 
           out[i] = value;

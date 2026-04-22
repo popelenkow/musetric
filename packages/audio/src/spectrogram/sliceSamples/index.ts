@@ -4,15 +4,15 @@ import { createStateCell, type StateArg } from './state.js';
 
 const workgroupSize = 64;
 
-export type SpectrogramSliceWave = {
+export type SpectrogramSliceSamples = {
   run: (encoder: GPUCommandEncoder) => void;
-  write: (waveArray: Float32Array, trackProgress: number) => void;
+  write: (samples: Float32Array, trackProgress: number) => void;
 };
 
-export const createSpectrogramSliceWaveCell = (
+export const createSpectrogramSliceSamplesCell = (
   device: GPUDevice,
   marker?: GPUComputePassTimestampWrites,
-): ResourceCell<StateArg, SpectrogramSliceWave> => {
+): ResourceCell<StateArg, SpectrogramSliceSamples> => {
   const pipeline = createPipeline(device);
   const stateCell = createStateCell(device, pipeline);
 
@@ -25,7 +25,7 @@ export const createSpectrogramSliceWaveCell = (
           const { paddedWindowSize, windowCount } = state.params.value;
           const xGroups = Math.ceil(paddedWindowSize / workgroupSize);
           const pass = encoder.beginComputePass({
-            label: 'slice-wave-pass',
+            label: 'slice-samples-pass',
             timestampWrites: marker,
           });
           pass.setPipeline(state.pipeline);
@@ -33,8 +33,8 @@ export const createSpectrogramSliceWaveCell = (
           pass.dispatchWorkgroups(xGroups, windowCount);
           pass.end();
         },
-        write: (waveArray, trackProgress) => {
-          state.wave.write(waveArray, trackProgress, state.config);
+        write: (samples, trackProgress) => {
+          state.samples.write(samples, trackProgress, state.config);
         },
       };
     },

@@ -1,7 +1,7 @@
 import { createResourceCell } from '@musetric/resource-utils';
 import type { ExtSpectrogramConfig } from '../common/extConfig.js';
 
-export type SliceWaveParams = {
+export type SliceSamplesParams = {
   windowSize: number;
   paddedWindowSize: number;
   windowCount: number;
@@ -9,7 +9,7 @@ export type SliceWaveParams = {
   step: number;
 };
 
-const toParams = (config: ExtSpectrogramConfig): SliceWaveParams => {
+const toParams = (config: ExtSpectrogramConfig): SliceSamplesParams => {
   const {
     windowSize,
     windowCount,
@@ -33,7 +33,7 @@ const toParams = (config: ExtSpectrogramConfig): SliceWaveParams => {
 };
 
 export type StateParams = {
-  value: SliceWaveParams;
+  value: SliceSamplesParams;
   buffer: GPUBuffer;
 };
 
@@ -49,7 +49,7 @@ export const createParamsCell = (device: GPUDevice) =>
       array.setFloat32(16, value.step, true);
 
       const buffer = device.createBuffer({
-        label: 'slice-wave-params-buffer',
+        label: 'slice-samples-params-buffer',
         size: array.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });

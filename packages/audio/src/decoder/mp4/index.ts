@@ -1,6 +1,6 @@
 import { decodeTrack } from './decode.js';
 import { withDemuxedTrack } from './demux.js';
-import { resamplePcm } from './resample.js';
+import { resampleChannels } from './resample.js';
 
 export type DecodedMp4 = {
   channels: Float32Array<SharedArrayBuffer>[];
@@ -11,7 +11,7 @@ export const decodeMp4 = async (
   sampleRate: number,
 ): Promise<DecodedMp4> => {
   const decoded = await withDemuxedTrack(encodedBuffer, decodeTrack);
-  const resampled = await resamplePcm(
+  const resampled = await resampleChannels(
     decoded.channels,
     decoded.sampleRate,
     sampleRate,

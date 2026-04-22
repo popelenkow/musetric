@@ -16,11 +16,11 @@ const getWindowSizes = () => {
 };
 export const windowSizes = getWindowSizes();
 
-const createWave = () => {
+const createSamples = () => {
   const result = new Float32Array(defaultSampleRate * 60 * 3);
   for (let i = 0; i < result.length; i++) {
     result[i] = Math.random() * 2 - 1;
   }
   return result;
 };
-export const wave = createWave();
+export const samples = createSamples();

@@ -1,6 +1,6 @@
 import { type DemuxedTrack } from './demux.js';
 
-const concatChannel = (
+const concatChunks = (
   chunks: Float32Array<ArrayBuffer>[],
   totalFrames: number,
 ): Float32Array<ArrayBuffer> => {
@@ -27,16 +27,23 @@ export const decodeTrack = async (
     throw new Error(`Unsupported AudioDecoder config: ${decoderConfig.codec}`);
   }
 
-  const channelChunks: Float32Array<ArrayBuffer>[][] = [[], []];
+  const chunksByChannel: Float32Array<ArrayBuffer>[][] = [[], []];
   let frameCount = 0;
   let decodeError: Error | undefined = undefined;
 
   const decoder = new AudioDecoder({
     output: (audioData) => {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
+      for (
+        let channelIndex = 0;
+        channelIndex < numberOfChannels;
+        channelIndex++
+      ) {
         const chunk = new Float32Array(audioData.numberOfFrames);
-        audioData.copyTo(chunk, { planeIndex: channel, format: 'f32-planar' });
-        channelChunks[channel].push(chunk);
+        audioData.copyTo(chunk, {
+          planeIndex: channelIndex,
+          format: 'f32-planar',
+        });
+        chunksByChannel[channelIndex].push(chunk);
       }
 
       frameCount += audioData.numberOfFrames;
@@ -62,11 +69,11 @@ export const decodeTrack = async (
     decoder.close();
   }
 
-  const left = concatChannel(channelChunks[0], frameCount);
+  const left = concatChunks(chunksByChannel[0], frameCount);
   if (numberOfChannels === 1) {
     return { channels: [left], sampleRate };
   }
 
-  const right = concatChannel(channelChunks[1], frameCount);
+  const right = concatChunks(chunksByChannel[1], frameCount);
   return { channels: [left, right], sampleRate };
 };
