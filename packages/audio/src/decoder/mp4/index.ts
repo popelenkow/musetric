@@ -1,11 +1,9 @@
-import { type ChannelArrays } from '../../common/channelBuffers.es.js';
-import { toChannelSharedArrays } from './buffers.js';
 import { decodeTrack } from './decode.js';
 import { withDemuxedTrack } from './demux.js';
 import { resamplePcm } from './resample.js';
 
 export type DecodedMp4 = {
-  channels: ChannelArrays<SharedArrayBuffer>;
+  channels: Float32Array<SharedArrayBuffer>[];
   frameCount: number;
 };
 export const decodeMp4 = async (
@@ -18,7 +16,12 @@ export const decodeMp4 = async (
     decoded.sampleRate,
     sampleRate,
   );
-  const channels = toChannelSharedArrays(resampled);
+  const channels = resampled.map((channel) => {
+    const shared = new SharedArrayBuffer(channel.byteLength);
+    const sharedChannel = new Float32Array(shared);
+    sharedChannel.set(channel);
+    return sharedChannel;
+  });
   const frameCount = channels[0].length;
 
   return {

@@ -1,7 +1,5 @@
-import { type ChannelArrays } from '../../common/channelBuffers.es.js';
-
 const resampleChannel = async (
-  channel: Float32Array<ArrayBuffer>,
+  channel: Float32Array,
   sourceSampleRate: number,
   targetSampleRate: number,
 ): Promise<Float32Array> => {
@@ -19,10 +17,10 @@ const resampleChannel = async (
 };
 
 export const resamplePcm = async (
-  channels: ChannelArrays<ArrayBuffer>,
+  channels: Float32Array[],
   sourceSampleRate: number,
   targetSampleRate: number,
-): Promise<ChannelArrays> => {
+): Promise<Float32Array[]> => {
   if (sourceSampleRate === targetSampleRate) {
     return channels;
   }

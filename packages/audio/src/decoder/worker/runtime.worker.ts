@@ -1,4 +1,3 @@
-import { toChannelBuffers } from '../../common/channelBuffers.es.js';
 import type { StemType } from '../../common/stemType.es.js';
 import { type playerDataChannel } from '../../player/protocol.cross.js';
 import { type spectrogramDataChannel } from '../../spectrogram/protocol.cross.js';
@@ -38,13 +37,13 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
 
         playerPort.methods.mount({
           tracks: {
-            lead: toChannelBuffers(leadDecoded.channels),
-            backing: toChannelBuffers(backingDecoded.channels),
-            instrumental: toChannelBuffers(instrumentalDecoded.channels),
+            lead: leadDecoded.channels,
+            backing: backingDecoded.channels,
+            instrumental: instrumentalDecoded.channels,
           },
         });
         spectrogramPort.methods.mount({
-          waveBuffer: leadDecoded.channels[0].buffer,
+          wave: leadDecoded.channels[0],
         });
         port.methods.mounted({
           frameCount: Math.max(

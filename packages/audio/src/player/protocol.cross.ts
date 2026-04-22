@@ -1,6 +1,5 @@
 import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
 import { type EmptyPortMethods } from '@musetric/resource-utils/cross/messagePort';
-import { type ChannelBuffers } from '../common/channelBuffers.es.js';
 import type { StemType } from '../common/stemType.es.js';
 
 export const playerProcessorName = 'player-processor';
@@ -35,7 +34,9 @@ export const playerChannel = createMessageChannel<
 });
 
 export type PlayerDataMethods = {
-  mount: (message: { tracks: Record<StemType, ChannelBuffers> }) => void;
+  mount: (message: {
+    tracks: Record<StemType, Float32Array<SharedArrayBuffer>[]>;
+  }) => void;
   unmount: () => void;
 };
 

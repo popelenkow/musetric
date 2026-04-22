@@ -1,7 +1,3 @@
-import {
-  type ChannelArrays,
-  toChannelArrays,
-} from '../../common/channelBuffers.es.js';
 import { type StemType, stemTypes } from '../../common/stemType.es.js';
 import {
   type playerChannel,
@@ -24,7 +20,7 @@ export const createPlayerRuntime = (
 ): PlayerRuntime => {
   const { port, dataPort } = options;
 
-  let tracks: Record<StemType, ChannelArrays> | undefined = undefined;
+  let tracks: Record<StemType, Float32Array[]> | undefined = undefined;
   let frameIndex = 0;
   let playing = false;
   const trackVolumes: Partial<Record<StemType, number>> = {};
@@ -32,11 +28,7 @@ export const createPlayerRuntime = (
 
   dataPort.bindHandlers({
     mount: (message) => {
-      tracks = {
-        lead: toChannelArrays(message.tracks.lead),
-        backing: toChannelArrays(message.tracks.backing),
-        instrumental: toChannelArrays(message.tracks.instrumental),
-      };
+      tracks = message.tracks;
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset(frameIndex);

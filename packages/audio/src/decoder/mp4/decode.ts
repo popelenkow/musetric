@@ -1,4 +1,3 @@
-import { type ChannelArrays } from '../../common/channelBuffers.es.js';
 import { type DemuxedTrack } from './demux.js';
 
 const concatChannel = (
@@ -15,7 +14,7 @@ const concatChannel = (
 };
 
 export type DecodedTrack = {
-  channels: ChannelArrays<ArrayBuffer>;
+  channels: Float32Array[];
   sampleRate: number;
 };
 export const decodeTrack = async (

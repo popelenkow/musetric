@@ -49,7 +49,7 @@ export const createSpectrogramRuntime = async (
 
   dataPort.bindHandlers({
     mount: async (message) => {
-      wave = new Float32Array(message.waveBuffer);
+      wave = message.wave;
       await render();
     },
     unmount: () => {
