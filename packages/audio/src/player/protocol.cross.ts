@@ -35,6 +35,7 @@ export const playerChannel = createMessageChannel<
 
 export type PlayerDataMethods = {
   mount: (message: {
+    frameCount: number;
     tracks: Record<StemType, Float32Array<SharedArrayBuffer>[]>;
   }) => void;
   unmount: () => void;
