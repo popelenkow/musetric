@@ -76,28 +76,35 @@ export const createPlayerRuntime = (
   return {
     port,
     process: (outputs) => {
-      outputs.forEach((output) => {
+      for (const output of outputs) {
         output.fill(0);
-      });
+      }
+
       if (!tracks || !playing) {
         return;
       }
 
-      const currentTracks = tracks;
-      outputs.forEach((output, channelIndex) => {
-        stemTypes.forEach((stemType) => {
-          const samples = currentTracks[stemType][channelIndex];
+      for (const stemType of stemTypes) {
+        const track = tracks[stemType];
+        const volume = trackVolumes[stemType] ?? 1;
+
+        for (
+          let channelIndex = 0;
+          channelIndex < outputs.length;
+          channelIndex += 1
+        ) {
+          const output = outputs[channelIndex];
+          const samples = track[channelIndex];
           if (!samples) {
-            return;
+            continue;
           }
 
-          const volume = trackVolumes[stemType] ?? 1;
-          output.forEach((_, i) => {
-            const sample = samples[frameIndex + i] ?? 0;
-            output[i] += sample * volume;
-          });
-        });
-      });
+          for (let offset = 0; offset < output.length; offset++) {
+            const sample = samples[frameIndex + offset] ?? 0;
+            output[offset] += sample * volume;
+          }
+        }
+      }
 
       frameIndex += outputs[0].length;
       if (frameIndex >= frameCount) {
