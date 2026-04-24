@@ -1,7 +1,9 @@
 import { Box, Stack } from '@mui/material';
 import { type FC } from 'react';
 import { DetailsModeToggle } from '../buttons/DetailsModeToggle.js';
+import { PitchShiftControl } from '../buttons/PitchShiftControl.js';
 import { PlayPauseButton } from '../buttons/PlayPauseButton.js';
+import { TempoControl } from '../buttons/TempoControl.js';
 import { PlayerProgress } from './PlayerProgress.js';
 
 export const PlaybackPanel: FC = () => {
@@ -20,6 +22,10 @@ export const PlaybackPanel: FC = () => {
         <Box gridColumn={2}>
           <PlayPauseButton />
         </Box>
+        <Stack gridColumn={3} direction='row' gap={1} justifySelf='end'>
+          <PitchShiftControl />
+          <TempoControl />
+        </Stack>
       </Box>
     </Stack>
   );

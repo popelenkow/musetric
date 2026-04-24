@@ -1458,6 +1458,7 @@ __metadata:
     "@musetric/eslint-config": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@musetric/spa-router": "workspace:*"
+    "@ncdai/react-wheel-picker": "catalog:"
     "@tanstack/react-query": "catalog:"
     "@types/audioworklet": "catalog:"
     "@types/node": "catalog:"
@@ -1585,6 +1586,15 @@ __metadata:
     "@emnapi/core": ^1.7.1
     "@emnapi/runtime": ^1.7.1
   checksum: 10c0/725c30ec9c480a8d0c1a6a4ce31dc6c830365d485e23ad560e143d1cb9db89a0c95fbb5b9d53c07121729817a3683db6f1ab65d7e4f38fa7482a11b15ef6c6fd
+  languageName: node
+  linkType: hard
+
+"@ncdai/react-wheel-picker@npm:1.2.2":
+  version: 1.2.2
+  resolution: "@ncdai/react-wheel-picker@npm:1.2.2"
+  peerDependencies:
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/db03f065a339cfaddea80794cbfa36acc5c79ccc7a44a67088fe0bc14572dbfa582632d9773e71e50d0ddc8420411891e00c74bbef727abb2648e24912d0806f
   languageName: node
   linkType: hard
 
