@@ -9,6 +9,8 @@ export type PlayerOutboundMethods = {
   play: () => void;
   pause: () => void;
   seek: (message: { frameIndex: number }) => void;
+  setTransposeSemitones: (message: { transposeSemitones: number }) => void;
+  setTempoRatio: (message: { tempoRatio: number }) => void;
   setTrackVolume: (message: { stemType: StemType; volume: number }) => void;
 };
 
@@ -26,7 +28,15 @@ export const playerChannel = createMessageChannel<
     keys: ['booted', 'setPlaying', 'setFrameIndex'],
   },
   outbound: {
-    keys: ['boot', 'play', 'seek', 'pause', 'setTrackVolume'],
+    keys: [
+      'boot',
+      'play',
+      'seek',
+      'pause',
+      'setTransposeSemitones',
+      'setTempoRatio',
+      'setTrackVolume',
+    ],
     transfers: {
       boot: (message) => [message.dataPort],
     },

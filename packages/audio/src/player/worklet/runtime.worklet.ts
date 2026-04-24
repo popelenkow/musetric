@@ -3,6 +3,7 @@ import {
   type playerChannel,
   type playerDataChannel,
 } from '../protocol.cross.js';
+import { createTimePitchProcessor } from '../timePitchProcessor.js';
 import { createFrameIndexTracker } from '../trackFrameIndex.js';
 
 export type CreatePlayerRuntimeOptions = {
@@ -15,9 +16,9 @@ export type PlayerRuntime = {
   process: (outputs: Float32Array[]) => void;
 };
 
-export const createPlayerRuntime = (
+export const createPlayerRuntime = async (
   options: CreatePlayerRuntimeOptions,
-): PlayerRuntime => {
+): Promise<PlayerRuntime> => {
   const { port, dataPort } = options;
 
   let frameCount = 0;
@@ -26,6 +27,7 @@ export const createPlayerRuntime = (
   let playing = false;
   const trackVolumes: Partial<Record<StemType, number>> = {};
   const frameIndexTracker = createFrameIndexTracker(sampleRate);
+  const timePitchProcessor = await createTimePitchProcessor(sampleRate);
 
   dataPort.bindHandlers({
     mount: (message) => {
@@ -33,7 +35,6 @@ export const createPlayerRuntime = (
       tracks = message.tracks;
       frameIndex = 0;
       playing = false;
-      frameIndexTracker.reset();
       port.methods.setPlaying({ playing, frameIndex });
     },
     unmount: () => {
@@ -42,6 +43,7 @@ export const createPlayerRuntime = (
       frameIndex = 0;
       playing = false;
       frameIndexTracker.reset();
+      timePitchProcessor.reset();
       port.methods.setPlaying({ playing, frameIndex });
     },
   });
@@ -66,7 +68,14 @@ export const createPlayerRuntime = (
     seek: (message) => {
       frameIndex = message.frameIndex;
       frameIndexTracker.reset();
+      timePitchProcessor.reset();
       port.methods.setFrameIndex({ frameIndex });
+    },
+    setTransposeSemitones: (message) => {
+      timePitchProcessor.setTransposeSemitones(message.transposeSemitones);
+    },
+    setTempoRatio: (message) => {
+      timePitchProcessor.setTempoRatio(message.tempoRatio);
     },
     setTrackVolume: (message) => {
       trackVolumes[message.stemType] = message.volume;
@@ -84,34 +93,41 @@ export const createPlayerRuntime = (
         return;
       }
 
-      for (const stemType of stemTypes) {
-        const track = tracks[stemType];
-        const volume = trackVolumes[stemType] ?? 1;
+      const currentTracks = tracks;
+      frameIndex += timePitchProcessor.process(
+        outputs,
+        (inputs, inputFrameOffset, inputFrameCount) => {
+          for (const stemType of stemTypes) {
+            const track = currentTracks[stemType];
+            const volume = trackVolumes[stemType] ?? 1;
 
-        for (
-          let channelIndex = 0;
-          channelIndex < outputs.length;
-          channelIndex += 1
-        ) {
-          const output = outputs[channelIndex];
-          const samples = track[channelIndex];
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (!samples) {
-            continue;
+            for (
+              let channelIndex = 0;
+              channelIndex < outputs.length;
+              channelIndex += 1
+            ) {
+              const input = inputs[channelIndex];
+              const samples = track[channelIndex];
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              if (!samples) {
+                continue;
+              }
+
+              for (let offset = 0; offset < inputFrameCount; offset += 1) {
+                const sample =
+                  samples[frameIndex + inputFrameOffset + offset] ?? 0;
+                input[offset] += sample * volume;
+              }
+            }
           }
+        },
+      );
 
-          for (let offset = 0; offset < output.length; offset++) {
-            const sample = samples[frameIndex + offset] ?? 0;
-            output[offset] += sample * volume;
-          }
-        }
-      }
-
-      frameIndex += outputs[0].length;
       if (frameIndex >= frameCount) {
         frameIndex = 0;
         playing = false;
         frameIndexTracker.reset();
+        timePitchProcessor.reset();
         port.methods.setPlaying({ playing, frameIndex });
         return;
       }
