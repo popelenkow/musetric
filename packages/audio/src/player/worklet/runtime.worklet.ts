@@ -95,6 +95,7 @@ export const createPlayerRuntime = (
         ) {
           const output = outputs[channelIndex];
           const samples = track[channelIndex];
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (!samples) {
             continue;
           }

@@ -74,7 +74,7 @@ export const attachStdout = <Message extends { type: string }>(
     });
     childProcess.stdout.on(
       'data',
-      createTextProcessor(logger, processName, (line) => {
+      createTextProcessor(logger, processName, async (line) => {
         const message = tryParseMessage<Message>(line);
         if (message === undefined) {
           logger.error(
@@ -85,7 +85,8 @@ export const attachStdout = <Message extends { type: string }>(
         }
 
         try {
-          if (!handle(message)) {
+          const ok = await handle(message);
+          if (!ok) {
             logger.error(
               { processName, line },
               'Child script received unknown message',

@@ -42,6 +42,7 @@ export const tsConfig: Linter.Config = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-non-null-assertion': ['error'],
     '@typescript-eslint/no-shadow': ['error'],
+    '@typescript-eslint/no-unnecessary-condition': 'error',
     '@typescript-eslint/no-unused-vars': ['error'],
     '@typescript-eslint/no-use-before-define': [
       'error',

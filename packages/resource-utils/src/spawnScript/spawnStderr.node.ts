@@ -1,5 +1,5 @@
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
-import type { Logger } from '../logger.js';
+import { isLogLevel, type Logger } from '../logger.js';
 import { createTextProcessor, tryParseMessage } from './common.node.js';
 import type { LogInfo } from './spawnScript.node.js';
 
@@ -87,9 +87,10 @@ export const attachStderr = (
           );
           return;
         }
-        const log = logger[info.level] ?? logger.info;
+        const level = isLogLevel(info.level) ? info.level : 'info';
+        const log = logger[level];
         log({ processName }, info.message);
-        if (info.level === 'error' || lastInfo?.level !== 'error') {
+        if (level === 'error' || lastInfo?.level !== 'error') {
           lastInfo = info;
         }
       }),

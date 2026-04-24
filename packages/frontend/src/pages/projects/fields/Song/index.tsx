@@ -26,7 +26,7 @@ export const SongField: FC<SongFieldProps> = (props) => {
     <Stack
       onDrop={(event) => {
         setIsDragging(false);
-        const file = event.dataTransfer.files[0];
+        const file = event.dataTransfer.files.item(0);
         if (!file) return;
         setValue({
           file,

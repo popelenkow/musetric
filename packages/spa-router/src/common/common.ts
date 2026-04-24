@@ -34,6 +34,7 @@ export const makePath = (pattern: string, params: NativeParams): string => {
 
   return normalizedPattern.replace(/:([^/]+)/g, (_, key) => {
     const value = params[key];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (value === undefined) {
       throw new Error(`Missing value for parameter "${key}"`);
     }

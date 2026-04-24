@@ -51,6 +51,7 @@ const bindHandlers = <Handlers extends PortMethods>(
   const onmessage = async (event: MessageEvent<PortMessage<Handlers>>) => {
     const message = event.data;
     const handler = handlers[message.type];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!handler) {
       console.error('Unhandled port method', message);
       return;

@@ -121,6 +121,7 @@ export const App: FC = () => {
         showDeviations={showDeviations}
       />
 
+      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
       {task && (
         <BenchmarkRunner
           fourierMode={task.fourierMode}

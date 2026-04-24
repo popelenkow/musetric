@@ -4,7 +4,7 @@ export const toPercent = (value: number, total: number) =>
   (value / total) * 100;
 
 export const getMetric = (
-  data: MetricsData,
+  data: MetricsData | undefined,
   metric: string,
   showFirst: boolean,
   showPercent: boolean,
@@ -14,7 +14,6 @@ export const getMetric = (
 
   if (showDeviations) {
     const deviation = data.maxDeviation[metric];
-    if (!deviation) return undefined;
 
     const positiveValue = showPercent
       ? toPercent(deviation.positive, data.average.total)

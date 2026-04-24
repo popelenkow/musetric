@@ -20,7 +20,8 @@ export const decodeTrack = async (
     () => [],
   );
   let frameCount = 0;
-  let decodeError: Error | undefined = undefined;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  let decodeError = undefined as Error | undefined;
 
   const decoder = new AudioDecoder({
     output: (audioData) => {
