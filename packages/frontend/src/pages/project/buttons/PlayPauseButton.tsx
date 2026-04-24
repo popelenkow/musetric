@@ -10,12 +10,15 @@ export const PlayPauseButton: FC = () => {
   const { t } = useTranslation();
   const frameCount = useEngineStore((state) => state.frameCount);
   const playing = useEngineStore((state) => state.playing);
-  const playPauseButtonLabel = playing
-    ? t('pages.project.player.controls.pause')
-    : t('pages.project.player.controls.play');
 
   return (
-    <Tooltip title={playPauseButtonLabel}>
+    <Tooltip
+      title={
+        playing
+          ? t('pages.project.player.controls.pause')
+          : t('pages.project.player.controls.play')
+      }
+    >
       <span>
         <IconButton
           onClick={playing ? engine.player.pause : engine.player.play}
