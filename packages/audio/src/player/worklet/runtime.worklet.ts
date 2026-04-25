@@ -3,7 +3,7 @@ import {
   type playerChannel,
   type playerDataChannel,
 } from '../protocol.cross.js';
-import { createFrameIndexTracker } from './trackFrameIndex.worklet.js';
+import { createFrameIndexTracker } from '../trackFrameIndex.js';
 
 export type CreatePlayerRuntimeOptions = {
   port: ReturnType<typeof playerChannel.inbound<MessagePort>>;
@@ -25,7 +25,7 @@ export const createPlayerRuntime = (
   let frameIndex = 0;
   let playing = false;
   const trackVolumes: Partial<Record<StemType, number>> = {};
-  const frameIndexTracker = createFrameIndexTracker(frameIndex);
+  const frameIndexTracker = createFrameIndexTracker(frameIndex, sampleRate);
 
   dataPort.bindHandlers({
     mount: (message) => {
