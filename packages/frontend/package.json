@@ -4,8 +4,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev:start": "vite -- musetric-frontend",
-    "dev:stop": "kill-process musetric-frontend",
+    "dev": "vite",
     "project:build": "vite build && cpx \"dist/**/*\" ../backend/storage/public --clean",
     "check:ts": "tsc --build",
     "check:lint": "eslint . --cache",
@@ -23,7 +22,6 @@
     "@musetric/api": "workspace:*",
     "@musetric/audio": "workspace:*",
     "@musetric/eslint-config": "workspace:*",
-    "@musetric/kill-process": "workspace:*",
     "@musetric/resource-utils": "workspace:*",
     "@musetric/spa-router": "workspace:*",
     "@tanstack/react-query": "catalog:",
