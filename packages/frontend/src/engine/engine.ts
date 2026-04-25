@@ -1,3 +1,4 @@
+import { type StemType } from '@musetric/audio';
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { createStore, type Store } from '../common/store.js';
 import { createEngineDecoder, type EngineDecoder } from './decoder.js';
@@ -31,6 +32,11 @@ const initialState: EngineState = {
   duration: 0,
   playing: false,
   frameIndex: 0,
+  trackVolumes: {
+    lead: 1,
+    backing: 1,
+    instrumental: 1,
+  },
 };
 
 export type Engine = {
@@ -40,6 +46,7 @@ export type Engine = {
   spectrogram: EngineSpectrogram;
   waveform: EngineWaveform;
   player: EnginePlayer;
+  setTrackVolume: (stemType: StemType, volume: number) => void;
   boot: () => Promise<void>;
 };
 
@@ -65,6 +72,11 @@ export const createEngine = (): Engine => {
       spectrogramPort: spectrogramChannel.port1,
     }),
     player: createEngineStubPlayer(),
+    setTrackVolume: (stemType, volume) => {
+      store.update((state) => {
+        state.trackVolumes[stemType] = volume;
+      });
+    },
     boot: async () => {
       ref.player = await createEnginePlayer({
         context,

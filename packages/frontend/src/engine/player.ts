@@ -73,6 +73,21 @@ export const createEnginePlayer = async (
     },
   });
 
+  const subscribeTrackVolume = (stemType: StemType) => {
+    store.subscribe(
+      (state) => state.trackVolumes[stemType],
+      (volume) => {
+        port.methods.setTrackVolume({
+          stemType,
+          volume,
+        });
+      },
+    );
+  };
+  subscribeTrackVolume('lead');
+  subscribeTrackVolume('backing');
+  subscribeTrackVolume('instrumental');
+
   const ref: EnginePlayer = {
     boot: async () => {
       port.methods.boot({

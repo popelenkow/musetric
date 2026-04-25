@@ -1,7 +1,11 @@
 {
   "extends": "../../tsconfigs/tsconfig.worklet.json",
+  "compilerOptions": {
+    "types": ["audioworklet", "vite/client"]
+  },
   "references": [
     { "path": "./tsconfig.es.json" },
-    { "path": "./tsconfig.cross.json" }
+    { "path": "./tsconfig.cross.json" },
+    { "path": "./tsconfig.src.json" }
   ]
 }

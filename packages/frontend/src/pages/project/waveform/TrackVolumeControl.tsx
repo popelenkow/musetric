@@ -3,7 +3,8 @@ import { type StemType } from '@musetric/audio';
 import type { TFunction } from 'i18next';
 import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProjectStore } from '../store.js';
+import { engine } from '../../../engine/engine.js';
+import { useEngineStore } from '../../../engine/useEngineStore.js';
 
 const stemLabels: Record<StemType, (t: TFunction) => string> = {
   lead: (t) => t('pages.project.waveform.stemType.lead'),
@@ -18,8 +19,7 @@ export type TrackVolumeControlProps = {
 export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
   const { stemType } = props;
   const { t } = useTranslation();
-  const trackVolume = useProjectStore((state) => state.trackVolumes[stemType]);
-  const setTrackVolume = useProjectStore((state) => state.setTrackVolume);
+  const trackVolume = useEngineStore((state) => state.trackVolumes[stemType]);
   const volumePercent = Math.round(trackVolume * 100);
 
   return (
@@ -48,7 +48,7 @@ export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
         max={100}
         value={volumePercent}
         onChange={(_, value) => {
-          setTrackVolume(stemType, value / 100);
+          engine.setTrackVolume(stemType, value / 100);
         }}
       />
     </Stack>

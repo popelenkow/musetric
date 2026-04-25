@@ -17,6 +17,7 @@ export type EngineState = {
   duration: number;
   playing: boolean;
   frameIndex: number;
+  trackVolumes: Record<StemType, number>;
 };
 
 export const getTrackProgress = (

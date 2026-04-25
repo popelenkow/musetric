@@ -4,14 +4,16 @@ const alignFrames = (frameCount: number) => {
   return Math.max(quantum, Math.ceil(frameCount / quantum) * quantum);
 };
 
-const interval = alignFrames(sampleRate / 30);
-
 export type FrameIndexTracker = {
   advance: (frameIndex: number) => boolean;
   reset: (frameIndex: number) => void;
 };
 
-export const createFrameIndexTracker = (initialFrameIndex: number) => {
+export const createFrameIndexTracker = (
+  initialFrameIndex: number,
+  sampleRate: number,
+) => {
+  const interval = alignFrames(sampleRate / 30);
   let lastFrameIndex = initialFrameIndex;
 
   const ref: FrameIndexTracker = {
