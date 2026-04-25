@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "project:build": "tsc --build",
-    "dev:start": "vite -- musetric-performance",
-    "dev:stop": "kill-process musetric-performance",
+    "dev": "vite",
     "check:ts": "tsc --build",
     "check:lint": "eslint . --cache",
     "check:lint:fix": "eslint . --fix --cache"
@@ -18,7 +17,6 @@
     "@mui/material": "catalog:",
     "@musetric/audio": "workspace:*",
     "@musetric/eslint-config": "workspace:*",
-    "@musetric/kill-process": "workspace:*",
     "@musetric/resource-utils": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

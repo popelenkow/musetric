@@ -17,7 +17,6 @@
 - `packages/toolkit`: backend-oriented media and processing helpers.
 - `packages/spa-router`: shared SPA routing utilities.
 - `packages/eslint-config`: the repository ESLint rules.
-- `packages/kill-process`: development helper for stopping named processes.
 - `packages/performance`: performance-focused playground and measurement app for audio work.
 
 ## Ground Rules

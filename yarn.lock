@@ -1401,7 +1401,6 @@ __metadata:
     "@musetric/api": "workspace:*"
     "@musetric/backend-db": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
-    "@musetric/kill-process": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@musetric/toolkit": "workspace:*"
     "@types/node": "catalog:"
@@ -1455,7 +1454,6 @@ __metadata:
     "@musetric/api": "workspace:*"
     "@musetric/audio": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
-    "@musetric/kill-process": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@musetric/spa-router": "workspace:*"
     "@tanstack/react-query": "catalog:"
@@ -1486,19 +1484,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@musetric/kill-process@workspace:*, @musetric/kill-process@workspace:packages/kill-process":
-  version: 0.0.0-use.local
-  resolution: "@musetric/kill-process@workspace:packages/kill-process"
-  dependencies:
-    "@musetric/eslint-config": "workspace:*"
-    "@types/node": "catalog:"
-    eslint: "catalog:"
-    typescript: "catalog:"
-  bin:
-    kill-process: ./src/index.ts
-  languageName: unknown
-  linkType: soft
-
 "@musetric/monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "@musetric/monorepo@workspace:."
@@ -1519,7 +1504,6 @@ __metadata:
     "@mui/material": "catalog:"
     "@musetric/audio": "workspace:*"
     "@musetric/eslint-config": "workspace:*"
-    "@musetric/kill-process": "workspace:*"
     "@musetric/resource-utils": "workspace:*"
     "@types/node": "catalog:"
     "@types/react": "catalog:"
