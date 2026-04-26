@@ -25,7 +25,7 @@ export const createPlayerRuntime = (
   let frameIndex = 0;
   let playing = false;
   const trackVolumes: Partial<Record<StemType, number>> = {};
-  const frameIndexTracker = createFrameIndexTracker(frameIndex, sampleRate);
+  const frameIndexTracker = createFrameIndexTracker(sampleRate);
 
   dataPort.bindHandlers({
     mount: (message) => {
@@ -33,7 +33,7 @@ export const createPlayerRuntime = (
       tracks = message.tracks;
       frameIndex = 0;
       playing = false;
-      frameIndexTracker.reset(frameIndex);
+      frameIndexTracker.reset();
       port.methods.setPlaying({ playing, frameIndex });
     },
     unmount: () => {
@@ -41,7 +41,7 @@ export const createPlayerRuntime = (
       tracks = undefined;
       frameIndex = 0;
       playing = false;
-      frameIndexTracker.reset(frameIndex);
+      frameIndexTracker.reset();
       port.methods.setPlaying({ playing, frameIndex });
     },
   });
@@ -60,12 +60,12 @@ export const createPlayerRuntime = (
     },
     pause: () => {
       playing = false;
-      frameIndexTracker.reset(frameIndex);
+      frameIndexTracker.reset();
       port.methods.setPlaying({ playing, frameIndex });
     },
     seek: (message) => {
       frameIndex = message.frameIndex;
-      frameIndexTracker.reset(frameIndex);
+      frameIndexTracker.reset();
       port.methods.setFrameIndex({ frameIndex });
     },
     setTrackVolume: (message) => {
@@ -111,12 +111,12 @@ export const createPlayerRuntime = (
       if (frameIndex >= frameCount) {
         frameIndex = 0;
         playing = false;
-        frameIndexTracker.reset(frameIndex);
+        frameIndexTracker.reset();
         port.methods.setPlaying({ playing, frameIndex });
         return;
       }
 
-      if (frameIndexTracker.advance(frameIndex)) {
+      if (frameIndexTracker.advance(outputs[0].length)) {
         port.methods.setFrameIndex({ frameIndex });
       }
     },

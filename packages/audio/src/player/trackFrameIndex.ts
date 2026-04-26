@@ -5,28 +5,27 @@ const alignFrames = (frameCount: number) => {
 };
 
 export type FrameIndexTracker = {
-  advance: (frameIndex: number) => boolean;
-  reset: (frameIndex: number) => void;
+  advance: (outputFrameCount: number) => boolean;
+  reset: () => void;
 };
 
-export const createFrameIndexTracker = (
-  initialFrameIndex: number,
-  sampleRate: number,
-) => {
+export const createFrameIndexTracker = (sampleRate: number) => {
   const interval = alignFrames(sampleRate / 30);
-  let lastFrameIndex = initialFrameIndex;
+  let pendingFrameCount = 0;
 
   const ref: FrameIndexTracker = {
-    advance: (frameIndex) => {
-      if (frameIndex - lastFrameIndex >= interval) {
-        lastFrameIndex = frameIndex;
+    advance: (outputFrameCount) => {
+      pendingFrameCount += outputFrameCount;
+
+      if (pendingFrameCount >= interval) {
+        pendingFrameCount %= interval;
         return true;
       }
 
       return false;
     },
-    reset: (frameIndex) => {
-      lastFrameIndex = frameIndex;
+    reset: () => {
+      pendingFrameCount = 0;
     },
   };
 
