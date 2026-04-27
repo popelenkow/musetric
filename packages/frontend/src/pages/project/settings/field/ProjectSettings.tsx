@@ -3,6 +3,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useProjectStore } from '../../store.js';
 import { useSettingsStore } from '../store.js';
 import { FourierModeField } from './FourierModeField.js';
 import { MaxFrequencyField } from './MaxFrequencyField.js';
@@ -16,12 +17,18 @@ import { ZeroPaddingFactorField } from './ZeroPaddingFactorField.js';
 
 export const ProjectSettings: FC = () => {
   const { t } = useTranslation();
+
+  const visualizationMode = useProjectStore((state) => state.visualizationMode);
   const open = useSettingsStore((s) => s.open);
   const setOpen = useSettingsStore((s) => s.setOpen);
 
+  if (visualizationMode !== 'spectrogram') {
+    return;
+  }
+
   return (
     <>
-      <IconButton onClick={() => setOpen(true)} sx={{ ml: 2 }}>
+      <IconButton size='small' onClick={() => setOpen(true)}>
         <SettingsIcon />
       </IconButton>
       <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>

@@ -1,10 +1,10 @@
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { IconButton, Tooltip } from '@mui/material';
 import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { engine } from '../../../../engine/engine.js';
-import { useEngineStore } from '../../../../engine/useEngineStore.js';
+import { engine } from '../../../engine/engine.js';
+import { useEngineStore } from '../../../engine/useEngineStore.js';
 
 export const PlayPauseButton: FC = () => {
   const { t } = useTranslation();
@@ -20,13 +20,13 @@ export const PlayPauseButton: FC = () => {
         <IconButton
           onClick={playing ? engine.player.pause : engine.player.play}
           size='small'
+          sx={{ p: 0 }}
           disabled={!frameCount}
-          aria-label={playPauseButtonLabel}
         >
           {playing ? (
-            <PauseIcon fontSize='small' />
+            <PauseCircleIcon fontSize='large' />
           ) : (
-            <PlayArrowIcon fontSize='small' />
+            <PlayCircleIcon fontSize='large' />
           )}
         </IconButton>
       </span>
