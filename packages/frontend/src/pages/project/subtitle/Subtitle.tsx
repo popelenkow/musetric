@@ -7,6 +7,7 @@ import { endpoints } from '../../../api/index.js';
 import { ViewError } from '../../../components/ViewError.js';
 import { getTrackProgress } from '../../../engine/state.js';
 import { useEngineStore } from '../../../engine/useEngineStore.js';
+import { useProjectStore } from '../store.js';
 import { SegmentLCurrent } from './SegmentLCurrent.js';
 import { SegmentNext } from './SegmentNext.js';
 
@@ -52,6 +53,7 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
   const { projectId } = props;
   const { t } = useTranslation();
   const subtitleQuery = useQuery(endpoints.subtitle.get(projectId));
+  const detailsMode = useProjectStore((state) => state.detailsMode);
 
   const duration = useEngineStore((state) => state.duration);
   const trackProgress = useEngineStore(getTrackProgress);
@@ -83,6 +85,10 @@ export const Subtitle: FC<SubtitleProps> = (props) => {
       </>
     );
   };
+
+  if (detailsMode !== 'subtitles') {
+    return;
+  }
 
   return (
     <Stack

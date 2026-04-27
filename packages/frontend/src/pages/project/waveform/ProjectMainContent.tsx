@@ -10,12 +10,12 @@ export type ProjectMainContentProps = {
 
 export const ProjectMainContent: FC<ProjectMainContentProps> = (props) => {
   const { projectId } = props;
-  const isWaveformVisible = useProjectStore((state) => state.isWaveformVisible);
+  const visualizationMode = useProjectStore((state) => state.visualizationMode);
 
   return (
     <Stack direction='row' flexGrow={1} overflow='hidden'>
       <TrackList projectId={projectId} />
-      {!isWaveformVisible && (
+      {visualizationMode === 'spectrogram' && (
         <Box flexGrow={1} flexBasis={0} height='100%' overflow='hidden'>
           <SpectrogramCanvas />
         </Box>

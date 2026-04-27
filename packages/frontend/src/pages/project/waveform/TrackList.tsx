@@ -11,19 +11,17 @@ export type TrackListProps = {
 
 export const TrackList: FC<TrackListProps> = (props) => {
   const { projectId } = props;
-  const isWaveformVisible = useProjectStore((state) => state.isWaveformVisible);
-  const isVolumeMixerVisible = useProjectStore(
-    (state) => state.isVolumeMixerVisible,
-  );
+  const visualizationMode = useProjectStore((state) => state.visualizationMode);
+  const detailsMode = useProjectStore((state) => state.detailsMode);
 
-  if (!isVolumeMixerVisible && !isWaveformVisible) {
+  if (detailsMode !== 'mixer' && visualizationMode !== 'waveform') {
     return;
   }
 
   return (
     <Stack
       gap={1}
-      flexGrow={isWaveformVisible ? 1 : undefined}
+      flexGrow={visualizationMode === 'waveform' ? 1 : undefined}
       sx={{
         overflowY: 'auto',
         scrollbarGutter: 'stable',
@@ -37,12 +35,12 @@ export const TrackList: FC<TrackListProps> = (props) => {
           height={100}
           flexShrink={0}
         >
-          {isVolumeMixerVisible && (
+          {detailsMode === 'mixer' && (
             <Box width={200}>
               <TrackVolumeControl stemType={stemType} />
             </Box>
           )}
-          {isWaveformVisible && (
+          {visualizationMode === 'waveform' && (
             <Box component={Paper} elevation={3} flexGrow={1}>
               <WaveformCanvas projectId={projectId} stemType={stemType} />
             </Box>

@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
 import { type FC, type ReactNode } from 'react';
-import { ProjectBackButton } from './ProjectBackButton.js';
+import { ProjectBackButton } from './buttons/ProjectBackButton.js';
 
 export type ProjectLayoutProps = {
   children: ReactNode;
