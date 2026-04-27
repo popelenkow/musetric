@@ -48,7 +48,9 @@ export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
         max={100}
         value={volumePercent}
         onChange={(_, value) => {
-          engine.setTrackVolume(stemType, value / 100);
+          engine.store.update((state) => {
+            state.trackVolumes[stemType] = value / 100;
+          });
         }}
       />
     </Stack>

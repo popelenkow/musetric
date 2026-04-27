@@ -17,6 +17,9 @@ export type EngineState = {
   duration: number;
   playing: boolean;
   frameIndex: number;
+  transposeSemitones: number;
+  sourceTempoBpm: number;
+  tempoBpm: number;
   trackVolumes: Record<StemType, number>;
 };
 

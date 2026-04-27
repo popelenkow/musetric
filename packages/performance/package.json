@@ -25,6 +25,7 @@
     "mediabunny": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "signalsmith-stretch": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-mkcert": "catalog:"

@@ -16,7 +16,6 @@ export type EnginePlayer = {
   play: () => Promise<void>;
   pause: () => void;
   seek: (frameIndex: number) => void;
-  setTrackVolume: (stemType: StemType, volume: number) => void;
 };
 
 export const createEngineStubPlayer = (): EnginePlayer => ({
@@ -30,9 +29,6 @@ export const createEngineStubPlayer = (): EnginePlayer => ({
     // nothing
   },
   seek: () => {
-    // nothing
-  },
-  setTrackVolume: () => {
     // nothing
   },
 });
@@ -88,6 +84,25 @@ export const createEnginePlayer = async (
   subscribeTrackVolume('backing');
   subscribeTrackVolume('instrumental');
 
+  store.subscribe(
+    (state) => state.transposeSemitones,
+    (transposeSemitones) => {
+      port.methods.setTransposeSemitones({
+        transposeSemitones,
+      });
+    },
+  );
+  store.subscribe(
+    (state) => state.tempoBpm,
+    (tempoBpm) => {
+      const { sourceTempoBpm } = store.get();
+
+      port.methods.setTempoRatio({
+        tempoRatio: tempoBpm / sourceTempoBpm,
+      });
+    },
+  );
+
   const ref: EnginePlayer = {
     boot: async () => {
       port.methods.boot({
@@ -108,12 +123,6 @@ export const createEnginePlayer = async (
     seek: (nextFrameIndex) => {
       port.methods.seek({
         frameIndex: nextFrameIndex,
-      });
-    },
-    setTrackVolume: (stemType, volume) => {
-      port.methods.setTrackVolume({
-        stemType,
-        volume,
       });
     },
   };

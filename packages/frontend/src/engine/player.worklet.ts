@@ -13,8 +13,8 @@ export class PlayerProcessor
   constructor() {
     super();
     const port = playerChannel.inbound(this.port);
-    port.bindBoot((message) => {
-      const runtime = createPlayerRuntime({
+    port.bindBoot(async (message) => {
+      const runtime = await createPlayerRuntime({
         port,
         dataPort: playerDataChannel.inbound(message.dataPort),
       });
