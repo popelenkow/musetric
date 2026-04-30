@@ -2,6 +2,10 @@ import { Box, Stack } from '@mui/material';
 import { type FC } from 'react';
 import { DetailsModeToggle } from '../buttons/DetailsModeToggle.js';
 import { PlayPauseButton } from '../buttons/PlayPauseButton.js';
+import { TempoButton } from '../buttons/TempoButton.js';
+import { TempoPicker } from '../buttons/TempoPicker.js';
+import { TransposeButton } from '../buttons/TransposeButton.js';
+import { TransposePicker } from '../buttons/TransposePicker.js';
 import { PlayerProgress } from './PlayerProgress.js';
 
 export const PlaybackPanel: FC = () => {
@@ -20,6 +24,12 @@ export const PlaybackPanel: FC = () => {
         <Box gridColumn={2}>
           <PlayPauseButton />
         </Box>
+        <Stack gridColumn={3} direction='row' gap={1} justifySelf='end'>
+          <TransposeButton />
+          <TransposePicker />
+          <TempoButton />
+          <TempoPicker />
+        </Stack>
       </Box>
     </Stack>
   );

@@ -24,6 +24,7 @@
     "@musetric/eslint-config": "workspace:*",
     "@musetric/resource-utils": "workspace:*",
     "@musetric/spa-router": "workspace:*",
+    "@ncdai/react-wheel-picker": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@types/audioworklet": "catalog:",
     "@types/node": "catalog:",
