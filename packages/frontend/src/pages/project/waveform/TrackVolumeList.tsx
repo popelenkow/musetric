@@ -10,6 +10,7 @@ export const TrackVolumeList: FC = () => {
   const setTrackListScrollTop = useProjectStore(
     (state) => state.setTrackListScrollTop,
   );
+  const visualizationMode = useProjectStore((state) => state.visualizationMode);
 
   return (
     <Stack
@@ -17,6 +18,20 @@ export const TrackVolumeList: FC = () => {
       gap={1}
       height='100%'
       overflow='auto'
+      sx={
+        visualizationMode === 'waveform'
+          ? {
+              scrollbarWidth: {
+                md: 'none',
+              },
+              '&::-webkit-scrollbar': {
+                display: {
+                  md: 'none',
+                },
+              },
+            }
+          : undefined
+      }
       onScroll={(event) => {
         const { scrollTop } = event.currentTarget;
         setTrackListScrollTop(scrollTop);
