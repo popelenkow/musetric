@@ -1,0 +1,59 @@
+import { Typography } from '@mui/material';
+import { type api } from '@musetric/api';
+import { type FC, Fragment } from 'react';
+import { type SubtitleSegmentStatus } from './subtitleTiming.js';
+import { SubtitleWord } from './SubtitleWord.js';
+
+const getInactiveSubtitleSegmentSx = (status: SubtitleSegmentStatus) => {
+  if (status === 'past') {
+    return {
+      color: 'text.secondary',
+      opacity: 0.5,
+    };
+  }
+
+  return {
+    color: 'text.primary',
+    opacity: 0.72,
+  };
+};
+
+export type SubtitleSegmentTextProps = {
+  playbackTime?: number;
+  segment: api.subtitle.Segment;
+  status: SubtitleSegmentStatus;
+};
+
+export const SubtitleSegmentText: FC<SubtitleSegmentTextProps> = (props) => {
+  const { playbackTime, segment, status } = props;
+  const active = status === 'active';
+
+  return (
+    <Typography
+      variant='h5'
+      fontWeight='bold'
+      lineHeight={1.18}
+      textAlign='center'
+      sx={
+        active
+          ? undefined
+          : {
+              ...getInactiveSubtitleSegmentSx(status),
+              transition: 'color 160ms linear, opacity 160ms linear',
+            }
+      }
+    >
+      {segment.words.length > 0
+        ? segment.words.map((word, index) => (
+            <Fragment key={`${word.start}-${index}`}>
+              <SubtitleWord
+                playbackTime={active ? playbackTime : undefined}
+                word={word}
+              />
+              {index < segment.words.length - 1 ? ' ' : ''}
+            </Fragment>
+          ))
+        : segment.text}
+    </Typography>
+  );
+};
