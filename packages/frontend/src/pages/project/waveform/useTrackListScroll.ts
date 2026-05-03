@@ -1,5 +1,17 @@
+import { type SxProps, type Theme } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { useProjectStore } from '../store.js';
+
+export const hiddenTrackListScrollbarSx: SxProps<Theme> = {
+  scrollbarWidth: {
+    md: 'none',
+  },
+  '&::-webkit-scrollbar': {
+    display: {
+      md: 'none',
+    },
+  },
+};
 
 export const useTrackListScroll = () => {
   const listRef = useRef<HTMLDivElement>(null);
@@ -12,7 +24,21 @@ export const useTrackListScroll = () => {
 
     trackListElement.scrollTop = useProjectStore.getState().trackListScrollTop;
 
-    return useProjectStore.subscribe(
+    const updateTrackListScrollTop = () => {
+      const { scrollTop } = trackListElement;
+      const { setTrackListScrollTop, trackListScrollTop } =
+        useProjectStore.getState();
+
+      if (trackListScrollTop !== scrollTop) {
+        setTrackListScrollTop(scrollTop);
+      }
+    };
+
+    trackListElement.addEventListener('scroll', updateTrackListScrollTop, {
+      passive: true,
+    });
+
+    const unsubscribe = useProjectStore.subscribe(
       (state) => state.trackListScrollTop,
       (trackListScrollTop) => {
         if (trackListElement.scrollTop !== trackListScrollTop) {
@@ -20,6 +46,11 @@ export const useTrackListScroll = () => {
         }
       },
     );
+
+    return () => {
+      trackListElement.removeEventListener('scroll', updateTrackListScrollTop);
+      unsubscribe();
+    };
   }, []);
 
   return listRef;

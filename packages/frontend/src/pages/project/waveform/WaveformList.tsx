@@ -2,7 +2,10 @@ import { Box, Paper, Stack } from '@mui/material';
 import { stemTypes } from '@musetric/audio';
 import { type FC } from 'react';
 import { useProjectStore } from '../store.js';
-import { useTrackListScroll } from './useTrackListScroll.js';
+import {
+  hiddenTrackListScrollbarSx,
+  useTrackListScroll,
+} from './useTrackListScroll.js';
 import { WaveformCanvas } from './WaveformCanvas.js';
 
 export type WaveformListProps = {
@@ -13,9 +16,7 @@ export const WaveformList: FC<WaveformListProps> = (props) => {
   const { projectId } = props;
 
   const listRef = useTrackListScroll();
-  const setTrackListScrollTop = useProjectStore(
-    (state) => state.setTrackListScrollTop,
-  );
+  const detailsMode = useProjectStore((state) => state.detailsMode);
 
   return (
     <Stack
@@ -23,10 +24,7 @@ export const WaveformList: FC<WaveformListProps> = (props) => {
       gap={1}
       height='100%'
       overflow='auto'
-      onScroll={(event) => {
-        const { scrollTop } = event.currentTarget;
-        setTrackListScrollTop(scrollTop);
-      }}
+      sx={detailsMode === 'mixer' ? hiddenTrackListScrollbarSx : undefined}
     >
       {stemTypes.map((stemType) => (
         <Box

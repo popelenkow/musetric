@@ -14,7 +14,7 @@ export type ProjectState = {
 
 const initialState: ProjectState = {
   visualizationMode: 'spectrogram',
-  detailsMode: 'mixer',
+  detailsMode: 'subtitles',
   trackListScrollTop: 0,
 };
 

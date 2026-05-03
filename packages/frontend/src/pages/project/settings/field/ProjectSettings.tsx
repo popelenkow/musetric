@@ -31,7 +31,7 @@ export const ProjectSettings: FC = () => {
       <IconButton size='small' onClick={() => setOpen(true)}>
         <SettingsIcon />
       </IconButton>
-      <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
+      <Drawer anchor='left' open={open} onClose={() => setOpen(false)}>
         <Box width={280} p={2} role='presentation'>
           <Stack gap={4}>
             <Stack direction='row' alignItems='center'>

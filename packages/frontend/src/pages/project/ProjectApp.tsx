@@ -3,11 +3,13 @@ import { type api } from '@musetric/api';
 import { type FC, useEffect } from 'react';
 import { engine } from '../../engine/engine.js';
 import { ProjectBackButton } from './buttons/ProjectBackButton.js';
-import { VisualizationModeToggle } from './buttons/VisualizationModeToggle.js';
+import { TempoButton } from './buttons/TempoButton.js';
+import { TempoPicker } from './buttons/TempoPicker.js';
+import { TransposeButton } from './buttons/TransposeButton.js';
+import { TransposePicker } from './buttons/TransposePicker.js';
 import { PlaybackPanel } from './player/PlaybackPanel.js';
 import { ProjectContent } from './ProjectContent.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
-import { ProjectSettings } from './settings/field/ProjectSettings.js';
 import { subscribeSettingsStore } from './settings/store.js';
 
 export type ProjectAppProps = {
@@ -26,8 +28,12 @@ export const ProjectApp: FC<ProjectAppProps> = (props) => {
         <>
           <ProjectBackButton />
           <Box flexGrow={1} />
-          <ProjectSettings />
-          <VisualizationModeToggle />
+          <Stack direction='row' gap={1}>
+            <TransposeButton />
+            <TransposePicker />
+            <TempoButton />
+            <TempoPicker />
+          </Stack>
         </>
       }
     >

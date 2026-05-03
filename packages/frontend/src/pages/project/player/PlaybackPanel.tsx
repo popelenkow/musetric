@@ -1,11 +1,9 @@
 import { Box, Stack } from '@mui/material';
 import { type FC } from 'react';
-import { DetailsModeToggle } from '../buttons/DetailsModeToggle.js';
+import { DetailsModeToggle } from '../buttons/detailsModeToggle/index.js';
 import { PlayPauseButton } from '../buttons/PlayPauseButton.js';
-import { TempoButton } from '../buttons/TempoButton.js';
-import { TempoPicker } from '../buttons/TempoPicker.js';
-import { TransposeButton } from '../buttons/TransposeButton.js';
-import { TransposePicker } from '../buttons/TransposePicker.js';
+import { VisualizationModeToggle } from '../buttons/visualizationModeToggle/index.js';
+import { ProjectSettings } from '../settings/field/ProjectSettings.js';
 import { PlayerProgress } from './PlayerProgress.js';
 
 export const PlaybackPanel: FC = () => {
@@ -18,17 +16,15 @@ export const PlaybackPanel: FC = () => {
         gridTemplateColumns='minmax(0, 1fr) auto minmax(0, 1fr)'
         alignItems='center'
       >
-        <Box gridColumn={1}>
-          <DetailsModeToggle />
-        </Box>
+        <Stack gridColumn={1} direction='row' gap={1}>
+          <VisualizationModeToggle />
+          <ProjectSettings />
+        </Stack>
         <Box gridColumn={2}>
           <PlayPauseButton />
         </Box>
         <Stack gridColumn={3} direction='row' gap={1} justifySelf='end'>
-          <TransposeButton />
-          <TransposePicker />
-          <TempoButton />
-          <TempoPicker />
+          <DetailsModeToggle />
         </Stack>
       </Box>
     </Stack>

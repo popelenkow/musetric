@@ -27,8 +27,8 @@ export type SettingsState = Pick<
 const initialState: SettingsState = {
   fourierMode: 'fftRadix4',
   windowSize: 1024 * 4,
-  visibleTimeBefore: 2.0,
-  visibleTimeAfter: 2.0,
+  visibleTimeBefore: 4,
+  visibleTimeAfter: 4,
   zeroPaddingFactor: 2,
   windowName: 'hamming',
   minDecibel: -40,

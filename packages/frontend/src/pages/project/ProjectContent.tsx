@@ -25,7 +25,7 @@ export const ProjectContent: FC<ProjectContentProps> = (props) => {
       overflow='hidden'
       gridTemplateColumns={{
         xs: 'minmax(0, 1fr)',
-        md: '460px minmax(0, 1fr)',
+        md: 'minmax(0, 1fr) 460px',
       }}
       gridTemplateRows={{
         xs: 'minmax(0, 1fr) minmax(0, 1fr)',
@@ -33,12 +33,16 @@ export const ProjectContent: FC<ProjectContentProps> = (props) => {
       }}
       gridTemplateAreas={{
         xs: `
-          "visualization"
           "details"
+          "visualization"
         `,
-        md: '"details visualization"',
+        md: '"visualization details"',
       }}
     >
+      <Box gridArea='details'>
+        {detailsMode === 'mixer' && <TrackVolumeList />}
+        {detailsMode === 'subtitles' && <Subtitle projectId={projectId} />}
+      </Box>
       <Box gridArea='visualization'>
         {visualizationMode === 'waveform' && (
           <WaveformList projectId={projectId} />
@@ -48,10 +52,6 @@ export const ProjectContent: FC<ProjectContentProps> = (props) => {
             <SpectrogramCanvas />
           </Box>
         )}
-      </Box>
-      <Box gridArea='details'>
-        {detailsMode === 'mixer' && <TrackVolumeList />}
-        {detailsMode === 'subtitles' && <Subtitle projectId={projectId} />}
       </Box>
     </Box>
   );
