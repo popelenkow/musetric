@@ -8,7 +8,7 @@ import { TempoPicker } from './buttons/TempoPicker.js';
 import { TransposeButton } from './buttons/TransposeButton.js';
 import { TransposePicker } from './buttons/TransposePicker.js';
 import { PlaybackPanel } from './player/PlaybackPanel.js';
-import { ProjectContent } from './ProjectContent.js';
+import { ProjectContent } from './ProjectContent/index.js';
 import { ProjectLayout } from './ProjectPageLayout.js';
 import { subscribeSettingsStore } from './settings/store.js';
 
