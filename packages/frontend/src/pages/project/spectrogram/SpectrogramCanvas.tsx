@@ -35,32 +35,6 @@ export const SpectrogramCanvas: FC = () => {
     <canvas
       ref={setCanvas}
       style={{ width: '100%', height: '100%', display: 'block' }}
-      onClick={(event) => {
-        const { visibleTimeBefore, visibleTimeAfter } =
-          useSettingsStore.getState();
-        const { frameCount, frameIndex } = engine.store.get();
-        const { sampleRate } = engine.context;
-
-        if (!frameCount) {
-          return;
-        }
-
-        const targetCanvas = event.currentTarget;
-        const rect = targetCanvas.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const clickRatio = clickX / targetCanvas.clientWidth;
-
-        const totalVisibleTime = visibleTimeBefore + visibleTimeAfter;
-        const playheadRatio = visibleTimeBefore / totalVisibleTime;
-        const clickOffsetRatio = clickRatio - playheadRatio;
-        const frameOffset = totalVisibleTime * sampleRate * clickOffsetRatio;
-        const nextFrameIndex = Math.min(
-          frameCount,
-          Math.max(0, Math.floor(frameIndex + frameOffset)),
-        );
-
-        engine.player.seek(nextFrameIndex);
-      }}
     />
   );
 };

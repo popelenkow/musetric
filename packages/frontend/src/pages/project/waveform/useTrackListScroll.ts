@@ -1,5 +1,5 @@
 import { type SxProps, type Theme } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useProjectStore } from '../store.js';
 
 export const hiddenTrackListScrollbarSx: SxProps<Theme> = {
@@ -13,10 +13,14 @@ export const hiddenTrackListScrollbarSx: SxProps<Theme> = {
   },
 };
 
-export const useTrackListScroll = () => {
+export const useTrackListScroll = (enabled = true) => {
   const listRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!enabled) {
+      return undefined;
+    }
+
     const trackListElement = listRef.current;
     if (!trackListElement) {
       return undefined;
@@ -51,7 +55,7 @@ export const useTrackListScroll = () => {
       trackListElement.removeEventListener('scroll', updateTrackListScrollTop);
       unsubscribe();
     };
-  }, []);
+  }, [enabled]);
 
   return listRef;
 };

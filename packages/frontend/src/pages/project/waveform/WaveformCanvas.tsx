@@ -39,20 +39,6 @@ export const WaveformCanvas: FC<WaveformCanvasProps> = (props) => {
           display: 'block',
           visibility: status === 'success' ? 'visible' : 'hidden',
         }}
-        onClick={(event) => {
-          const { frameCount } = engine.store.get();
-          if (!frameCount) {
-            return;
-          }
-
-          const targetCanvas = event.currentTarget;
-          const rect = targetCanvas.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const frameIndex = Math.floor(
-            (x / targetCanvas.clientWidth) * frameCount,
-          );
-          engine.player.seek(frameIndex);
-        }}
       />
       {status === 'pending' && (
         <Box position='absolute' top={0} right={0} bottom={0} left={0}>
