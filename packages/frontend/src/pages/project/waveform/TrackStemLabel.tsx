@@ -29,6 +29,7 @@ export const TrackStemLabel: FC<TrackStemLabelProps> = (props) => {
         left: 12,
         zIndex: 1,
         pointerEvents: 'none',
+        userSelect: 'none',
       }}
     >
       {stemLabels[stemType](t)}

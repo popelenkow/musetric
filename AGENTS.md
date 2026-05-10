@@ -56,6 +56,10 @@
 - Do not introduce unnecessary Material UI customization. Prefer the built-in variants, spacing, and visual design by default, but preserve existing behavior and established UI output when custom styling is already serving a real purpose.
 - When a Material UI component already exposes a dedicated prop for a layout or visual option, prefer that prop over `sx` only if the result stays behaviorally and visually equivalent; use `sx` whenever it is needed to preserve the current result or to express styling that the component props do not cover.
 
+**Component Layout**
+
+- Do not add `minHeight` or `minWidth` without extreme necessity.
+
 ## Runtime Boundaries
 
 - Runtime boundaries are defined by `tsconfigs/` and each package `tsconfig.*.json`.

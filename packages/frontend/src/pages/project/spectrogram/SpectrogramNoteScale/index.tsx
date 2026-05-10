@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import { type FC, useMemo } from 'react';
 import { useSettingsStore } from '../../settings/store.js';
-import { timelineHeight } from '../../visualization/VisualizationTimeline.js';
 import { getNoteMarkers } from './noteMarker.js';
 import { NoteScaleMarker } from './NoteScaleMarker.js';
 
@@ -19,7 +18,7 @@ export const SpectrogramNoteScale: FC = () => {
       position='absolute'
       top={0}
       right={0}
-      bottom={timelineHeight}
+      bottom={0}
       left={0}
       sx={{ pointerEvents: 'none' }}
     >

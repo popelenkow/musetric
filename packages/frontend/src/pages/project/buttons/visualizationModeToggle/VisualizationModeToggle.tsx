@@ -1,7 +1,7 @@
 import { ToggleButtonGroup } from '@mui/material';
 import { type FC } from 'react';
 import { SpectrogramButton } from './SpectrogramButton.js';
-import { WaveformButton } from './WaveformButton.js';
+import { TracksButton } from './TracksButton.js';
 
 export const VisualizationModeToggle: FC = () => {
   return (
@@ -19,7 +19,7 @@ export const VisualizationModeToggle: FC = () => {
         },
       }}
     >
-      <WaveformButton />
+      <TracksButton />
       <SpectrogramButton />
     </ToggleButtonGroup>
   );

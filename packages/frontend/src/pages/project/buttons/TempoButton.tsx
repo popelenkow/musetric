@@ -27,7 +27,12 @@ export const TempoButton: FC = () => {
     >
       <Stack alignItems='center'>
         <TempoIcon fontSize='small' />
-        <Typography component='span' variant='caption' lineHeight={1}>
+        <Typography
+          component='span'
+          variant='caption'
+          fontSize={10}
+          lineHeight={1}
+        >
           {t('pages.project.player.controls.tempoValue', {
             value: tempoBpm,
           })}

@@ -1,4 +1,4 @@
-export type TimelineMode = 'spectrogram' | 'waveform';
+export type TimelineMode = 'spectrogram' | 'tracks';
 
 export type TimelineConfig = {
   canvas: HTMLCanvasElement;

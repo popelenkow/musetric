@@ -7,38 +7,41 @@ import { engine } from '../../../engine/engine.js';
 import { useSettingsStore } from '../settings/store.js';
 import { useProjectStore } from '../store.js';
 
-export const timelineHeight = 16;
-
-const engineRenderKeys = ['duration', 'frameCount', 'frameIndex'] as const;
-const projectRenderKeys = ['visualizationMode'] as const;
-const settingsRenderKeys = ['visibleTime', 'playheadRatio'] as const;
+const alignPixel = (value: number, pixelRatio: number) =>
+  Math.round(value * pixelRatio) / pixelRatio;
 
 export const VisualizationTimeline: FC = () => {
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const handle = handleRef.current;
 
-    if (!canvas) {
+    if (!canvas || !handle) {
       return;
     }
 
-    const { fontSize } = theme.typography.caption;
+    const engineRenderKeys = ['duration', 'frameCount', 'frameIndex'] as const;
+    const projectRenderKeys = ['visualizationMode'] as const;
+    const settingsRenderKeys = ['visibleTime', 'playheadRatio'] as const;
+
     const processor = createTimelineProcessor({
       config: {
         canvas,
-        markerColor: theme.palette.grey[500],
-        labelColor: theme.palette.grey[400],
-        font: `${fontSize} ${theme.typography.fontFamily}`,
+        markerColor: theme.palette.default.main,
+        labelColor: theme.palette.default.main,
+        font: `11px ${theme.typography.fontFamily}`,
       },
     });
     const render = () => {
       const { duration, frameIndex, frameCount } = engine.store.get();
       const { visibleTime, playheadRatio } = useSettingsStore.getState();
+      const { visualizationMode } = useProjectStore.getState();
 
       processor.updateConfig({
-        mode: useProjectStore.getState().visualizationMode,
+        mode: visualizationMode,
         duration,
         frameIndex,
         frameCount,
@@ -46,6 +49,17 @@ export const VisualizationTimeline: FC = () => {
         playheadRatio,
       });
       processor.render();
+
+      let cursorRatio = playheadRatio;
+
+      if (visualizationMode === 'tracks') {
+        cursorRatio = frameCount ? frameIndex / frameCount : 0;
+      }
+
+      const { width } = canvas.getBoundingClientRect();
+      const cursorX = alignPixel(cursorRatio * width, window.devicePixelRatio);
+
+      handle.style.transform = `translateX(${cursorX + 0.5}px) translateX(-50%)`;
     };
 
     render();
@@ -73,25 +87,38 @@ export const VisualizationTimeline: FC = () => {
 
   return (
     <Box
-      position='absolute'
-      left={0}
-      right={0}
-      bottom={0}
-      height={timelineHeight}
-      bgcolor='background.default'
+      height='16px'
+      position='relative'
+      sx={{
+        flexShrink: 0,
+      }}
     >
       <Box
         component='canvas'
         ref={canvasRef}
-        height={timelineHeight}
+        bgcolor='background.default'
         sx={{
           display: 'block',
           width: '100%',
-          height: timelineHeight,
-          flexShrink: 0,
+          height: '100%',
           borderTop: 1,
-          borderColor: 'divider',
+          borderColor: 'grey.700',
           boxSizing: 'border-box',
+        }}
+      />
+      <Box
+        ref={handleRef}
+        position='absolute'
+        top={0}
+        left={0}
+        width='7px'
+        height='7px'
+        borderRadius='50%'
+        sx={{
+          backgroundColor: 'primary.main',
+          pointerEvents: 'none',
+          willChange: 'transform',
+          zIndex: 1,
         }}
       />
     </Box>

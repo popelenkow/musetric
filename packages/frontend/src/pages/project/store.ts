@@ -1,27 +1,23 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-export type DetailsMode = 'mixer' | 'subtitles';
-export type VisualizationMode = 'spectrogram' | 'waveform';
+export type VisualizationMode = 'spectrogram' | 'tracks';
 
 export type ProjectState = {
   visualizationMode: VisualizationMode;
-  detailsMode: DetailsMode;
-  trackListScrollTop: number;
+  subtitlesOpen: boolean;
   transposeAnchorEl?: HTMLElement;
   tempoAnchorEl?: HTMLElement;
 };
 
 const initialState: ProjectState = {
   visualizationMode: 'spectrogram',
-  detailsMode: 'subtitles',
-  trackListScrollTop: 0,
+  subtitlesOpen: true,
 };
 
 export type ProjectActions = {
   setVisualizationMode: (value: VisualizationMode) => void;
-  setDetailsMode: (value: DetailsMode) => void;
-  setTrackListScrollTop: (scrollTop: number) => void;
+  setSubtitlesOpen: (value: boolean) => void;
   setTransposeAnchorEl: (anchorEl: HTMLElement | undefined) => void;
   setTempoAnchorEl: (anchorEl: HTMLElement | undefined) => void;
 };
@@ -33,9 +29,7 @@ export const useProjectStore = create<State>()(
     return {
       ...initialState,
       setVisualizationMode: (visualizationMode) => set({ visualizationMode }),
-      setDetailsMode: (detailsMode) => set({ detailsMode }),
-      setTrackListScrollTop: (trackListScrollTop) =>
-        set({ trackListScrollTop }),
+      setSubtitlesOpen: (subtitlesOpen) => set({ subtitlesOpen }),
       setTransposeAnchorEl: (transposeAnchorEl) =>
         set({
           transposeAnchorEl,
