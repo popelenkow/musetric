@@ -22,6 +22,7 @@ export const TrackVolumeControl: FC<TrackVolumeControlProps> = (props) => {
       justifyContent='center'
       p={2.5}
       position='relative'
+      sx={{ userSelect: 'none' }}
     >
       <TrackStemLabel stemType={stemType} />
       <Stack direction='row' alignItems='center' gap={3}>

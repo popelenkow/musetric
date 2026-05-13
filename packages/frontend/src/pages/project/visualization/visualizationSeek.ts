@@ -1,7 +1,6 @@
 import type { MouseEvent } from 'react';
 import { engine } from '../../../engine/engine.js';
 import { useSettingsStore } from '../settings/store.js';
-import { useProjectStore } from '../store.js';
 
 const getClickRatio = (event: MouseEvent) => {
   const targetCanvas = event.currentTarget;
@@ -13,7 +12,7 @@ const getClickRatio = (event: MouseEvent) => {
 const limitFrameIndex = (frameIndex: number, frameCount: number) =>
   Math.min(frameCount, Math.max(0, frameIndex));
 
-const getWaveformFrameIndex = (event: MouseEvent) => {
+export const getWaveformFrameIndex = (event: MouseEvent) => {
   const { frameCount } = engine.store.get();
   if (!frameCount) return undefined;
 
@@ -21,7 +20,7 @@ const getWaveformFrameIndex = (event: MouseEvent) => {
   return limitFrameIndex(Math.floor(clickRatio * frameCount), frameCount);
 };
 
-const getSpectrogramFrameIndex = (event: MouseEvent) => {
+export const getSpectrogramFrameIndex = (event: MouseEvent) => {
   const { frameCount, frameIndex } = engine.store.get();
   if (!frameCount) return undefined;
 
@@ -32,12 +31,4 @@ const getSpectrogramFrameIndex = (event: MouseEvent) => {
   const frameOffset = visibleTime * sampleRate * clickOffsetRatio;
 
   return limitFrameIndex(Math.floor(frameIndex + frameOffset), frameCount);
-};
-
-export const getVisualizationFrameIndex = (event: MouseEvent) => {
-  const { visualizationMode } = useProjectStore.getState();
-  if (visualizationMode === 'spectrogram') {
-    return getSpectrogramFrameIndex(event);
-  }
-  return getWaveformFrameIndex(event);
 };

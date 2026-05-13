@@ -6,27 +6,16 @@ import { ProjectVisualization } from './ProjectVisualization.js';
 export const ProjectContent: FC = () => {
   return (
     <Box
-      display='grid'
+      display='flex'
+      flexDirection={{
+        xs: 'column',
+        md: 'row',
+      }}
       width='100%'
       flexGrow={1}
       minHeight={0}
       gap={1}
       overflow='hidden'
-      gridTemplateColumns={{
-        xs: 'minmax(0, 1fr)',
-        md: 'minmax(0, 1fr) 460px',
-      }}
-      gridTemplateRows={{
-        xs: 'minmax(0, 1fr) minmax(0, 1fr)',
-        md: 'minmax(0, 1fr)',
-      }}
-      gridTemplateAreas={{
-        xs: `
-          "details"
-          "visualization"
-        `,
-        md: '"visualization details"',
-      }}
     >
       <ProjectDetails />
       <ProjectVisualization />

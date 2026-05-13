@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { WaveformIcon } from '../../../../icons/WaveformIcon.js';
 import { useProjectStore } from '../../store.js';
 
-export const WaveformButton: FC = () => {
+export const TracksButton: FC = () => {
   const { t } = useTranslation();
   const visualizationMode = useProjectStore((state) => state.visualizationMode);
   const setVisualizationMode = useProjectStore(
@@ -12,12 +12,12 @@ export const WaveformButton: FC = () => {
   );
 
   return (
-    <Tooltip title={t('pages.project.visualizationMode.waveform')}>
+    <Tooltip title={t('pages.project.visualizationMode.tracks')}>
       <ToggleButton
-        selected={visualizationMode === 'waveform'}
-        value='waveform'
+        selected={visualizationMode === 'tracks'}
+        value='tracks'
         onClick={() => {
-          setVisualizationMode('waveform');
+          setVisualizationMode('tracks');
         }}
       >
         <Stack alignItems='center'>
@@ -28,7 +28,7 @@ export const WaveformButton: FC = () => {
             lineHeight={1}
             textTransform='none'
           >
-            {t('pages.project.visualizationMode.waveform')}
+            {t('pages.project.visualizationMode.tracks')}
           </Typography>
         </Stack>
       </ToggleButton>

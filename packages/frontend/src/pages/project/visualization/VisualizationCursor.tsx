@@ -1,15 +1,16 @@
-import { alpha, Box } from '@mui/material';
+import { Box } from '@mui/material';
+import { subscribeResizeObserver } from '@musetric/resource-utils/dom';
 import { type FC, useEffect, useRef } from 'react';
 import { engine } from '../../../engine/engine.js';
 import { useSettingsStore } from '../settings/store.js';
 import { useProjectStore } from '../store.js';
-import { timelineHeight } from './VisualizationTimeline.js';
 
-const cursorWidth = 2;
-const cursorHandleSize = 6;
 const engineRenderKeys = ['frameCount', 'frameIndex'] as const;
 const projectRenderKeys = ['visualizationMode'] as const;
 const settingsRenderKeys = ['playheadRatio'] as const;
+
+const alignPixel = (value: number, pixelRatio: number) =>
+  Math.round(value * pixelRatio) / pixelRatio;
 
 export const VisualizationCursor: FC = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -21,21 +22,31 @@ export const VisualizationCursor: FC = () => {
       return;
     }
 
+    const { parentElement } = element;
+
+    if (!parentElement) {
+      return;
+    }
+
     const render = () => {
       const { frameCount, frameIndex } = engine.store.get();
       const { playheadRatio } = useSettingsStore.getState();
+      const { visualizationMode } = useProjectStore.getState();
       const waveformCursorRatio = frameCount ? frameIndex / frameCount : 0;
       const cursorRatio =
-        useProjectStore.getState().visualizationMode === 'spectrogram'
+        visualizationMode === 'spectrogram'
           ? playheadRatio
           : waveformCursorRatio;
+      const { width } = parentElement.getBoundingClientRect();
+      const cursorX = alignPixel(cursorRatio * width, window.devicePixelRatio);
 
-      element.style.left = `${cursorRatio * 100}%`;
+      element.style.transform = `translateX(${cursorX}px)`;
     };
 
     render();
 
     const unsubscribes = [
+      subscribeResizeObserver(parentElement, render),
       ...engineRenderKeys.map((key) =>
         engine.store.subscribe((state) => state[key], render),
       ),
@@ -59,33 +70,15 @@ export const VisualizationCursor: FC = () => {
       ref={ref}
       position='absolute'
       top={0}
-      bottom={timelineHeight}
+      bottom={0}
       left={0}
-      width={cursorWidth}
+      width='1px'
       sx={{
-        backgroundColor: (theme) => alpha(theme.palette.default.main, 0.9),
-        boxShadow: (theme) =>
-          `0 0 8px ${alpha(theme.palette.common.black, 0.45)}`,
+        backgroundColor: (theme) => theme.palette.primary.main,
         pointerEvents: 'none',
-        transform: `translateX(-${cursorWidth / 2}px)`,
         willChange: 'transform',
-        zIndex: 2,
+        zIndex: 0,
       }}
-    >
-      <Box
-        position='absolute'
-        left='50%'
-        bottom={-cursorHandleSize}
-        width={cursorHandleSize}
-        height={cursorHandleSize}
-        borderRadius='50%'
-        sx={{
-          backgroundColor: (theme) => alpha(theme.palette.default.main, 0.95),
-          boxShadow: (theme) =>
-            `0 0 8px ${alpha(theme.palette.common.black, 0.45)}`,
-          transform: 'translateX(-50%)',
-        }}
-      />
-    </Box>
+    />
   );
 };

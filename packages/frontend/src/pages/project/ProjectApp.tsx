@@ -3,6 +3,7 @@ import { type api } from '@musetric/api';
 import { type FC, useEffect } from 'react';
 import { engine } from '../../engine/engine.js';
 import { ProjectBackButton } from './buttons/ProjectBackButton.js';
+import { SubtitlesToggleButton } from './buttons/SubtitlesToggleButton.js';
 import { TempoButton } from './buttons/TempoButton.js';
 import { TempoPicker } from './buttons/TempoPicker.js';
 import { TransposeButton } from './buttons/TransposeButton.js';
@@ -31,6 +32,7 @@ export const ProjectApp: FC<ProjectAppProps> = (props) => {
           <ProjectBackButton />
           <Box flexGrow={1} />
           <Stack direction='row' gap={1}>
+            <SubtitlesToggleButton />
             <TransposeButton />
             <TransposePicker />
             <TempoButton />

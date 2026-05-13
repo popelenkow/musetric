@@ -26,6 +26,11 @@ export const PlayerProgress: FC = () => {
         value={Math.round(progress * progressScale)}
         disabled={!frameCount}
         size='small'
+        sx={{
+          '& .MuiSlider-thumb': {
+            color: 'primary.main',
+          },
+        }}
         onChange={(_, value) => {
           if (!frameCount) {
             return;

@@ -31,7 +31,12 @@ export const TransposeButton: FC = () => {
     >
       <Stack alignItems='center'>
         <TransposeIcon fontSize='small' />
-        <Typography component='span' variant='caption' lineHeight={1}>
+        <Typography
+          component='span'
+          variant='caption'
+          fontSize={10}
+          lineHeight={1}
+        >
           {t('pages.project.player.controls.transposeValue', {
             value: formatTransposeSemitones(transposeSemitones),
           })}
