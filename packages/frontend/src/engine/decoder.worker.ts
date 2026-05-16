@@ -72,13 +72,21 @@ let finishInterruptedRecordingStream = (stream: RecordingStream) => {
   stream.finish.resolve();
 };
 
+const sanitizeLogMessage = (message: string) =>
+  message
+    .split('\r')
+    .join(' ')
+    .split('\n')
+    .join(' ')
+    .split('\u2028')
+    .join(' ')
+    .split('\u2029')
+    .join(' ');
+
 const getErrorMessage = (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
   return sanitizeLogMessage(message);
 };
-
-const sanitizeLogMessage = (message: string) =>
-  message.replace(/[\x00-\x1f\x7f\u2028\u2029]/g, ' ');
 
 const waitWithTimeout = async (
   promise: Promise<void>,
