@@ -68,6 +68,9 @@ let recordingReady = false;
 let playerPort:
   | ReturnType<typeof playerDataChannel.outbound<MessagePort>>
   | undefined = undefined;
+let spectrogramPort:
+  | ReturnType<typeof spectrogramDataChannel.outbound<MessagePort>>
+  | undefined = undefined;
 let finishInterruptedRecordingStream = (stream: RecordingStream) => {
   stream.finish.resolve();
 };
@@ -277,9 +280,15 @@ const closeProjectRealtimeSocket = (realtime: ProjectRealtime) => {
 
 const handleProjectRealtimeEvent = (event: ProjectRealtimeEvent) => {
   if (event.type === 'recording.chunkCommitted') {
+    const channels = decodeCommittedSamples(event.samplesBase64);
     playerPort?.methods.patchRecordingTrack({
       frameIndex: event.frameIndex,
-      channels: decodeCommittedSamples(event.samplesBase64),
+      channels,
+    });
+    const [samples] = channels;
+    spectrogramPort?.methods.patchRecording({
+      frameIndex: event.frameIndex,
+      samples,
     });
     return;
   }
@@ -573,9 +582,10 @@ const bindRuntimeHandlers = () => {
 
 port.bindBoot((message) => {
   playerPort = playerDataChannel.outbound(message.playerPort);
+  spectrogramPort = spectrogramDataChannel.outbound(message.spectrogramPort);
   decoderRuntime = createDecoderRuntime({
     playerPort,
-    spectrogramPort: spectrogramDataChannel.outbound(message.spectrogramPort),
+    spectrogramPort,
     getDeliveryEncodedBuffer: async (projectId, stemType) => {
       const encodedBuffer = await getDeliveryAudioContent(projectId, stemType);
       return encodedBuffer.buffer;

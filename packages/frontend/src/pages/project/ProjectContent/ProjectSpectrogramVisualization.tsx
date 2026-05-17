@@ -4,6 +4,7 @@ import { createInertialDrag } from '@musetric/resource-utils/dom';
 import { type FC, useEffect, useRef } from 'react';
 import { engine } from '../../../engine/engine.js';
 import { useSettingsStore } from '../settings/store.js';
+import { SpectrogramAssessmentOverlay } from '../spectrogram/SpectrogramAssessmentOverlay.js';
 import { SpectrogramCanvas } from '../spectrogram/SpectrogramCanvas.js';
 import { SpectrogramNoteScale } from '../spectrogram/SpectrogramNoteScale/index.js';
 import { VisualizationCursor } from '../visualization/VisualizationCursor.js';
@@ -83,6 +84,7 @@ export const ProjectSpectrogramVisualization: FC = () => {
       <Box height='100%' position='relative'>
         <SpectrogramCanvas />
         <SpectrogramNoteScale />
+        <SpectrogramAssessmentOverlay />
         <VisualizationCursor />
       </Box>
       <VisualizationTimeline />

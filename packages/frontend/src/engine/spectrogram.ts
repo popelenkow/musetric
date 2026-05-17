@@ -1,4 +1,9 @@
-import { spectrogramChannel, type SpectrogramConfig } from '@musetric/audio';
+import {
+  type SpectrogramAssessmentFrame,
+  type SpectrogramAssessmentPatch,
+  spectrogramChannel,
+  type SpectrogramConfig,
+} from '@musetric/audio';
 import {
   type ControlledPromise,
   createControlledPromise,
@@ -12,6 +17,41 @@ import spectrogramWorkerUrl from './spectrogram.worker.ts?worker&url';
 import { type EngineState, getTrackProgress } from './state.js';
 
 type Unmount = () => void;
+
+const upsertAssessmentFrames = (
+  currentFrames: SpectrogramAssessmentFrame[],
+  patchFrames: SpectrogramAssessmentFrame[],
+) => {
+  const frameIndexes = new Map<number, number>();
+  const frames = [...currentFrames];
+  for (let index = 0; index < frames.length; index += 1) {
+    const frame = frames[index];
+    frameIndexes.set(frame.frameIndex, index);
+  }
+
+  for (const patchFrame of patchFrames) {
+    const index = frameIndexes.get(patchFrame.frameIndex);
+    if (index === undefined) {
+      frameIndexes.set(patchFrame.frameIndex, frames.length);
+      frames.push(patchFrame);
+      continue;
+    }
+    frames[index] = patchFrame;
+  }
+
+  return frames.sort((a, b) => a.frameIndex - b.frameIndex);
+};
+
+const applyAssessmentPatch = (
+  state: EngineState,
+  patch: SpectrogramAssessmentPatch,
+) => {
+  state.vocalAssessment.revision = patch.revision;
+  state.vocalAssessment.score = patch.score;
+  state.vocalAssessment.frames = patch.reset
+    ? patch.frames
+    : upsertAssessmentFrames(state.vocalAssessment.frames, patch.frames);
+};
 
 export type EngineSpectrogram = {
   port: ReturnType<typeof spectrogramChannel.outbound<Worker>>;
@@ -49,6 +89,11 @@ export const createEngineSpectrogram = (
     setState: (message) => {
       store.update((state) => {
         state.statuses.spectrogram = message.status;
+      });
+    },
+    patchAssessment: (message) => {
+      store.update((state) => {
+        applyAssessmentPatch(state, message.patch);
       });
     },
   });

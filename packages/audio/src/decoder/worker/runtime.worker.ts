@@ -79,17 +79,22 @@ export const createDecoderRuntime = (options: CreateDecoderRuntimeOptions) => {
         instrumental.frameCount,
         recording.frameCount,
       );
+      const recordingChannels = fitChannelsToFrameCount(
+        recording.channels,
+        frameCount,
+      );
       playerPort.methods.mount({
         frameCount,
         tracks: {
           lead: lead.channels,
           backing: backing.channels,
           instrumental: instrumental.channels,
-          recording: fitChannelsToFrameCount(recording.channels, frameCount),
+          recording: recordingChannels,
         },
       });
       spectrogramPort.methods.mount({
         samples: lead.channels[0],
+        recordingSamples: recordingChannels[0],
       });
       return {
         frameCount,
