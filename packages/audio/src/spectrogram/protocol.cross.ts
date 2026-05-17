@@ -1,5 +1,6 @@
 import { createMessageChannel } from '@musetric/resource-utils/cross/messageChannel';
 import { type EmptyPortMethods } from '@musetric/resource-utils/cross/messagePort';
+import type { SpectrogramAssessmentPatch } from './assessment/report.cross.js';
 import type { SpectrogramConfig } from './config.cross.js';
 
 export type SpectrogramOutboundMethods = {
@@ -16,6 +17,7 @@ export type SpectrogramOutboundMethods = {
 export type SpectrogramInboundMethods = {
   booted: () => void;
   setState: (message: { status: 'pending' | 'error' | 'success' }) => void;
+  patchAssessment: (message: { patch: SpectrogramAssessmentPatch }) => void;
 };
 
 export const spectrogramChannel = createMessageChannel<
@@ -23,7 +25,7 @@ export const spectrogramChannel = createMessageChannel<
   SpectrogramOutboundMethods
 >({
   inbound: {
-    keys: ['booted', 'setState'],
+    keys: ['booted', 'setState', 'patchAssessment'],
   },
   outbound: {
     keys: ['boot', 'mount', 'unmount', 'setTrackProgress', 'updateConfig'],
@@ -36,7 +38,14 @@ export const spectrogramChannel = createMessageChannel<
 });
 
 export type SpectrogramDataMethods = {
-  mount: (message: { samples: Float32Array<SharedArrayBuffer> }) => void;
+  mount: (message: {
+    samples: Float32Array<SharedArrayBuffer>;
+    recordingSamples?: Float32Array<SharedArrayBuffer>;
+  }) => void;
+  patchRecording: (message: {
+    frameIndex: number;
+    samples: Float32Array<ArrayBuffer>;
+  }) => void;
   unmount: () => void;
 };
 
@@ -48,6 +57,6 @@ export const spectrogramDataChannel = createMessageChannel<
     keys: [],
   },
   outbound: {
-    keys: ['mount', 'unmount'],
+    keys: ['mount', 'patchRecording', 'unmount'],
   },
 });

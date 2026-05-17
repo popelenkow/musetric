@@ -1,4 +1,9 @@
-import { type StemType, type ViewColors } from '@musetric/audio';
+import {
+  type SpectrogramAssessmentFrame,
+  type SpectrogramAssessmentScore,
+  type StemType,
+  type ViewColors,
+} from '@musetric/audio';
 
 export type PortStatus = 'pending' | 'success' | 'error';
 
@@ -32,6 +37,11 @@ export type EngineState = {
   recordingGain: number;
   trackVolumes: Record<StemType, number> & {
     recording: number;
+  };
+  vocalAssessment: {
+    revision: number;
+    frames: SpectrogramAssessmentFrame[];
+    score: SpectrogramAssessmentScore;
   };
 };
 

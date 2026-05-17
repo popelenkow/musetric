@@ -1,3 +1,4 @@
+import { emptySpectrogramAssessmentScore } from '@musetric/audio';
 import { defaultSampleRate } from '@musetric/resource-utils';
 import { createStore, type Store } from '../common/store.js';
 import { createEngineDecoder, type EngineDecoder } from './decoder.js';
@@ -47,6 +48,11 @@ const initialState: EngineState = {
     backing: 1,
     instrumental: 1,
     recording: 1,
+  },
+  vocalAssessment: {
+    revision: 0,
+    frames: [],
+    score: emptySpectrogramAssessmentScore,
   },
 };
 

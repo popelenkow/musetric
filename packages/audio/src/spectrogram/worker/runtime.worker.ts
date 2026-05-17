@@ -1,3 +1,4 @@
+import { createVocalAssessmentProcessor } from '../assessment/processor.js';
 import { getGpuDevice } from '../common/gpuDevice.js';
 import { createSpectrogramProcessor } from '../processor.js';
 import {
@@ -31,7 +32,28 @@ export const createSpectrogramRuntime = async (
 
   let processor = createProcessor();
   let samples: Float32Array<SharedArrayBuffer> | undefined = undefined;
+  let recordingSamples: Float32Array<SharedArrayBuffer> | undefined = undefined;
   let trackProgress = 0;
+  let sampleRate = 0;
+  const assessment = createVocalAssessmentProcessor({
+    onPatch: (patch) => {
+      port.methods.patchAssessment({
+        patch,
+      });
+    },
+  });
+
+  const mountAssessment = () => {
+    if (!samples || sampleRate <= 0) {
+      return;
+    }
+
+    assessment.mount({
+      leadSamples: samples,
+      recordingSamples,
+      sampleRate,
+    });
+  };
 
   const render = async () => {
     if (!samples) {
@@ -50,10 +72,17 @@ export const createSpectrogramRuntime = async (
   dataPort.bindHandlers({
     mount: async (message) => {
       samples = message.samples;
+      recordingSamples = message.recordingSamples;
+      mountAssessment();
       await render();
+    },
+    patchRecording: (message) => {
+      assessment.patchRecording(message);
     },
     unmount: () => {
       samples = undefined;
+      recordingSamples = undefined;
+      assessment.reset();
       port.methods.setState({
         status: 'pending',
       });
@@ -64,6 +93,10 @@ export const createSpectrogramRuntime = async (
     mount: async (message) => {
       try {
         trackProgress = message.trackProgress;
+        if (message.config.sampleRate !== undefined) {
+          sampleRate = message.config.sampleRate;
+          mountAssessment();
+        }
         processor = createProcessor();
         processor.updateConfig(message.config);
         await render();
@@ -78,6 +111,8 @@ export const createSpectrogramRuntime = async (
       processor.dispose();
       processor = createProcessor();
       trackProgress = 0;
+      sampleRate = 0;
+      assessment.reset();
       port.methods.setState({
         status: 'pending',
       });
@@ -87,6 +122,10 @@ export const createSpectrogramRuntime = async (
       void render();
     },
     updateConfig: (message) => {
+      if (message.patch.sampleRate !== undefined) {
+        sampleRate = message.patch.sampleRate;
+        mountAssessment();
+      }
       processor.updateConfig(message.patch);
       void render();
     },

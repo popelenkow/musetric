@@ -1,3 +1,4 @@
+export * from './assessment/index.js';
 export * from './common/complexArray.js';
 export * from './common/extConfig.js';
 export * from './common/frequencyRange.js';
